@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 2 — Filter Film per Tahun | Visualisasi Data Film</title>
+    <meta name="description" content="Filter interaktif film berdasarkan rentang tahun, genre, dan skor IMDb — 6.820 film dari 1986 hingga 2016.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* ══════════════════════════════════════════
+           PAGE SHELL
+        ══════════════════════════════════════════ */
+        body { background: var(--bg-base); }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,13,18,.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-inner {
+            max-width: 1320px; margin: 0 auto; padding: 0 28px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .topbar-brand {
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .brand-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
+        .brand-sub {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
+            background: var(--accent-dim); border: 1px solid var(--accent-glow);
+            padding: 2px 7px; border-radius: 4px;
+        }
+        .topbar-case {
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            letter-spacing: .04em; display: flex; align-items: center; gap: 6px;
+        }
+        .topbar-case span { color: var(--text-secondary); }
+
+        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
+
+        /* ── Back button ── */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--text-muted); text-decoration: none;
+            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-elevated); transition: color .2s, border-color .2s;
+            margin-bottom: 28px;
+        }
+        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .back-btn svg { width: 14px; height: 14px; }
+
+        /* ── Case header ── */
+        .case-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #34d399; background: rgba(52,211,153,.1);
+            border: 1px solid rgba(52,211,153,.2); padding: 4px 10px; border-radius: 100px;
+            margin-bottom: 14px;
+        }
+        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #34d399; }
+
+        h1.case-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        h1.case-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, #34d399 0%, #60a5fa 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .case-desc {
+            font-size: .975rem; color: var(--text-secondary);
+            max-width: 700px; line-height: 1.65; margin-bottom: 32px;
+        }
+
+        /* ══════════════════════════════════════════
+           STATS CARDS
+        ══════════════════════════════════════════ */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px; margin-bottom: 24px;
+        }
+        .stat-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 18px 20px;
+            position: relative; overflow: hidden;
+            transition: border-color .2s;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        }
+        .stat-card.sc-total::before  { background: var(--accent); }
+        .stat-card.sc-score::before  { background: #f59e0b; }
+        .stat-card.sc-gross::before  { background: #34d399; }
+        .stat-card.sc-top::before    { background: #a78bfa; }
+
+        .stat-lbl {
+            font-size: 10px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+        }
+        .stat-val {
+            font-size: 1.55rem; font-weight: 800; letter-spacing: -.02em;
+            color: var(--text-primary); line-height: 1; margin-bottom: 3px;
+        }
+        .stat-sub { font-size: 11px; color: var(--text-muted); }
+
+        /* ══════════════════════════════════════════
+           FILTER PANEL
+        ══════════════════════════════════════════ */
+        .filter-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+        .filter-card-title {
+            font-size: 11px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .filter-card-title::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 20px; align-items: end;
+        }
+
+        .fgroup { display: flex; flex-direction: column; gap: 7px; }
+        .flabel {
+            font-size: 11px; font-weight: 600; letter-spacing: .07em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+
+        /* Search input */
+        .search-wrap { position: relative; }
+        .search-wrap svg {
+            position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+            width: 15px; height: 15px; color: var(--text-muted); pointer-events: none;
+        }
+        .search-input {
+            width: 100%; padding: 9px 12px 9px 34px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-family: var(--font); font-size: 13px; outline: none;
+            transition: border-color .2s;
+        }
+        .search-input::placeholder { color: var(--text-muted); }
+        .search-input:focus { border-color: var(--accent); }
+
+        /* Select & number input */
+        .f-select, .f-input {
+            width: 100%; padding: 9px 12px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-family: var(--font); font-size: 13px; outline: none;
+            transition: border-color .2s; cursor: pointer;
+            -webkit-appearance: none; appearance: none;
+        }
+        .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
+        .f-select:focus, .f-input:focus { border-color: var(--accent); }
+
+        /* ── Dual range slider ── */
+        .year-slider-wrap { display: flex; flex-direction: column; gap: 7px; }
+        .year-range-display {
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .year-badge {
+            font-size: 13px; font-weight: 700; color: var(--text-primary);
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            padding: 4px 10px; border-radius: 5px; letter-spacing: .03em;
+        }
+        .year-sep { font-size: 11px; color: var(--text-muted); }
+
+        .dual-range {
+            position: relative; height: 28px; display: flex; align-items: center;
+        }
+        .dual-range input[type="range"] {
+            position: absolute; width: 100%; height: 0; pointer-events: none;
+            -webkit-appearance: none; appearance: none;
+            background: transparent; outline: none;
+        }
+        .dual-range input[type="range"]::-webkit-slider-thumb {
+            pointer-events: all; -webkit-appearance: none;
+            width: 18px; height: 18px; border-radius: 50%;
+            background: var(--accent); border: 2px solid var(--bg-card);
+            cursor: grab; box-shadow: 0 0 0 3px var(--accent-dim);
+            transition: box-shadow .15s;
+        }
+        .dual-range input[type="range"]::-webkit-slider-thumb:active { cursor: grabbing; box-shadow: 0 0 0 5px var(--accent-dim); }
+        .dual-range input[type="range"]::-moz-range-thumb {
+            pointer-events: all; width: 18px; height: 18px; border-radius: 50%;
+            background: var(--accent); border: 2px solid var(--bg-card);
+            cursor: grab; box-shadow: 0 0 0 3px var(--accent-dim);
+        }
+        .range-track-bg {
+            position: absolute; left: 0; right: 0; height: 4px;
+            background: var(--bg-elevated); border-radius: 2px; pointer-events: none;
+        }
+        .range-track-fill {
+            position: absolute; height: 4px;
+            background: linear-gradient(90deg, var(--accent), #f5a623);
+            border-radius: 2px; pointer-events: none;
+        }
+
+        /* Reset filters */
+        .btn-reset {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 600; color: var(--text-secondary);
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            padding: 9px 16px; border-radius: var(--radius-sm);
+            cursor: pointer; transition: color .2s, border-color .2s;
+            font-family: var(--font); white-space: nowrap;
+        }
+        .btn-reset:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .btn-reset svg { width: 13px; height: 13px; }
+
+        /* ══════════════════════════════════════════
+           TABLE
+        ══════════════════════════════════════════ */
+        .table-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); overflow: hidden;
+            position: relative;
+        }
+
+        /* Table toolbar */
+        .table-toolbar {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            flex-wrap: wrap; gap: 10px;
+        }
+        .table-count {
+            font-size: 13px; font-weight: 600; color: var(--text-primary);
+        }
+        .table-count span { color: var(--accent); }
+        .table-hint { font-size: 11px; color: var(--text-muted); }
+
+        /* Pagination controls */
+        .pagination {
+            display: flex; align-items: center; gap: 6px;
+        }
+        .page-btn {
+            display: flex; align-items: center; justify-content: center;
+            width: 30px; height: 30px; border-radius: 6px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            color: var(--text-secondary); cursor: pointer;
+            font-family: var(--font); font-size: 12px; font-weight: 600;
+            transition: color .2s, border-color .2s, background .2s;
+        }
+        .page-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .page-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
+        .page-btn:disabled { opacity: .3; cursor: not-allowed; }
+        .page-info { font-size: 12px; color: var(--text-muted); padding: 0 6px; }
+
+        /* Table itself */
+        .table-scroll { overflow-x: auto; }
+        table {
+            width: 100%; border-collapse: collapse; min-width: 760px;
+        }
+        thead { position: sticky; top: 0; z-index: 2; }
+        th {
+            padding: 12px 16px; text-align: left;
+            font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+            color: var(--text-muted); background: var(--bg-elevated);
+            border-bottom: 1px solid var(--border);
+            cursor: pointer; user-select: none; white-space: nowrap;
+            transition: color .2s;
+        }
+        th:hover { color: var(--text-primary); }
+        th.sorted-asc::after  { content: ' ↑'; color: var(--accent); }
+        th.sorted-desc::after { content: ' ↓'; color: var(--accent); }
+        th.sorted-asc, th.sorted-desc { color: var(--text-primary); }
+
+        td {
+            padding: 13px 16px; font-size: 13px; color: var(--text-secondary);
+            border-bottom: 1px solid var(--border); vertical-align: middle;
+        }
+        tr:last-child td { border-bottom: none; }
+
+        tbody tr {
+            transition: background .15s;
+            cursor: default;
+        }
+        tbody tr:hover td { background: rgba(255,255,255,.03); color: var(--text-primary); }
+
+        /* Cell specifics */
+        .cell-title { font-weight: 600; color: var(--text-primary); max-width: 260px; }
+        .cell-title-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+        .cell-year { font-weight: 600; color: var(--text-secondary); }
+        .cell-genre .genre-pill {
+            font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
+            padding: 3px 8px; border-radius: 4px; white-space: nowrap;
+        }
+        .cell-votes { color: var(--text-muted); font-size: 12px; }
+
+        /* Score badge */
+        .score-badge {
+            display: inline-flex; align-items: center; gap: 4px;
+            font-size: 13px; font-weight: 700; padding: 3px 10px;
+            border-radius: 6px; white-space: nowrap;
+        }
+        .score-high { background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.2); }
+        .score-mid  { background: rgba(245,158,11,.12); color: #f59e0b; border: 1px solid rgba(245,158,11,.2); }
+        .score-low  { background: rgba(251,113,133,.12); color: #fb7185; border: 1px solid rgba(251,113,133,.2); }
+
+        /* Gross cell */
+        .cell-gross { font-weight: 600; }
+        .gross-value { color: #34d399; }
+        .gross-na { color: var(--text-muted); font-size: 12px; }
+
+        /* Empty state */
+        .empty-state {
+            padding: 60px 20px; text-align: center;
+        }
+        .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .empty-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+        .empty-sub { font-size: 13px; color: var(--text-muted); }
+
+        /* Loading */
+        .loading-overlay {
+            position: absolute; inset: 0; background: rgba(13,13,18,.7);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-lg); z-index: 10;
+            backdrop-filter: blur(4px);
+        }
+        .loading-spinner {
+            width: 32px; height: 32px; border: 3px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .filters-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .page-wrap { padding: 20px 16px 60px; }
+            .filters-grid { grid-template-columns: 1fr; }
+            .filter-card { padding: 18px 16px; }
+            .table-toolbar { flex-direction: column; align-items: flex-start; }
+        }
+
+        /* Genre pill colors (matches case1 palette) */
+        .g-Comedy    { background: rgba(224,92,58,.12);   color: #e05c3a;  border: 1px solid rgba(224,92,58,.2); }
+        .g-Action    { background: rgba(45,212,191,.12);  color: #2dd4bf;  border: 1px solid rgba(45,212,191,.2); }
+        .g-Drama     { background: rgba(167,139,250,.12); color: #a78bfa;  border: 1px solid rgba(167,139,250,.2); }
+        .g-Crime     { background: rgba(245,158,11,.12);  color: #f59e0b;  border: 1px solid rgba(245,158,11,.2); }
+        .g-Biography { background: rgba(96,165,250,.12);  color: #60a5fa;  border: 1px solid rgba(96,165,250,.2); }
+        .g-Adventure { background: rgba(52,211,153,.12);  color: #34d399;  border: 1px solid rgba(52,211,153,.2); }
+        .g-Animation { background: rgba(249,115,22,.12);  color: #f97316;  border: 1px solid rgba(249,115,22,.2); }
+        .g-Horror    { background: rgba(251,113,133,.12); color: #fb7185;  border: 1px solid rgba(251,113,133,.2); }
+        .g-default   { background: rgba(148,148,168,.1);  color: #9494a8;  border: 1px solid rgba(148,148,168,.15); }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="topbar-brand">
+            <span class="brand-dot"></span>
+            <span class="brand-text">VISDAT</span>
+            <span class="brand-sub">KLP 10</span>
+        </a>
+        <div class="topbar-case">
+            Case <span>02</span> · Filter Film per Tahun
+        </div>
+    </div>
+</div>
+
+<div class="page-wrap">
+
+    <!-- Back -->
+    <a href="../index.html" class="back-btn">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
+        </svg>
+        Kembali ke Dashboard
+    </a>
+
+    <!-- Case header -->
+    <div class="case-badge">
+        <span class="case-badge-dot"></span>
+        Case 02 · Filter &amp; Table
+    </div>
+    <h1 class="case-title">Film <em>Explorer</em></h1>
+    <p class="case-desc">
+        Filter dan telusuri <strong style="color:var(--text-primary)">6.820 film</strong> berdasarkan rentang tahun, genre, dan skor IMDb.
+        Temukan film apa saja yang dirilis pada periode tertentu, seberapa tinggi skornya,
+        dan seberapa besar pendapatan (gross) yang dihasilkan. Klik header kolom untuk mengurutkan data.
+    </p>
+
+    <!-- Stats cards -->
+    <div class="stats-row">
+        <div class="stat-card sc-total">
+            <div class="stat-lbl">Film Ditampilkan</div>
+            <div class="stat-val" id="stat-count">—</div>
+            <div class="stat-sub" id="stat-count-sub">dari total dataset</div>
+        </div>
+        <div class="stat-card sc-score">
+            <div class="stat-lbl">Rata-rata Skor</div>
+            <div class="stat-val" id="stat-avg-score">—</div>
+            <div class="stat-sub">IMDb Rating</div>
+        </div>
+        <div class="stat-card sc-gross">
+            <div class="stat-lbl">Gross Tertinggi</div>
+            <div class="stat-val" id="stat-max-gross">—</div>
+            <div class="stat-sub" id="stat-max-gross-name">dalam filter ini</div>
+        </div>
+        <div class="stat-card sc-top">
+            <div class="stat-lbl">Skor Tertinggi</div>
+            <div class="stat-val" id="stat-max-score">—</div>
+            <div class="stat-sub" id="stat-max-score-name">dalam filter ini</div>
+        </div>
+    </div>
+
+    <!-- Filter panel -->
+    <div class="filter-card">
+        <div class="filter-card-title">Filter &amp; Pencarian</div>
+        <div class="filters-grid">
+
+            <!-- Search -->
+            <div class="fgroup">
+                <label class="flabel">Cari Film</label>
+                <div class="search-wrap">
+                    <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="9" cy="9" r="6"/><path d="M15 15l-3-3"/>
+                    </svg>
+                    <input type="text" class="search-input" id="search-input" placeholder="Nama film…">
+                </div>
+            </div>
+
+            <!-- Genre -->
+            <div class="fgroup">
+                <label class="flabel">Genre</label>
+                <select class="f-select" id="genre-select">
+                    <option value="">Semua Genre</option>
+                </select>
+            </div>
+
+            <!-- Min score -->
+            <div class="fgroup">
+                <label class="flabel">Skor Minimum (IMDb)</label>
+                <input type="number" class="f-input" id="min-score"
+                    min="0" max="10" step="0.1" placeholder="0.0 – 10.0">
+            </div>
+
+            <!-- Reset -->
+            <div class="fgroup">
+                <label class="flabel" style="visibility:hidden">reset</label>
+                <button class="btn-reset" id="btn-reset">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                        <path d="M3 8a5 5 0 105 5"/><path d="M3 5V8H6"/>
+                    </svg>
+                    Reset Semua Filter
+                </button>
+            </div>
+
+            <!-- Year slider — full width -->
+            <div class="fgroup" style="grid-column: 1 / -1;">
+                <label class="flabel">Rentang Tahun</label>
+                <div class="year-slider-wrap">
+                    <div class="year-range-display">
+                        <span class="year-badge" id="year-from-badge">1986</span>
+                        <span class="year-sep">hingga</span>
+                        <span class="year-badge" id="year-to-badge">2016</span>
+                    </div>
+                    <div class="dual-range" id="dual-range">
+                        <div class="range-track-bg"></div>
+                        <div class="range-track-fill" id="range-fill"></div>
+                        <input type="range" id="range-min" min="1986" max="2016" value="1986" step="1">
+                        <input type="range" id="range-max" min="1986" max="2016" value="2016" step="1">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Table card -->
+    <div class="table-card" id="table-card">
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner"></div>
+        </div>
+
+        <div class="table-toolbar">
+            <div>
+                <div class="table-count">Menampilkan <span id="showing-count">—</span> film</div>
+                <div class="table-hint">Klik header kolom untuk mengurutkan · Klik baris untuk detail</div>
+            </div>
+            <div class="pagination" id="pagination"></div>
+        </div>
+
+        <div class="table-scroll">
+            <table id="films-table">
+                <thead>
+                    <tr>
+                        <th data-col="name"   class="sorted-asc" style="min-width:220px">Judul Film</th>
+                        <th data-col="genre"  style="min-width:100px">Genre</th>
+                        <th data-col="year"   style="min-width:80px">Tahun</th>
+                        <th data-col="score"  style="min-width:100px">Skor IMDb</th>
+                        <th data-col="gross"  style="min-width:130px">Gross Revenue</th>
+                        <th data-col="votes"  style="min-width:110px">Votes</th>
+                    </tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+    </div>
+
+</div>
+
+<script src="../js/d3.v7.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════
+const PAGE_SIZE = 25;
+
+// Genre → CSS class map
+const GENRE_CLASS = {
+    Comedy: 'g-Comedy', Action: 'g-Action', Drama: 'g-Drama',
+    Crime: 'g-Crime', Biography: 'g-Biography', Adventure: 'g-Adventure',
+    Animation: 'g-Animation', Horror: 'g-Horror',
+};
+
+// ═══════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════
+let allData = [];       // raw cleaned rows
+let filtered = [];      // after filters
+let sortCol  = 'name';
+let sortDir  = 'asc';   // 'asc' | 'desc'
+let currentPage = 1;
+
+let filterState = {
+    yearMin: 1986,
+    yearMax: 2016,
+    genre: '',
+    minScore: 0,
+    search: '',
+};
+
+// ═══════════════════════════════════════════════════════════
+// FORMATTERS
+// ═══════════════════════════════════════════════════════════
+function fmtGross(v) {
+    if (!v || isNaN(v) || v <= 0) return null;
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+    return '$' + Math.round(v);
+}
+
+function fmtVotes(v) {
+    if (!v || isNaN(v)) return '—';
+    if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
+    return v.toString();
+}
+
+function scoreClass(s) {
+    if (s >= 7.5) return 'score-high';
+    if (s >= 5.5) return 'score-mid';
+    return 'score-low';
+}
+
+// ═══════════════════════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════════════════════
+d3.csv('../data/movies.csv').then(raw => {
+    allData = raw.map(d => ({
+        name:  d.name  || '',
+        genre: d.genre || '',
+        year:  +d.year || 0,
+        score: parseFloat(d.score) || 0,
+        gross: parseFloat(d.gross) || 0,
+        budget:parseFloat(d.budget)|| 0,
+        votes: parseFloat(d.votes) || 0,
+    })).filter(d => d.year >= 1980 && d.name);
+
+    // Populate genre dropdown
+    const genres = [...new Set(allData.map(d => d.genre))].filter(Boolean).sort();
+    const sel = document.getElementById('genre-select');
+    genres.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g; opt.textContent = g;
+        sel.appendChild(opt);
+    });
+
+    document.getElementById('loading-overlay').style.display = 'none';
+    applyFilters();
+}).catch(err => {
+    document.getElementById('loading-overlay').innerHTML =
+        `<div style="text-align:center;color:var(--accent)">
+            <strong>Gagal memuat data</strong><br>
+            <small style="color:var(--text-muted)">${err.message}</small>
+        </div>`;
+});
+
+// ═══════════════════════════════════════════════════════════
+// DUAL RANGE SLIDER
+// ═══════════════════════════════════════════════════════════
+const rangeMin = document.getElementById('range-min');
+const rangeMax = document.getElementById('range-max');
+const rangeFill = document.getElementById('range-fill');
+const yearFromBadge = document.getElementById('year-from-badge');
+const yearToBadge   = document.getElementById('year-to-badge');
+
+function updateTrack() {
+    const min = +rangeMin.min, max = +rangeMin.max;
+    const lo  = +rangeMin.value, hi = +rangeMax.value;
+    const leftPct  = (lo - min) / (max - min) * 100;
+    const rightPct = (hi - min) / (max - min) * 100;
+    rangeFill.style.left  = leftPct  + '%';
+    rangeFill.style.width = (rightPct - leftPct) + '%';
+    yearFromBadge.textContent = lo;
+    yearToBadge.textContent   = hi;
+}
+
+rangeMin.addEventListener('input', () => {
+    if (+rangeMin.value > +rangeMax.value - 1) rangeMin.value = +rangeMax.value - 1;
+    filterState.yearMin = +rangeMin.value;
+    updateTrack();
+    debounce(applyFilters, 120)();
+});
+
+rangeMax.addEventListener('input', () => {
+    if (+rangeMax.value < +rangeMin.value + 1) rangeMax.value = +rangeMin.value + 1;
+    filterState.yearMax = +rangeMax.value;
+    updateTrack();
+    debounce(applyFilters, 120)();
+});
+
+updateTrack();
+
+// ═══════════════════════════════════════════════════════════
+// OTHER FILTERS
+// ═══════════════════════════════════════════════════════════
+const searchInput = document.getElementById('search-input');
+const genreSelect = document.getElementById('genre-select');
+const minScoreInput = document.getElementById('min-score');
+
+searchInput.addEventListener('input', () => {
+    filterState.search = searchInput.value.trim().toLowerCase();
+    currentPage = 1;
+    debounce(applyFilters, 180)();
+});
+
+genreSelect.addEventListener('change', () => {
+    filterState.genre = genreSelect.value;
+    currentPage = 1;
+    applyFilters();
+});
+
+minScoreInput.addEventListener('input', () => {
+    filterState.minScore = parseFloat(minScoreInput.value) || 0;
+    currentPage = 1;
+    debounce(applyFilters, 180)();
+});
+
+document.getElementById('btn-reset').addEventListener('click', () => {
+    filterState = { yearMin: 1986, yearMax: 2016, genre: '', minScore: 0, search: '' };
+    rangeMin.value = 1986; rangeMax.value = 2016; updateTrack();
+    searchInput.value = ''; genreSelect.value = ''; minScoreInput.value = '';
+    sortCol = 'name'; sortDir = 'asc';
+    currentPage = 1;
+    applyFilters();
+});
+
+// ═══════════════════════════════════════════════════════════
+// SORT (header click)
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('th[data-col]').forEach(th => {
+    th.addEventListener('click', () => {
+        const col = th.dataset.col;
+        if (sortCol === col) {
+            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
+        } else {
+            sortCol = col;
+            sortDir = col === 'name' || col === 'genre' ? 'asc' : 'desc';
+        }
+        currentPage = 1;
+        renderTable();
+        updateSortHeaders();
+    });
+});
+
+function updateSortHeaders() {
+    document.querySelectorAll('th[data-col]').forEach(th => {
+        th.classList.remove('sorted-asc', 'sorted-desc');
+        if (th.dataset.col === sortCol) {
+            th.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILTER + RENDER
+// ═══════════════════════════════════════════════════════════
+function applyFilters() {
+    const { yearMin, yearMax, genre, minScore, search } = filterState;
+
+    filtered = allData.filter(d => {
+        if (d.year < yearMin || d.year > yearMax) return false;
+        if (genre && d.genre !== genre) return false;
+        if (minScore > 0 && d.score < minScore) return false;
+        if (search && !d.name.toLowerCase().includes(search)) return false;
+        return true;
+    });
+
+    currentPage = 1;
+    updateStats();
+    renderTable();
+}
+
+function updateStats() {
+    const total = filtered.length;
+    document.getElementById('stat-count').textContent = total.toLocaleString('id-ID');
+    document.getElementById('stat-count-sub').textContent =
+        `dari ${allData.length.toLocaleString('id-ID')} total film`;
+
+    if (total === 0) {
+        document.getElementById('stat-avg-score').textContent    = '—';
+        document.getElementById('stat-max-gross').textContent    = '—';
+        document.getElementById('stat-max-score').textContent    = '—';
+        document.getElementById('stat-max-gross-name').textContent = 'tidak ada data';
+        document.getElementById('stat-max-score-name').textContent = 'tidak ada data';
+        return;
+    }
+
+    const withScore = filtered.filter(d => d.score > 0);
+    const avgScore  = withScore.length
+        ? (d3.mean(withScore, d => d.score)).toFixed(2)
+        : '—';
+    document.getElementById('stat-avg-score').textContent = avgScore;
+
+    const withGross = filtered.filter(d => d.gross > 0);
+    if (withGross.length) {
+        const topGross = d3.greatest(withGross, d => d.gross);
+        document.getElementById('stat-max-gross').textContent = fmtGross(topGross.gross) || '—';
+        document.getElementById('stat-max-gross-name').textContent = truncate(topGross.name, 24);
+    } else {
+        document.getElementById('stat-max-gross').textContent = '—';
+        document.getElementById('stat-max-gross-name').textContent = 'tidak ada data';
+    }
+
+    const topScore = d3.greatest(withScore, d => d.score);
+    if (topScore) {
+        document.getElementById('stat-max-score').textContent = topScore.score.toFixed(1);
+        document.getElementById('stat-max-score-name').textContent = truncate(topScore.name, 24);
+    } else {
+        document.getElementById('stat-max-score').textContent = '—';
+        document.getElementById('stat-max-score-name').textContent = '—';
+    }
+}
+
+function renderTable() {
+    // Sort
+    const sorted = [...filtered].sort((a, b) => {
+        let va = a[sortCol], vb = b[sortCol];
+        if (typeof va === 'string') va = va.toLowerCase();
+        if (typeof vb === 'string') vb = vb.toLowerCase();
+        if (va < vb) return sortDir === 'asc' ? -1 : 1;
+        if (va > vb) return sortDir === 'asc' ? 1 : -1;
+        return 0;
+    });
+
+    // Paginate
+    const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
+    if (currentPage > totalPages) currentPage = totalPages;
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageRows = sorted.slice(start, start + PAGE_SIZE);
+
+    // Update showing count
+    const end = Math.min(start + PAGE_SIZE, sorted.length);
+    document.getElementById('showing-count').textContent =
+        sorted.length === 0 ? '0' :
+        `${(start + 1).toLocaleString('id-ID')}–${end.toLocaleString('id-ID')} dari ${sorted.length.toLocaleString('id-ID')}`;
+
+    // Render rows
+    const tbody = document.getElementById('table-body');
+
+    if (sorted.length === 0) {
+        tbody.innerHTML = `
+            <tr><td colspan="6">
+                <div class="empty-state">
+                    <div class="empty-icon">🎬</div>
+                    <div class="empty-title">Tidak ada film yang cocok</div>
+                    <div class="empty-sub">Coba ubah filter atau perlebar rentang tahun</div>
+                </div>
+            </td></tr>`;
+        renderPagination(0, totalPages);
+        return;
+    }
+
+    tbody.innerHTML = pageRows.map(d => {
+        const scoreC = d.score > 0 ? `<span class="score-badge ${scoreClass(d.score)}">★ ${d.score.toFixed(1)}</span>` : '<span style="color:var(--text-muted);font-size:12px">—</span>';
+        const grossStr = fmtGross(d.gross);
+        const grossCell = grossStr
+            ? `<span class="gross-value">${grossStr}</span>`
+            : `<span class="gross-na">N/A</span>`;
+        const gClass = GENRE_CLASS[d.genre] || 'g-default';
+        const votesFmt = fmtVotes(d.votes);
+
+        return `<tr>
+            <td class="cell-title"><span class="cell-title-name" title="${escHtml(d.name)}">${escHtml(d.name)}</span></td>
+            <td class="cell-genre"><span class="genre-pill ${gClass}">${escHtml(d.genre)}</span></td>
+            <td class="cell-year">${d.year}</td>
+            <td>${scoreC}</td>
+            <td class="cell-gross">${grossCell}</td>
+            <td class="cell-votes">${votesFmt}</td>
+        </tr>`;
+    }).join('');
+
+    renderPagination(currentPage, totalPages);
+}
+
+// ═══════════════════════════════════════════════════════════
+// PAGINATION
+// ═══════════════════════════════════════════════════════════
+function renderPagination(page, total) {
+    const wrap = document.getElementById('pagination');
+    if (total <= 1) { wrap.innerHTML = ''; return; }
+
+    const pages = [];
+    // Always show first, last, current ±1
+    const show = new Set([1, total, page, page - 1, page + 1].filter(p => p >= 1 && p <= total));
+    const sorted = [...show].sort((a, b) => a - b);
+
+    let html = `<button class="page-btn" id="pg-prev" ${page === 1 ? 'disabled' : ''} title="Sebelumnya">‹</button>`;
+
+    let prev = 0;
+    sorted.forEach(p => {
+        if (p - prev > 1) html += `<span class="page-info">…</span>`;
+        html += `<button class="page-btn ${p === page ? 'active' : ''}" data-pg="${p}">${p}</button>`;
+        prev = p;
+    });
+
+    html += `<button class="page-btn" id="pg-next" ${page === total ? 'disabled' : ''} title="Berikutnya">›</button>`;
+
+    wrap.innerHTML = html;
+
+    wrap.querySelector('#pg-prev')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
+    wrap.querySelector('#pg-next')?.addEventListener('click', () => { if (currentPage < total) { currentPage++; renderTable(); } });
+    wrap.querySelectorAll('[data-pg]').forEach(btn => {
+        btn.addEventListener('click', () => { currentPage = +btn.dataset.pg; renderTable(); });
+    });
+}
+
+// ═══════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════
+function debounce(fn, ms) {
+    let t;
+    return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
+}
+
+function truncate(str, n) {
+    return str.length > n ? str.slice(0, n) + '…' : str;
+}
+
+function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+</script>
+</body>
+</html>
