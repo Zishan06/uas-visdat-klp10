@@ -1,0 +1,666 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 4 — Score vs Gross | Visualisasi Data Film</title>
+    <meta name="description" content="Scatter plot korelasi antara skor IMDb (rating) dan pendapatan kotor (gross) film dari 1986 hingga 2016.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body { background: var(--bg-base); }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,13,18,.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-inner {
+            max-width: 1320px; margin: 0 auto; padding: 0 28px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .topbar-brand {
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .brand-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
+        .brand-sub {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
+            background: var(--accent-dim); border: 1px solid var(--accent-glow);
+            padding: 2px 7px; border-radius: 4px;
+        }
+        .topbar-case {
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            letter-spacing: .04em; display: flex; align-items: center; gap: 6px;
+        }
+        .topbar-case span { color: var(--text-secondary); }
+
+        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--text-muted); text-decoration: none;
+            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-elevated); transition: color .2s, border-color .2s;
+            margin-bottom: 28px;
+        }
+        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .back-btn svg { width: 14px; height: 14px; }
+
+        .case-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #f59e0b; background: rgba(245,158,11,.1);
+            border: 1px solid rgba(245,158,11,.2); padding: 4px 10px; border-radius: 100px;
+            margin-bottom: 14px;
+        }
+        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #f59e0b; }
+
+        h1.case-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        h1.case-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, #f59e0b 0%, var(--teal) 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .case-desc {
+            font-size: .975rem; color: var(--text-secondary);
+            max-width: 700px; line-height: 1.65; margin-bottom: 32px;
+        }
+
+        .stats-strip {
+            display: flex; gap: 0; flex-wrap: wrap;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
+            width: fit-content;
+        }
+        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
+            border-right: 1px solid var(--border); }
+        .sstat:last-child { border-right: none; }
+        .sstat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
+        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .08em;
+            text-transform: uppercase; color: var(--text-muted); }
+
+        .filter-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+        .filter-card-title {
+            font-size: 11px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .filter-card-title::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 20px; align-items: end;
+        }
+
+        .fgroup { display: flex; flex-direction: column; gap: 7px; }
+        .flabel {
+            font-size: 11px; font-weight: 600; letter-spacing: .07em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+
+        .f-select, .f-input {
+            width: 100%; padding: 9px 12px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-family: var(--font); font-size: 13px; outline: none;
+            transition: border-color .2s; cursor: pointer;
+        }
+        .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
+        .f-select:focus, .f-input:focus { border-color: var(--accent); }
+
+        .btn-reset {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 600; color: var(--text-secondary);
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            padding: 9px 16px; border-radius: var(--radius-sm);
+            cursor: pointer; transition: color .2s, border-color .2s;
+            font-family: var(--font); white-space: nowrap;
+        }
+        .btn-reset:hover { color: var(--text-primary); border-color: var(--border-hover); }
+
+        .chart-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px;
+            position: relative;
+            overflow-x: auto;
+        }
+        .chart-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, #f59e0b 0%, var(--teal) 60%, transparent 100%);
+            opacity: .5;
+        }
+
+        .axis text { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; }
+        .axis line, .axis path { stroke: rgba(255,255,255,.07); }
+        .axis .domain { display: none; }
+        .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
+
+        .insight-card {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border-left: 3px solid #f59e0b;
+        }
+        .insight-card h4 {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .insight-card p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .insight-card strong {
+            color: var(--text-primary);
+        }
+
+        .legend-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        @media (max-width: 768px) {
+            .page-wrap { padding: 20px 16px 60px; }
+            .filters-grid { grid-template-columns: 1fr 1fr; }
+            .stats-strip { width: 100%; }
+            .sstat { padding: 10px 16px; flex: 1; }
+        }
+        @media (max-width: 550px) {
+            .filters-grid { grid-template-columns: 1fr; }
+        }
+
+        .score-highlight {
+            fill: #f59e0b;
+            stroke: #fff;
+            stroke-width: 1.5;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="topbar-brand">
+            <span class="brand-dot"></span>
+            <span class="brand-text">VISDAT</span>
+            <span class="brand-sub">KLP 10</span>
+        </a>
+        <div class="topbar-case">
+            Case <span>04</span> · Score vs Gross
+        </div>
+    </div>
+</div>
+
+<div class="page-wrap">
+
+    <a href="../index.html" class="back-btn">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
+        </svg>
+        Kembali ke Dashboard
+    </a>
+
+    <div class="case-badge">
+        <span class="case-badge-dot"></span>
+        Case 04 · Scatter Plot
+    </div>
+    <h1 class="case-title">Kualitas <em>vs</em> Komersial</h1>
+    <p class="case-desc">
+        Apakah film dengan rating IMDb tinggi selalu sukses secara finansial? 
+        Visualisasi ini menunjukkan hubungan antara <strong style="color:#f59e0b">skor IMDb</strong> (sumbu X) dan 
+        <strong style="color:var(--teal)">pendapatan kotor (gross)</strong> (sumbu Y). 
+        Setiap titik mewakili satu film dengan warna berdasarkan genre. Hover untuk melihat detail film.
+    </p>
+
+    <div class="stats-strip">
+        <div class="sstat">
+            <span class="sstat-val" id="stat-total">—</span>
+            <span class="sstat-lbl">Film</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-avg-score">—</span>
+            <span class="sstat-lbl">Rata-rata Score</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-top-score">—</span>
+            <span class="sstat-lbl">Score Tertinggi</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-top-gross">—</span>
+            <span class="sstat-lbl">Gross Tertinggi</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-correlation">—</span>
+            <span class="sstat-lbl">Korelasi (r)</span>
+        </div>
+    </div>
+
+    <div class="filter-card">
+        <div class="filter-card-title">Filter Data</div>
+        <div class="filters-grid">
+            <div class="fgroup">
+                <label class="flabel">Genre</label>
+                <select class="f-select" id="genre-select">
+                    <option value="">Semua Genre</option>
+                </select>
+            </div>
+            <div class="fgroup">
+                <label class="flabel">Tahun (min)</label>
+                <input type="number" class="f-input" id="year-min" value="1986" min="1986" max="2016" step="1">
+            </div>
+            <div class="fgroup">
+                <label class="flabel">Tahun (max)</label>
+                <input type="number" class="f-input" id="year-max" value="2016" min="1986" max="2016" step="1">
+            </div>
+            <div class="fgroup">
+                <label class="flabel">Score Min (IMDb)</label>
+                <input type="number" class="f-input" id="score-min" value="0" min="0" max="10" step="0.1">
+            </div>
+            <div class="fgroup">
+                <button class="btn-reset" id="btn-reset">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                        <path d="M3 8a5 5 0 105 5"/><path d="M3 5V8H6"/>
+                    </svg>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-card">
+        <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 500px; flex-direction: column; gap: 16px;">
+            <div style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite;"></div>
+            <span style="color: var(--text-muted);">Memuat data film...</span>
+        </div>
+        <svg id="scatter-chart" width="100%" height="540" style="display: none;"></svg>
+        <div class="legend-wrap" id="legend"></div>
+    </div>
+
+    <div class="insight-card" id="insight-card" style="display: none;">
+        <h4>📈 Analisis Korelasi</h4>
+        <p id="insight-text">Memuat analisis...</p>
+    </div>
+
+</div>
+
+<div id="tooltip" class="tooltip-scatter" style="position: fixed; background: rgba(10,10,16,.97); border: 1px solid var(--border-hover); border-radius: 12px; padding: 12px 16px; pointer-events: none; z-index: 200; font-family: 'Inter', sans-serif; font-size: 12px; color: var(--text-primary); box-shadow: 0 12px 48px rgba(0,0,0,.7); min-width: 220px; opacity: 0; transition: opacity .15s ease;"></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
+const GENRE_COLORS = {
+    'Comedy':    '#e05c3a',
+    'Action':    '#2dd4bf',
+    'Drama':     '#a78bfa',
+    'Crime':     '#f59e0b',
+    'Biography': '#60a5fa',
+    'Adventure': '#34d399',
+    'Animation': '#f97316',
+    'Horror':    '#fb7185',
+    'Thriller':  '#8b5cf6',
+    'Romance':   '#ec4899',
+    'Sci-Fi':    '#06b6d4',
+    'Fantasy':   '#d946ef',
+    'Family':    '#84cc16',
+    'Music':     '#f43f5e',
+    'Mystery':   '#6366f1',
+    'History':   '#14b8a6',
+    'War':       '#ef4444',
+    'Western':   '#b45309',
+};
+
+let allData = [];
+let currentData = [];
+let width, height;
+
+const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
+
+function fmtMoney(v) {
+    if (!v || isNaN(v) || v <= 0) return 'N/A';
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+    return '$' + Math.round(v);
+}
+
+function calculateCorrelation(xArr, yArr) {
+    const n = xArr.length;
+    const sumX = d3.sum(xArr);
+    const sumY = d3.sum(yArr);
+    const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
+    const sumX2 = d3.sum(xArr.map(x => x * x));
+    const sumY2 = d3.sum(yArr.map(y => y * y));
+    const numerator = n * sumXY - sumX * sumY;
+    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+    return denominator === 0 ? 0 : numerator / denominator;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════════════════════════
+d3.csv('../data/movies.csv').then(raw => {
+    allData = raw.map(d => ({
+        name: d.name || '',
+        genre: d.genre || 'Other',
+        year: +d.year || 0,
+        score: parseFloat(d.score) || 0,
+        gross: parseFloat(d.gross) || 0,
+        budget: parseFloat(d.budget) || 0,
+        votes: parseFloat(d.votes) || 0,
+    })).filter(d => d.year >= 1980 && d.name && d.score > 0 && d.gross > 0 && d.genre);
+
+    const genres = [...new Set(allData.map(d => d.genre))].filter(Boolean).sort();
+    const sel = document.getElementById('genre-select');
+    genres.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        sel.appendChild(opt);
+    });
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('scatter-chart').style.display = 'block';
+    document.getElementById('insight-card').style.display = 'block';
+    
+    applyFilters();
+}).catch(err => {
+    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small></div>`;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════════════
+function applyFilters() {
+    const genre = document.getElementById('genre-select').value;
+    const yearMin = parseInt(document.getElementById('year-min').value) || 1986;
+    const yearMax = parseInt(document.getElementById('year-max').value) || 2016;
+    const scoreMin = parseFloat(document.getElementById('score-min').value) || 0;
+
+    currentData = allData.filter(d => {
+        if (genre && d.genre !== genre) return false;
+        if (d.year < yearMin || d.year > yearMax) return false;
+        if (d.score < scoreMin) return false;
+        return true;
+    });
+
+    updateStats();
+    renderChart();
+}
+
+function updateStats() {
+    const total = currentData.length;
+    document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
+    
+    if (total === 0) {
+        document.getElementById('stat-avg-score').textContent = '—';
+        document.getElementById('stat-top-score').textContent = '—';
+        document.getElementById('stat-top-gross').textContent = '—';
+        document.getElementById('stat-correlation').textContent = '—';
+        return;
+    }
+
+    const avgScore = d3.mean(currentData, d => d.score);
+    document.getElementById('stat-avg-score').textContent = avgScore.toFixed(2);
+    
+    const topScore = d3.greatest(currentData, d => d.score);
+    const topGross = d3.greatest(currentData, d => d.gross);
+    document.getElementById('stat-top-score').textContent = topScore ? topScore.score.toFixed(1) : '—';
+    document.getElementById('stat-top-gross').textContent = topGross ? fmtMoney(topGross.gross) : '—';
+
+    const corr = calculateCorrelation(currentData.map(d => d.score), currentData.map(d => d.gross));
+    document.getElementById('stat-correlation').textContent = corr.toFixed(3);
+    
+    const strength = Math.abs(corr);
+    let interpretation = '';
+    if (strength > 0.5) interpretation = 'KUAT';
+    else if (strength > 0.3) interpretation = 'SEDANG';
+    else if (strength > 0.1) interpretation = 'LEMAH';
+    else interpretation = 'SANGAT LEMAH';
+    
+    document.getElementById('insight-text').innerHTML = `
+        Koefisien korelasi <strong style="color:${corr > 0 ? 'var(--teal)' : 'var(--accent)'}">r = ${corr.toFixed(3)}</strong> 
+        (hubungan ${interpretation} dan ${corr > 0 ? 'positif' : 'negatif'}) berdasarkan <strong>${total.toLocaleString('id-ID')}</strong> film.
+        ${corr > 0.2 ? ' Film dengan rating tinggi cenderung menghasilkan pendapatan yang lebih besar.' : 
+          corr < -0.2 ? ' Menariknya, semakin tinggi rating justru cenderung menghasilkan pendapatan lebih rendah.' : 
+          ' Korelasi yang lemah menunjukkan bahwa kualitas (IMDb score) bukanlah penentu utama kesuksesan finansial — faktor lain seperti pemasaran, franchise, dan waktu rilis juga berperan penting.'}
+        ${corr > 0.3 ? ' ⚠️ Namun perhatikan bahwa korelasi tidak berarti kausalitas — film blockbuster dengan budget besar cenderung punya rating layak dan gross tinggi.' : ''}
+    `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER CHART
+// ═══════════════════════════════════════════════════════════════
+function renderChart() {
+    const container = document.getElementById('scatter-chart');
+    const containerRect = container.parentElement.getBoundingClientRect();
+    width = containerRect.width - 40;
+    height = 540;
+
+    container.setAttribute('width', width);
+    container.setAttribute('height', height);
+    container.innerHTML = '';
+
+    if (currentData.length === 0) {
+        container.innerHTML = `<text x="${width/2}" y="${height/2}" text-anchor="middle" fill="var(--text-muted)" font-size="14">Tidak ada data dengan filter yang dipilih</text>`;
+        return;
+    }
+
+    const innerW = width - MARGIN.left - MARGIN.right;
+    const innerH = height - MARGIN.top - MARGIN.bottom;
+
+    const svg = d3.select('#scatter-chart')
+        .append('g')
+        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+
+    const xScale = d3.scaleLinear()
+        .domain([Math.floor(d3.min(currentData, d => d.score) || 0), Math.ceil(d3.max(currentData, d => d.score) || 10)])
+        .range([0, innerW])
+        .nice();
+
+    const yScale = d3.scaleLog()
+        .domain([d3.min(currentData, d => d.gross) || 1, d3.max(currentData, d => d.gross) || 1])
+        .range([innerH, 0])
+        .nice();
+
+    // Grid
+    svg.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft(yScale).ticks(6).tickSize(-innerW).tickFormat(''))
+        .select('.domain').remove();
+
+    svg.append('g')
+        .attr('class', 'grid')
+        .attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(xScale).ticks(8).tickSize(-innerH).tickFormat(''))
+        .select('.domain').remove();
+
+    // Axes
+    svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(xScale).tickFormat(d => d.toFixed(1)));
+
+    svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(yScale).tickFormat(d3.format('~s')));
+
+    // Labels
+    svg.append('text')
+        .attr('x', innerW / 2)
+        .attr('y', innerH + 45)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('IMDb SCORE →');
+
+    svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerH / 2)
+        .attr('y', -52)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('GROSS REVENUE (USD) →');
+
+    // Vertical reference lines for score categories
+    svg.append('line')
+        .attr('x1', xScale(7.5))
+        .attr('y1', 0)
+        .attr('x2', xScale(7.5))
+        .attr('y2', innerH)
+        .attr('stroke', 'rgba(255,255,255,.08)')
+        .attr('stroke-dasharray', '4,4')
+        .attr('stroke-width', 1);
+
+    svg.append('line')
+        .attr('x1', xScale(5.0))
+        .attr('y1', 0)
+        .attr('x2', xScale(5.0))
+        .attr('y2', innerH)
+        .attr('stroke', 'rgba(255,255,255,.05)')
+        .attr('stroke-dasharray', '2,4')
+        .attr('stroke-width', 1);
+
+    // Annotations
+    svg.append('text')
+        .attr('x', xScale(8.2))
+        .attr('y', 14)
+        .attr('fill', 'rgba(255,255,255,.25)')
+        .attr('font-size', 9)
+        .attr('font-weight', 600)
+        .text('High Quality Zone');
+    
+    svg.append('text')
+        .attr('x', xScale(6.8))
+        .attr('y', 14)
+        .attr('fill', 'rgba(255,255,255,.15)')
+        .attr('font-size', 9)
+        .text('Mid Range');
+
+    // Points
+    svg.selectAll('.dot')
+        .data(currentData)
+        .enter()
+        .append('circle')
+        .attr('cx', d => xScale(d.score))
+        .attr('cy', d => yScale(d.gross))
+        .attr('r', d => Math.min(8, 3 + (d.votes / 500000)))
+        .attr('fill', d => GENRE_COLORS[d.genre] || '#888')
+        .attr('fill-opacity', 0.55)
+        .attr('stroke', 'none')
+        .on('mouseenter', function(event, d) {
+            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 1.5).attr('fill-opacity', 0.9);
+            showTooltip(event, d);
+        })
+        .on('mouseleave', function() {
+            d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.55);
+            hideTooltip();
+        });
+
+    // Legend
+    const genresInView = [...new Set(currentData.map(d => d.genre))];
+    const legendWrap = document.getElementById('legend');
+    legendWrap.innerHTML = genresInView.map(g => `
+        <div class="legend-item">
+            <span class="legend-dot" style="background: ${GENRE_COLORS[g] || '#888'}"></span>
+            <span>${g}</span>
+        </div>
+    `).join('');
+}
+
+function showTooltip(event, d) {
+    const tooltip = document.getElementById('tooltip');
+    tooltip.innerHTML = `
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px;"><span style="color: var(--text-muted);">🎬 Film</span><span style="font-weight: 700;">${d.name}</span></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px;"><span style="color: var(--text-muted);">📅 Tahun</span><span style="font-weight: 700;">${d.year}</span></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px;"><span style="color: var(--text-muted);">🎭 Genre</span><span style="font-weight: 700;">${d.genre}</span></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px;"><span style="color: var(--text-muted);">⭐ IMDb</span><span style="font-weight: 700; color: #f59e0b;">${d.score.toFixed(1)}</span></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px;"><span style="color: var(--text-muted);">💰 Gross</span><span style="font-weight: 700; color: var(--teal);">${fmtMoney(d.gross)}</span></div>
+        <div style="display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px;"><span style="color: var(--text-muted);">📊 Budget</span><span style="font-weight: 700;">${fmtMoney(d.budget)}</span></div>
+        <div style="display: flex; justify-content: space-between; gap: 16px;"><span style="color: var(--text-muted);">🗳️ Votes</span><span style="font-weight: 700;">${d.votes.toLocaleString('id-ID')}</span></div>
+    `;
+
+    const left = event.clientX + 14;
+    const top = event.clientY - 10;
+    tooltip.style.left = Math.min(left, window.innerWidth - 260) + 'px';
+    tooltip.style.top = Math.max(8, top) + 'px';
+    tooltip.style.opacity = '1';
+}
+
+function hideTooltip() {
+    const tooltip = document.getElementById('tooltip');
+    tooltip.style.opacity = '0';
+}
+
+function debounce(fn, ms) {
+    let timer;
+    return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+const debouncedRender = debounce(() => applyFilters(), 200);
+
+document.getElementById('genre-select').addEventListener('change', applyFilters);
+document.getElementById('year-min').addEventListener('input', debouncedRender);
+document.getElementById('year-max').addEventListener('input', debouncedRender);
+document.getElementById('score-min').addEventListener('input', debouncedRender);
+document.getElementById('btn-reset').addEventListener('click', () => {
+    document.getElementById('genre-select').value = '';
+    document.getElementById('year-min').value = '1986';
+    document.getElementById('year-max').value = '2016';
+    document.getElementById('score-min').value = '0';
+    applyFilters();
+});
+
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (currentData.length) renderChart();
+    }, 200);
+});
+</script>
+</body>
+</html>
