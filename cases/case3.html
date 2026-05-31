@@ -1,0 +1,733 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 3 — Budget vs Gross | Visualisasi Data Film</title>
+    <meta name="description" content="Scatter plot korelasi antara anggaran produksi (budget) dan pendapatan kotor (gross) film dari 1986 hingga 2016.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body { background: var(--bg-base); }
+
+        .topbar {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(13,13,18,.88);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+        }
+        .topbar-inner {
+            max-width: 1320px; margin: 0 auto; padding: 0 28px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between;
+        }
+        .topbar-brand {
+            display: flex; align-items: center; gap: 8px; text-decoration: none;
+        }
+        .brand-dot {
+            width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
+        }
+        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
+        .brand-sub {
+            font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
+            background: var(--accent-dim); border: 1px solid var(--accent-glow);
+            padding: 2px 7px; border-radius: 4px;
+        }
+        .topbar-case {
+            font-size: 12px; font-weight: 500; color: var(--text-muted);
+            letter-spacing: .04em; display: flex; align-items: center; gap: 6px;
+        }
+        .topbar-case span { color: var(--text-secondary); }
+
+        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
+
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--text-muted); text-decoration: none;
+            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-elevated); transition: color .2s, border-color .2s;
+            margin-bottom: 28px;
+        }
+        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .back-btn svg { width: 14px; height: 14px; }
+
+        .case-badge {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #a78bfa; background: rgba(167,139,250,.1);
+            border: 1px solid rgba(167,139,250,.2); padding: 4px 10px; border-radius: 100px;
+            margin-bottom: 14px;
+        }
+        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #a78bfa; }
+
+        h1.case-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        h1.case-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+        }
+        .case-desc {
+            font-size: .975rem; color: var(--text-secondary);
+            max-width: 700px; line-height: 1.65; margin-bottom: 32px;
+        }
+
+        /* Stats strip */
+        .stats-strip {
+            display: flex; gap: 0; flex-wrap: wrap;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
+            width: fit-content;
+        }
+        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
+            border-right: 1px solid var(--border); }
+        .sstat:last-child { border-right: none; }
+        .sstat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
+        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .08em;
+            text-transform: uppercase; color: var(--text-muted); }
+
+        /* Filter panel */
+        .filter-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px 28px;
+            margin-bottom: 20px;
+        }
+        .filter-card-title {
+            font-size: 11px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .filter-card-title::after {
+            content: ''; flex: 1; height: 1px; background: var(--border);
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr auto;
+            gap: 20px; align-items: end;
+        }
+
+        .fgroup { display: flex; flex-direction: column; gap: 7px; }
+        .flabel {
+            font-size: 11px; font-weight: 600; letter-spacing: .07em;
+            text-transform: uppercase; color: var(--text-muted);
+        }
+
+        .f-select, .f-input {
+            width: 100%; padding: 9px 12px;
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-sm); color: var(--text-primary);
+            font-family: var(--font); font-size: 13px; outline: none;
+            transition: border-color .2s; cursor: pointer;
+        }
+        .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
+        .f-select:focus, .f-input:focus { border-color: var(--accent); }
+
+        .btn-reset {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 600; color: var(--text-secondary);
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            padding: 9px 16px; border-radius: var(--radius-sm);
+            cursor: pointer; transition: color .2s, border-color .2s;
+            font-family: var(--font); white-space: nowrap;
+        }
+        .btn-reset:hover { color: var(--text-primary); border-color: var(--border-hover); }
+
+        /* Chart card */
+        .chart-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px;
+            position: relative;
+            overflow-x: auto;
+        }
+        .chart-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent) 0%, #a78bfa 60%, transparent 100%);
+            opacity: .5;
+        }
+
+        .axis text { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; }
+        .axis line, .axis path { stroke: rgba(255,255,255,.07); }
+        .axis .domain { display: none; }
+        .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
+
+        .correlation-text {
+            margin-top: 20px;
+            padding: 16px 20px;
+            background: var(--bg-elevated);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--accent);
+        }
+        .correlation-text h4 {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+        .correlation-text p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.6;
+        }
+        .correlation-text strong {
+            color: var(--text-primary);
+        }
+
+        .tooltip-scatter {
+            position: fixed;
+            background: rgba(10,10,16,.97);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            pointer-events: none;
+            z-index: 200;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: var(--text-primary);
+            box-shadow: 0 12px 48px rgba(0,0,0,.7);
+            min-width: 220px;
+            opacity: 0;
+            transition: opacity .15s ease;
+        }
+        .tooltip-scatter.visible { opacity: 1; }
+        .tt-row { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px; }
+        .tt-label { color: var(--text-muted); }
+        .tt-val { font-weight: 700; color: var(--text-primary); }
+        .tt-gross { color: var(--teal); }
+        .tt-budget { color: var(--accent); }
+
+        .legend-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            color: var(--text-secondary);
+        }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
+
+        @media (max-width: 768px) {
+            .page-wrap { padding: 20px 16px 60px; }
+            .filters-grid { grid-template-columns: 1fr 1fr; }
+            .stats-strip { width: 100%; }
+            .sstat { padding: 10px 16px; flex: 1; }
+        }
+        @media (max-width: 550px) {
+            .filters-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="topbar-brand">
+            <span class="brand-dot"></span>
+            <span class="brand-text">VISDAT</span>
+            <span class="brand-sub">KLP 10</span>
+        </a>
+        <div class="topbar-case">
+            Case <span>03</span> · Budget vs Gross
+        </div>
+    </div>
+</div>
+
+<div class="page-wrap">
+
+    <a href="../index.html" class="back-btn">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
+        </svg>
+        Kembali ke Dashboard
+    </a>
+
+    <div class="case-badge">
+        <span class="case-badge-dot"></span>
+        Case 03 · Scatter Plot
+    </div>
+    <h1 class="case-title">Budget <em>vs</em> Gross</h1>
+    <p class="case-desc">
+        Apakah anggaran produksi yang lebih besar menjamin pendapatan yang lebih tinggi? 
+        Visualisasi ini menampilkan korelasi antara <strong style="color:var(--accent)">budget</strong> (sumbu X) dan 
+        <strong style="color:var(--teal)">gross revenue</strong> (sumbu Y) dari ribuan film. 
+        Setiap titik mewakili satu film, dengan warna berdasarkan genre. Hover untuk melihat detail film.
+    </p>
+
+    <!-- Stats strip -->
+    <div class="stats-strip">
+        <div class="sstat">
+            <span class="sstat-val" id="stat-total">—</span>
+            <span class="sstat-lbl">Film</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-avg-roi">—</span>
+            <span class="sstat-lbl">Rata-rata ROI</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-top-budget">—</span>
+            <span class="sstat-lbl">Budget Tertinggi</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-top-gross">—</span>
+            <span class="sstat-lbl">Gross Tertinggi</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-correlation">—</span>
+            <span class="sstat-lbl">Korelasi (r)</span>
+        </div>
+    </div>
+
+    <!-- Filter panel -->
+    <div class="filter-card">
+        <div class="filter-card-title">Filter Data</div>
+        <div class="filters-grid">
+            <div class="fgroup">
+                <label class="flabel">Genre</label>
+                <select class="f-select" id="genre-select">
+                    <option value="">Semua Genre</option>
+                </select>
+            </div>
+            <div class="fgroup">
+                <label class="flabel">Tahun (min)</label>
+                <input type="number" class="f-input" id="year-min" value="1986" min="1986" max="2016" step="1">
+            </div>
+            <div class="fgroup">
+                <label class="flabel">Tahun (max)</label>
+                <input type="number" class="f-input" id="year-max" value="2016" min="1986" max="2016" step="1">
+            </div>
+            <div class="fgroup">
+                <label class="flabel">Budget Min (USD)</label>
+                <select class="f-select" id="budget-filter">
+                    <option value="0">Semua Budget</option>
+                    <option value="1000000">≥ $1M</option>
+                    <option value="10000000">≥ $10M</option>
+                    <option value="50000000">≥ $50M</option>
+                    <option value="100000000">≥ $100M</option>
+                </select>
+            </div>
+            <div class="fgroup">
+                <button class="btn-reset" id="btn-reset">
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
+                        <path d="M3 8a5 5 0 105 5"/><path d="M3 5V8H6"/>
+                    </svg>
+                    Reset
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart card -->
+    <div class="chart-card">
+        <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 500px; flex-direction: column; gap: 16px;">
+            <div class="loading-spinner" style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite;"></div>
+            <span style="color: var(--text-muted);">Memuat data film...</span>
+        </div>
+        <svg id="scatter-chart" width="100%" height="540" style="display: none;"></svg>
+        <div class="legend-wrap" id="legend"></div>
+    </div>
+
+    <!-- Correlation insight -->
+    <div class="correlation-text" id="correlation-insight" style="display: none;">
+        <h4>📊 Analisis Korelasi</h4>
+        <p id="correlation-desc">Memuat analisis...</p>
+    </div>
+
+</div>
+
+<div id="tooltip" class="tooltip-scatter"></div>
+
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIGURATION
+// ═══════════════════════════════════════════════════════════════
+const GENRE_COLORS = {
+    'Comedy':    '#e05c3a',
+    'Action':    '#2dd4bf',
+    'Drama':     '#a78bfa',
+    'Crime':     '#f59e0b',
+    'Biography': '#60a5fa',
+    'Adventure': '#34d399',
+    'Animation': '#f97316',
+    'Horror':    '#fb7185',
+    'Thriller':  '#8b5cf6',
+    'Romance':   '#ec4899',
+    'Sci-Fi':    '#06b6d4',
+    'Fantasy':   '#d946ef',
+    'Family':    '#84cc16',
+    'Music':     '#f43f5e',
+    'Mystery':   '#6366f1',
+    'History':   '#14b8a6',
+    'War':       '#ef4444',
+    'Western':   '#b45309',
+};
+
+let allData = [];
+let currentData = [];
+let svg, width, height;
+let xScale, yScale;
+let tooltip;
+
+const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
+
+// ═══════════════════════════════════════════════════════════════
+// FORMATTERS
+// ═══════════════════════════════════════════════════════════════
+function fmtMoney(v) {
+    if (!v || isNaN(v) || v <= 0) return 'N/A';
+    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
+    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
+    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
+    return '$' + Math.round(v);
+}
+
+function calcROI(budget, gross) {
+    if (!budget || budget <= 0) return null;
+    return (gross - budget) / budget;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD DATA
+// ═══════════════════════════════════════════════════════════════
+d3.csv('../data/movies.csv').then(raw => {
+    allData = raw.map(d => ({
+        name: d.name || '',
+        genre: d.genre || 'Other',
+        year: +d.year || 0,
+        budget: parseFloat(d.budget) || 0,
+        gross: parseFloat(d.gross) || 0,
+        score: parseFloat(d.score) || 0,
+        votes: parseFloat(d.votes) || 0,
+    })).filter(d => d.year >= 1980 && d.name && d.budget > 0 && d.gross > 0 && d.genre);
+
+    // Populate genre dropdown
+    const genres = [...new Set(allData.map(d => d.genre))].filter(Boolean).sort();
+    const sel = document.getElementById('genre-select');
+    genres.forEach(g => {
+        const opt = document.createElement('option');
+        opt.value = g;
+        opt.textContent = g;
+        sel.appendChild(opt);
+    });
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('scatter-chart').style.display = 'block';
+    document.getElementById('correlation-insight').style.display = 'block';
+    
+    applyFilters();
+}).catch(err => {
+    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small></div>`;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// FILTERS
+// ═══════════════════════════════════════════════════════════════
+function applyFilters() {
+    const genre = document.getElementById('genre-select').value;
+    const yearMin = parseInt(document.getElementById('year-min').value) || 1986;
+    const yearMax = parseInt(document.getElementById('year-max').value) || 2016;
+    const budgetMin = parseFloat(document.getElementById('budget-filter').value) || 0;
+
+    currentData = allData.filter(d => {
+        if (genre && d.genre !== genre) return false;
+        if (d.year < yearMin || d.year > yearMax) return false;
+        if (d.budget < budgetMin) return false;
+        return true;
+    });
+
+    updateStats();
+    renderChart();
+}
+
+function updateStats() {
+    const total = currentData.length;
+    document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
+    
+    if (total === 0) {
+        document.getElementById('stat-avg-roi').textContent = '—';
+        document.getElementById('stat-top-budget').textContent = '—';
+        document.getElementById('stat-top-gross').textContent = '—';
+        document.getElementById('stat-correlation').textContent = '—';
+        return;
+    }
+
+    // Average ROI
+    const roiValues = currentData.map(d => calcROI(d.budget, d.gross)).filter(v => v !== null);
+    const avgROI = roiValues.length ? d3.mean(roiValues) : 0;
+    document.getElementById('stat-avg-roi').textContent = avgROI.toFixed(2) + 'x';
+
+    // Top budget & gross
+    const topBudget = d3.greatest(currentData, d => d.budget);
+    const topGross = d3.greatest(currentData, d => d.gross);
+    document.getElementById('stat-top-budget').textContent = topBudget ? fmtMoney(topBudget.budget) : '—';
+    document.getElementById('stat-top-gross').textContent = topGross ? fmtMoney(topGross.gross) : '—';
+
+    // Correlation
+    const withBoth = currentData.filter(d => d.budget > 0 && d.gross > 0);
+    if (withBoth.length >= 3) {
+        const corr = calculateCorrelation(withBoth.map(d => d.budget), withBoth.map(d => d.gross));
+        document.getElementById('stat-correlation').textContent = corr.toFixed(3);
+        updateCorrelationInsight(corr, withBoth.length);
+    } else {
+        document.getElementById('stat-correlation').textContent = '—';
+        document.getElementById('correlation-desc').innerHTML = 'Data tidak cukup untuk menghitung korelasi.';
+    }
+}
+
+function calculateCorrelation(xArr, yArr) {
+    const n = xArr.length;
+    const sumX = d3.sum(xArr);
+    const sumY = d3.sum(yArr);
+    const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
+    const sumX2 = d3.sum(xArr.map(x => x * x));
+    const sumY2 = d3.sum(yArr.map(y => y * y));
+    const numerator = n * sumXY - sumX * sumY;
+    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+    return denominator === 0 ? 0 : numerator / denominator;
+}
+
+function updateCorrelationInsight(corr, n) {
+    const strength = Math.abs(corr);
+    let interpretation = '';
+    if (strength > 0.7) interpretation = 'Hubungan positif yang KUAT';
+    else if (strength > 0.4) interpretation = 'Hubungan positif yang SEDANG';
+    else if (strength > 0.2) interpretation = 'Hubungan positif yang LEMAH';
+    else if (strength > -0.2) interpretation = 'Hubungan sangat LEMAH (hampir tidak berkorelasi)';
+    else if (strength > -0.5) interpretation = 'Hubungan negatif yang SEDANG';
+    else interpretation = 'Hubungan negatif yang KUAT';
+
+    const direction = corr > 0 ? 'positif' : 'negatif';
+    document.getElementById('correlation-desc').innerHTML = `
+        Koefisien korelasi <strong style="color:${corr > 0 ? 'var(--teal)' : 'var(--accent)'}">r = ${corr.toFixed(3)}</strong> 
+        (${interpretation}) berdasarkan <strong>${n.toLocaleString('id-ID')}</strong> film dengan data budget dan gross lengkap.
+        ${corr > 0.3 ? ' Secara umum, film dengan budget lebih besar cenderung menghasilkan pendapatan yang lebih tinggi.' : 
+          corr < -0.3 ? ' Menariknya, ada kecenderungan negatif — film dengan budget lebih kecil justru lebih menguntungkan secara proporsional.' : 
+          ' Korelasi lemah menunjukkan bahwa budget bukanlah penentu utama kesuksesan finansial.'}
+    `;
+}
+
+// ═══════════════════════════════════════════════════════════════
+// RENDER CHART
+// ═══════════════════════════════════════════════════════════════
+function renderChart() {
+    const container = document.getElementById('scatter-chart');
+    const containerRect = container.parentElement.getBoundingClientRect();
+    width = containerRect.width - 40;
+    height = 540;
+
+    container.setAttribute('width', width);
+    container.setAttribute('height', height);
+    container.innerHTML = '';
+
+    if (currentData.length === 0) {
+        container.innerHTML = `<text x="${width/2}" y="${height/2}" text-anchor="middle" fill="var(--text-muted)" font-size="14">Tidak ada data dengan filter yang dipilih</text>`;
+        return;
+    }
+
+    const innerW = width - MARGIN.left - MARGIN.right;
+    const innerH = height - MARGIN.top - MARGIN.bottom;
+
+    svg = d3.select('#scatter-chart')
+        .append('g')
+        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+
+    // Scales (log)
+    const minBudget = d3.min(currentData, d => d.budget) || 1;
+    const maxBudget = d3.max(currentData, d => d.budget) || 1;
+    const minGross = d3.min(currentData, d => d.gross) || 1;
+    const maxGross = d3.max(currentData, d => d.gross) || 1;
+
+    xScale = d3.scaleLog()
+        .domain([minBudget, maxBudget])
+        .range([0, innerW])
+        .nice();
+
+    yScale = d3.scaleLog()
+        .domain([minGross, maxGross])
+        .range([innerH, 0])
+        .nice();
+
+    // Grid
+    svg.append('g')
+        .attr('class', 'grid')
+        .call(d3.axisLeft(yScale).ticks(6).tickSize(-innerW).tickFormat(''))
+        .select('.domain').remove();
+
+    svg.append('g')
+        .attr('class', 'grid')
+        .attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(xScale).ticks(6).tickSize(-innerH).tickFormat(''))
+        .select('.domain').remove();
+
+    // Axis
+    svg.append('g')
+        .attr('class', 'axis')
+        .attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(xScale).tickFormat(d3.format('~s')));
+
+    svg.append('g')
+        .attr('class', 'axis')
+        .call(d3.axisLeft(yScale).tickFormat(d3.format('~s')));
+
+    // Labels
+    svg.append('text')
+        .attr('x', innerW / 2)
+        .attr('y', innerH + 45)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('BUDGET (USD) →');
+
+    svg.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerH / 2)
+        .attr('y', -52)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('GROSS REVENUE (USD) →');
+
+    // Diagonal line (budget = gross)
+    const diagStart = Math.max(minBudget, minGross);
+    const diagEnd = Math.min(maxBudget, maxGross);
+    if (diagEnd > diagStart) {
+        svg.append('line')
+            .attr('x1', xScale(diagStart))
+            .attr('y1', yScale(diagStart))
+            .attr('x2', xScale(diagEnd))
+            .attr('y2', yScale(diagEnd))
+            .attr('stroke', 'rgba(255,255,255,.12)')
+            .attr('stroke-dasharray', '5,5')
+            .attr('stroke-width', 1.5);
+    }
+
+    // Points
+    const points = svg.selectAll('.dot')
+        .data(currentData)
+        .enter()
+        .append('circle')
+        .attr('class', 'dot')
+        .attr('cx', d => xScale(d.budget))
+        .attr('cy', d => yScale(d.gross))
+        .attr('r', 4)
+        .attr('fill', d => GENRE_COLORS[d.genre] || '#888')
+        .attr('fill-opacity', 0.55)
+        .attr('stroke', 'none')
+        .on('mouseenter', function(event, d) {
+            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 1.5).attr('fill-opacity', 0.9);
+            showTooltip(event, d);
+        })
+        .on('mouseleave', function() {
+            d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.55);
+            hideTooltip();
+        });
+
+    // Reference line (ROI = 100%)
+    // Optional: add a line for 2x ROI
+    const roiLineX = d3.scaleLinear().domain([minBudget, maxBudget]).range([0, innerW]);
+    svg.append('line')
+        .attr('x1', 0)
+        .attr('y1', yScale(minBudget * 2))
+        .attr('x2', innerW)
+        .attr('y2', yScale(maxBudget * 2))
+        .attr('stroke', 'rgba(52,211,153,.25)')
+        .attr('stroke-dasharray', '3,4')
+        .attr('stroke-width', 1);
+
+    // Legend
+    const genresInView = [...new Set(currentData.map(d => d.genre))];
+    const legendWrap = document.getElementById('legend');
+    legendWrap.innerHTML = genresInView.map(g => `
+        <div class="legend-item">
+            <span class="legend-dot" style="background: ${GENRE_COLORS[g] || '#888'}"></span>
+            <span>${g}</span>
+        </div>
+    `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// TOOLTIP
+// ═══════════════════════════════════════════════════════════════
+function showTooltip(event, d) {
+    const tooltip = document.getElementById('tooltip');
+    const roi = calcROI(d.budget, d.gross);
+    tooltip.innerHTML = `
+        <div class="tt-row"><span class="tt-label">🎬 Film</span><span class="tt-val">${d.name}</span></div>
+        <div class="tt-row"><span class="tt-label">📅 Tahun</span><span class="tt-val">${d.year}</span></div>
+        <div class="tt-row"><span class="tt-label">🎭 Genre</span><span class="tt-val">${d.genre}</span></div>
+        <div class="tt-row"><span class="tt-label">💰 Budget</span><span class="tt-val tt-budget">${fmtMoney(d.budget)}</span></div>
+        <div class="tt-row"><span class="tt-label">📈 Gross</span><span class="tt-val tt-gross">${fmtMoney(d.gross)}</span></div>
+        <div class="tt-row"><span class="tt-label">📊 ROI</span><span class="tt-val">${roi !== null ? roi.toFixed(2) + 'x' : '—'}</span></div>
+        <div class="tt-row"><span class="tt-label">⭐ IMDb</span><span class="tt-val">${d.score.toFixed(1)}</span></div>
+        <div class="tt-row"><span class="tt-label">🗳️ Votes</span><span class="tt-val">${d.votes.toLocaleString('id-ID')}</span></div>
+    `;
+
+    const left = event.clientX + 14;
+    const top = event.clientY - 10;
+    tooltip.style.left = Math.min(left, window.innerWidth - 260) + 'px';
+    tooltip.style.top = Math.max(8, top) + 'px';
+    tooltip.classList.add('visible');
+}
+
+function hideTooltip() {
+    const tooltip = document.getElementById('tooltip');
+    tooltip.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════════
+function debounce(fn, ms) {
+    let timer;
+    return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+}
+
+const debouncedRender = debounce(() => applyFilters(), 200);
+
+document.getElementById('genre-select').addEventListener('change', applyFilters);
+document.getElementById('year-min').addEventListener('input', debouncedRender);
+document.getElementById('year-max').addEventListener('input', debouncedRender);
+document.getElementById('budget-filter').addEventListener('change', applyFilters);
+document.getElementById('btn-reset').addEventListener('click', () => {
+    document.getElementById('genre-select').value = '';
+    document.getElementById('year-min').value = '1986';
+    document.getElementById('year-max').value = '2016';
+    document.getElementById('budget-filter').value = '0';
+    applyFilters();
+});
+
+// Responsive resize
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (currentData.length) renderChart();
+    }, 200);
+});
+
+// Spin animation style
+const style = document.createElement('style');
+style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
