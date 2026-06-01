@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Case 7 — Reliabilitas Rating | Visualisasi Data Film</title>
     <meta name="description"
-        content="Scatter plot votes vs score untuk melihat korelasi jumlah penilai dengan rating IMDb.">
+        content="Bubble chart overview + scatter plot detail untuk analisis reliabilitas rating IMDb berdasarkan jumlah votes.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
@@ -27,7 +27,7 @@
         }
 
         .topbar-inner {
-            max-width: 1320px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 0 28px;
             height: 56px;
@@ -84,7 +84,7 @@
         }
 
         .page-wrap {
-            max-width: 1320px;
+            max-width: 1400px;
             margin: 0 auto;
             padding: 36px 28px 80px;
         }
@@ -110,11 +110,6 @@
         .back-btn:hover {
             color: var(--text-primary);
             border-color: var(--border-hover);
-        }
-
-        .back-btn svg {
-            width: 14px;
-            height: 14px;
         }
 
         .case-badge {
@@ -165,6 +160,7 @@
             margin-bottom: 32px;
         }
 
+        /* Stats strip */
         .stats-strip {
             display: flex;
             gap: 0;
@@ -204,98 +200,41 @@
             color: var(--text-muted);
         }
 
-        .controls-row {
+        /* Layout 2 columns */
+        .main-layout {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 12px;
-            margin-bottom: 16px;
+            gap: 24px;
         }
 
-        .controls-left {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
+        .charts-area {
+            flex: 3;
+            min-width: 0;
         }
 
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: var(--bg-elevated);
-            padding: 4px 12px;
-            border-radius: 6px;
+        .detail-panel {
+            flex: 1;
+            min-width: 260px;
+            background: var(--bg-card);
             border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 20px;
+            height: fit-content;
+            position: sticky;
+            top: 80px;
         }
 
-        .filter-group label {
-            font-size: 11px;
-            font-weight: 600;
-            color: var(--text-muted);
-        }
-
-        .filter-group select {
-            background: transparent;
-            border: none;
-            color: var(--text-primary);
-            font-size: 12px;
-            font-weight: 500;
-            padding: 6px 0;
-            cursor: pointer;
-            font-family: 'Inter', sans-serif;
-        }
-
-        .filter-group select:focus {
-            outline: none;
-        }
-
-        .ctrl-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            letter-spacing: .03em;
-            color: var(--text-secondary);
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            padding: 7px 14px;
-            border-radius: 6px;
-            cursor: pointer;
-            transition: color .2s, border-color .2s;
-            user-select: none;
-        }
-
-        .ctrl-btn:hover {
-            color: var(--text-primary);
-            border-color: var(--border-hover);
-        }
-
-        .ctrl-btn.active {
-            color: var(--gold);
-            border-color: var(--gold);
-            background: rgba(245, 158, 11, .1);
-        }
-
-        .hint-text {
-            font-size: 11px;
-            color: var(--text-muted);
-            letter-spacing: .02em;
-        }
-
+        /* Chart cards */
         .chart-card {
             background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 28px;
-            margin-bottom: 16px;
+            padding: 20px;
+            margin-bottom: 24px;
             position: relative;
             overflow: hidden;
         }
 
-        .chart-card::before {
+        .chart-card:first-child::before {
             content: '';
             position: absolute;
             top: 0;
@@ -306,60 +245,18 @@
             opacity: .5;
         }
 
-        .legend-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
+        .chart-card:last-child::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #a78bfa 0%, #c084fc 60%, transparent 100%);
+            opacity: .5;
         }
 
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 6px 12px;
-            border-radius: 100px;
-            cursor: pointer;
-            border: 1px solid transparent;
-            font-size: 12px;
-            font-weight: 500;
-            color: var(--text-secondary);
-            transition: all .2s;
-            user-select: none;
-        }
-
-        .legend-item:hover {
-            border-color: var(--border-hover);
-            color: var(--text-primary);
-        }
-
-        .legend-item.active {
-            border-color: var(--border-hover);
-            background: var(--bg-elevated);
-        }
-
-        .legend-item.muted {
-            opacity: .3;
-        }
-
-        .legend-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            flex-shrink: 0;
-        }
-
-        .stats-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-top: 20px;
-        }
-
-        .stats-panel-title {
+        .chart-title {
             font-size: 13px;
             font-weight: 700;
             letter-spacing: .08em;
@@ -371,120 +268,205 @@
             gap: 8px;
         }
 
-        .reliability-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-bottom: 20px;
-        }
-
-        .reliability-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            border-left: 3px solid var(--gold);
-        }
-
-        .reliability-card .label {
+        .chart-sub {
             font-size: 10px;
-            font-weight: 600;
-            text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-left: auto;
         }
 
-        .reliability-card .value {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: var(--text-primary);
+        /* Bubble chart specific */
+        .bubble {
+            cursor: pointer;
+            transition: filter 0.2s, stroke 0.2s;
         }
 
-        .reliability-card .insight {
+        .bubble:hover {
+            filter: brightness(1.1);
+        }
+
+        .bubble.highlighted {
+            stroke: white;
+            stroke-width: 3;
+        }
+
+        .bubble-label {
             font-size: 11px;
-            color: var(--text-muted);
-            margin-top: 6px;
-            line-height: 1.4;
-        }
-
-        #tooltip {
-            position: fixed;
+            font-weight: 700;
+            text-anchor: middle;
+            dominant-baseline: middle;
             pointer-events: none;
-            z-index: 999;
-            background: rgba(10, 10, 16, .97);
-            border: 1px solid var(--border-hover);
-            border-radius: var(--radius-md);
-            padding: 14px 16px;
-            box-shadow: 0 12px 48px rgba(0, 0, 0, .7);
-            font-family: 'Inter', sans-serif;
-            min-width: 220px;
-            opacity: 0;
-            transform: translateY(6px);
-            transition: opacity .15s ease, transform .15s ease;
         }
 
-        #tooltip.visible {
-            opacity: 1;
-            transform: translateY(0);
+        /* Scatter plot specific */
+        .dot {
+            cursor: pointer;
+            transition: r 0.1s, stroke 0.1s;
         }
 
-        .tt-header {
+        .dot:hover {
+            stroke: white;
+            stroke-width: 2;
+        }
+
+        .dot.highlighted {
+            stroke: white;
+            stroke-width: 2;
+            filter: brightness(1.2);
+        }
+
+        .dot-dimmed {
+            opacity: 0.15;
+        }
+
+        /* Detail panel */
+        .detail-header {
             display: flex;
             align-items: center;
             gap: 8px;
-            margin-bottom: 10px;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid var(--border);
         }
 
-        .tt-dot {
+        .detail-icon {
+            width: 32px;
+            height: 32px;
+            background: var(--accent-dim);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+        }
+
+        .detail-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .detail-sub {
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .movie-detail-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .movie-name-detail {
+            font-size: 15px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.3;
+        }
+
+        .movie-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 12px;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .movie-score-badge {
+            display: inline-block;
+            background: rgba(245, 158, 11, .15);
+            color: var(--gold);
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 13px;
+        }
+
+        .movie-stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            padding: 6px 0;
+            border-bottom: 1px dashed var(--border);
+        }
+
+        .movie-stat-label {
+            color: var(--text-muted);
+        }
+
+        .movie-stat-value {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .empty-detail {
+            text-align: center;
+            padding: 40px 20px;
+            color: var(--text-muted);
+            font-size: 12px;
+        }
+
+        /* Legend */
+        .legend-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            color: var(--text-muted);
+        }
+
+        .legend-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            flex-shrink: 0;
         }
 
-        .tt-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: var(--text-primary);
-            margin-bottom: 4px;
-        }
-
-        .tt-genre {
-            font-size: 11px;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-
-        .tt-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 20px;
-            font-size: 11px;
-            margin-bottom: 4px;
-        }
-
-        .tt-label {
-            color: var(--text-muted);
-        }
-
-        .tt-val {
-            color: var(--text-primary);
+        /* Reliability badge */
+        .reliability-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 9px;
             font-weight: 700;
         }
 
-        .tt-badge {
-            margin-top: 8px;
-            padding-top: 6px;
-            border-top: 1px solid var(--border);
-            font-size: 10px;
-            color: var(--gold);
+        .reliability-high {
+            background: rgba(52, 211, 153, .2);
+            color: #34d399;
+        }
+
+        .reliability-reliable {
+            background: rgba(45, 212, 191, .2);
+            color: #2dd4bf;
+        }
+
+        .reliability-moderate {
+            background: rgba(245, 158, 11, .2);
+            color: #f59e0b;
+        }
+
+        .reliability-low {
+            background: rgba(248, 113, 113, .2);
+            color: #f87171;
         }
 
         .loading-state {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 420px;
+            height: 300px;
             flex-direction: column;
             gap: 16px;
         }
@@ -504,22 +486,18 @@
             }
         }
 
-        @media (max-width: 768px) {
+        @media (max-width: 968px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .detail-panel {
+                position: static;
+                margin-top: 20px;
+            }
+
             .page-wrap {
                 padding: 20px 16px 60px;
-            }
-
-            .chart-card {
-                padding: 16px;
-            }
-
-            .stats-strip {
-                width: 100%;
-            }
-
-            .sstat {
-                padding: 10px 16px;
-                flex: 1;
             }
         }
     </style>
@@ -549,70 +527,80 @@
 
         <div class="case-badge">
             <span class="case-badge-dot"></span>
-            Case 07 · Scatter Plot Analysis
+            Case 07 · Overview + Detail
         </div>
         <h1 class="case-title">Reliabilitas <em>Rating IMDb</em></h1>
         <p class="case-desc">
-            Semakin banyak jumlah <strong style="color:var(--gold)">votes (penilai)</strong>, semakin representatif
-            rating IMDb sebuah film.
-            Visualisasi ini membantu mengidentifikasi film dengan rating yang <strong>paling kredibel</strong> vs film
-            yang ratingnya
-            mungkin bias karena jumlah penilai sedikit.
+            <strong>Bubble Chart (atas)</strong> memberikan gambaran umum 4 kategori reliabilitas berdasarkan jumlah
+            votes.
+            <strong>Scatter Plot (bawah)</strong> menampilkan seluruh film dengan detail lengkap.
+            Hover/klik pada titik untuk melihat informasi film.
         </p>
 
         <div class="stats-strip" id="stats-strip">
             <div class="sstat"><span class="sstat-val" id="stat-total">—</span><span class="sstat-lbl">Total Film</span>
             </div>
-            <div class="sstat"><span class="sstat-val" id="stat-avg-score">—</span><span class="sstat-lbl">Rata-rata
-                    Score</span></div>
-            <div class="sstat"><span class="sstat-val" id="stat-avg-votes">—</span><span class="sstat-lbl">Rata-rata
-                    Votes</span></div>
             <div class="sstat"><span class="sstat-val" id="stat-correlation">—</span><span
                     class="sstat-lbl">Korelasi</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-high-reliable">—</span><span class="sstat-lbl">Highly
+                    Reliable</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-low-reliable">—</span><span class="sstat-lbl">Low
+                    Votes</span></div>
         </div>
 
-        <div class="controls-row">
-            <div class="controls-left">
-                <div class="filter-group">
-                    <label>🎭 Genre</label>
-                    <select id="genre-filter">
-                        <option value="all">Semua Genre</option>
-                    </select>
+        <div class="main-layout">
+            <div class="charts-area">
+                <!-- Bubble Chart (Overview) -->
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="12" cy="12" r="10" />
+                            <circle cx="12" cy="12" r="4" />
+                        </svg>
+                        Bubble Chart · Overview per Kategori Reliabilitas
+                        <span class="chart-sub">💡 Hover → highlight scatter plot</span>
+                    </div>
+                    <div id="bubble-chart" style="min-height: 320px;"></div>
                 </div>
-                <div class="filter-group">
-                    <label>📊 Score Range</label>
-                    <select id="score-filter">
-                        <option value="all">Semua</option>
-                        <option value="7">Score ≥ 7.0 (Bagus)</option>
-                        <option value="8">Score ≥ 8.0 (Excellent)</option>
-                        <option value="9">Score ≥ 9.0 (Legend)</option>
-                    </select>
+
+                <!-- Scatter Plot (Detail) -->
+                <div class="chart-card">
+                    <div class="chart-title">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <circle cx="8" cy="8" r="3" />
+                            <circle cx="16" cy="16" r="3" />
+                            <circle cx="8" cy="16" r="3" />
+                            <circle cx="16" cy="8" r="3" />
+                        </svg>
+                        Scatter Plot · Seluruh Film (4.526 titik)
+                        <span class="chart-sub">💡 Hover → tooltip | Klik → detail di panel kanan</span>
+                    </div>
+                    <div id="scatter-chart" style="min-height: 480px;"></div>
+                    <div class="legend-wrap" id="legend"></div>
                 </div>
-                <button class="ctrl-btn active" id="btn-all">Semua Data</button>
-                <button class="ctrl-btn" id="btn-reliable">Votes > 100K</button>
-                <button class="ctrl-btn" id="btn-lowvotes">Votes < 10K</button>
             </div>
-            <span class="hint-text">💡 Hover titik untuk detail film · Ukuran titik = votes (log)</span>
-        </div>
 
-        <div class="chart-card">
-            <div class="loading-state" id="loading">
-                <div class="loading-spinner"></div>
-                <span class="loading-text">Memuat data film…</span>
+            <!-- Detail Panel -->
+            <div class="detail-panel" id="detail-panel">
+                <div class="detail-header">
+                    <div class="detail-icon">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                            <circle cx="12" cy="7" r="4" />
+                        </svg>
+                    </div>
+                    <div>
+                        <div class="detail-title">Detail Film</div>
+                        <div class="detail-sub">Klik titik pada scatter plot</div>
+                    </div>
+                </div>
+                <div id="movie-detail-content" class="empty-detail">
+                    Belum ada film dipilih.<br>Klik salah satu titik di scatter plot.
+                </div>
             </div>
-            <svg id="main-chart" style="display:none"></svg>
-            <div class="legend-wrap" id="legend"></div>
-        </div>
-
-        <div class="stats-panel" id="insight-panel" style="display:none">
-            <div class="stats-panel-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10" />
-                    <path d="M12 16v-4M12 8h.01" />
-                </svg>
-                Insight Reliabilitas Rating
-            </div>
-            <div class="reliability-grid" id="reliability-grid"></div>
         </div>
     </div>
 
@@ -623,103 +611,63 @@
         // ═══════════════════════════════════════════════════════════════
         // CONFIGURATION
         // ═══════════════════════════════════════════════════════════════
-        const MAIN_GENRES = ['Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Drama', 'Horror'];
+        const GENRES = ['Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Drama', 'Horror'];
         const GENRE_COLORS = {
-            'Action': '#2dd4bf', 'Adventure': '#34d399', 'Animation': '#f97316',
-            'Biography': '#60a5fa', 'Comedy': '#e05c3a', 'Crime': '#f59e0b',
-            'Drama': '#a78bfa', 'Horror': '#fb7185'
+            'Action': '#e05c3a', 'Adventure': '#2dd4bf', 'Animation': '#f97316',
+            'Biography': '#60a5fa', 'Comedy': '#fb7185', 'Crime': '#f59e0b',
+            'Drama': '#a78bfa', 'Horror': '#6b705c'
         };
 
+        // Kategori reliabilitas
+        const RELIABILITY_CATEGORIES = [
+            { name: 'Highly Reliable', minVotes: 100000, color: '#34d399', label: '> 100K votes' },
+            { name: 'Reliable', minVotes: 50000, maxVotes: 100000, color: '#2dd4bf', label: '50K - 100K votes' },
+            { name: 'Moderate', minVotes: 10000, maxVotes: 50000, color: '#f59e0b', label: '10K - 50K votes' },
+            { name: 'Low', minVotes: 0, maxVotes: 10000, color: '#f87171', label: '< 10K votes' }
+        ];
+
         let movieData = [];
-        let filteredData = [];
-        let activeGenres = new Set(MAIN_GENRES);
-        let currentScoreFilter = 'all';
-        let currentVotesFilter = 'all';
+        let currentHighlightCategory = null;
+        let currentSelectedMovie = null;
 
         // ═══════════════════════════════════════════════════════════════
         // LOAD DATA
         // ═══════════════════════════════════════════════════════════════
         d3.csv('../data/movies.csv').then(raw => {
-            movieData = raw.filter(d => {
-                const year = +d.year;
-                const score = +d.score;
-                const votes = +d.votes;
-                const budget = +d.budget;
-                const gross = +d.gross;
-                return year >= 1986 && year <= 2016 &&
-                    !isNaN(score) && !isNaN(votes) &&
-                    votes > 0 && budget > 0 && gross > 0 &&
-                    MAIN_GENRES.includes(d.genre);
-            }).map(d => ({
+            movieData = raw.map(d => ({
                 name: d.name,
                 genre: d.genre,
                 year: +d.year,
                 score: +d.score,
                 votes: +d.votes,
                 budget: +d.budget,
-                gross: +d.gross
-            }));
+                gross: +d.gross,
+                roi: +d.roi
+            })).filter(d => !isNaN(d.score) && !isNaN(d.votes) && d.votes > 0 && GENRES.includes(d.genre));
 
-            filteredData = [...movieData];
-            applyFilters();
+            console.log(`Data loaded: ${movieData.length} films`);
 
-            // Update stats
             updateStats();
-            populateGenreFilter();
+            renderBubbleChart();
+            renderScatterPlot();
             buildLegend();
-            buildChart();
-            buildInsights();
-
-            document.getElementById('loading').style.display = 'none';
-            document.getElementById('main-chart').style.display = 'block';
-            document.getElementById('insight-panel').style.display = 'block';
 
         }).catch(err => {
-            document.getElementById('loading').innerHTML = `
-        <div style="color:var(--gold);text-align:center">
+            console.error('Error loading data:', err);
+            document.getElementById('bubble-chart').innerHTML = `
+        <div style="color:var(--gold);text-align:center;padding:60px;">
             <strong>Gagal memuat data</strong><br>
-            <small style="color:var(--text-muted)">${err.message}</small>
+            <small style="color:var(--text-muted)">Pastikan file movies_clean.csv ada di folder data/</small>
+            <br><br>
+            <span style="font-size:12px;">Hint: Jalankan preprocess_movies.py terlebih dahulu</span>
         </div>`;
         });
 
-        function applyFilters() {
-            filteredData = movieData.filter(m => {
-                if (!activeGenres.has(m.genre)) return false;
-                if (currentScoreFilter !== 'all' && m.score < +currentScoreFilter) return false;
-                if (currentVotesFilter === 'high' && m.votes < 100000) return false;
-                if (currentVotesFilter === 'low' && m.votes > 10000) return false;
-                return true;
-            });
-            updateStats();
-            updateChart();
-        }
-
-        function updateStats() {
-            const total = filteredData.length;
-            const avgScore = d3.mean(filteredData, d => d.score) || 0;
-            const avgVotes = d3.mean(filteredData, d => d.votes) || 0;
-
-            // Correlation between votes and score
-            const votesArr = filteredData.map(d => Math.log10(d.votes));
-            const scoresArr = filteredData.map(d => d.score);
-            const corr = calculateCorrelation(votesArr, scoresArr);
-
-            document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
-            document.getElementById('stat-avg-score').textContent = avgScore.toFixed(2);
-            document.getElementById('stat-avg-votes').textContent = formatNumber(avgVotes);
-            document.getElementById('stat-correlation').innerHTML = corr.toFixed(2) + '<span style="font-size:10px;margin-left:3px;">' + (corr > 0 ? '↑' : '↓') + '</span>';
-        }
-
-        function calculateCorrelation(x, y) {
-            const n = x.length;
-            const sumX = d3.sum(x);
-            const sumY = d3.sum(y);
-            const sumXY = d3.sum(x.map((v, i) => v * y[i]));
-            const sumX2 = d3.sum(x.map(v => v * v));
-            const sumY2 = d3.sum(y.map(v => v * v));
-            const numerator = n * sumXY - sumX * sumY;
-            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-            return denominator === 0 ? 0 : numerator / denominator;
+        function getReliabilityCategory(votes) {
+            if (votes >= 100000) return RELIABILITY_CATEGORIES[0];
+            if (votes >= 50000) return RELIABILITY_CATEGORIES[1];
+            if (votes >= 10000) return RELIABILITY_CATEGORIES[2];
+            return RELIABILITY_CATEGORIES[3];
         }
 
         function formatNumber(num) {
@@ -734,297 +682,397 @@
             return '$' + value.toFixed(0);
         }
 
-        function populateGenreFilter() {
-            const select = document.getElementById('genre-filter');
-            MAIN_GENRES.forEach(g => {
-                const option = document.createElement('option');
-                option.value = g;
-                option.textContent = g;
-                select.appendChild(option);
-            });
-            select.addEventListener('change', (e) => {
-                const val = e.target.value;
-                if (val === 'all') {
-                    activeGenres = new Set(MAIN_GENRES);
-                } else {
-                    activeGenres = new Set([val]);
-                }
-                updateLegendState();
-                applyFilters();
-            });
+        function updateStats() {
+            const total = movieData.length;
+            const votes = movieData.map(d => Math.log10(d.votes));
+            const scores = movieData.map(d => d.score);
+            const corr = calculateCorrelation(votes, scores);
+            const highReliable = movieData.filter(m => m.votes >= 100000).length;
+            const lowVotes = movieData.filter(m => m.votes < 10000).length;
+
+            document.getElementById('stat-total').textContent = total.toLocaleString();
+            document.getElementById('stat-correlation').innerHTML = corr.toFixed(2) + (corr > 0 ? ' ↑' : ' ↓');
+            document.getElementById('stat-high-reliable').textContent = highReliable.toLocaleString();
+            document.getElementById('stat-low-reliable').textContent = lowVotes.toLocaleString();
         }
 
-        document.getElementById('score-filter').addEventListener('change', (e) => {
-            currentScoreFilter = e.target.value;
-            applyFilters();
-        });
-
-        document.getElementById('btn-all').addEventListener('click', () => {
-            currentVotesFilter = 'all';
-            setActiveButton('btn-all');
-            applyFilters();
-        });
-
-        document.getElementById('btn-reliable').addEventListener('click', () => {
-            currentVotesFilter = 'high';
-            setActiveButton('btn-reliable');
-            applyFilters();
-        });
-
-        document.getElementById('btn-lowvotes').addEventListener('click', () => {
-            currentVotesFilter = 'low';
-            setActiveButton('btn-lowvotes');
-            applyFilters();
-        });
-
-        function setActiveButton(activeId) {
-            ['btn-all', 'btn-reliable', 'btn-lowvotes'].forEach(id => {
-                const btn = document.getElementById(id);
-                if (id === activeId) btn.classList.add('active');
-                else btn.classList.remove('active');
-            });
+        function calculateCorrelation(x, y) {
+            const n = x.length;
+            const sumX = d3.sum(x);
+            const sumY = d3.sum(y);
+            const sumXY = d3.sum(x.map((v, i) => v * y[i]));
+            const sumX2 = d3.sum(x.map(v => v * v));
+            const sumY2 = d3.sum(y.map(v => v * v));
+            const numerator = n * sumXY - sumX * sumY;
+            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+            return denominator === 0 ? 0 : numerator / denominator;
         }
 
         // ═══════════════════════════════════════════════════════════════
-        // LEGEND
+        // BUBBLE CHART (Overview per kategori)
         // ═══════════════════════════════════════════════════════════════
-        function buildLegend() {
-            const wrap = document.getElementById('legend');
-            wrap.innerHTML = '';
-            MAIN_GENRES.forEach(genre => {
-                const el = document.createElement('div');
-                el.className = 'legend-item active';
-                el.id = `legend-${genre.toLowerCase()}`;
-                el.innerHTML = `<span class="legend-dot" style="background:${GENRE_COLORS[genre]}"></span><span>${genre}</span>`;
-                el.addEventListener('click', () => toggleGenre(genre));
-                wrap.appendChild(el);
+        function renderBubbleChart() {
+            const container = document.getElementById('bubble-chart');
+            container.innerHTML = '';
+
+            // Agregasi data per kategori
+            const categoryStats = RELIABILITY_CATEGORIES.map(cat => {
+                const moviesInCat = movieData.filter(m => {
+                    if (cat.name === 'Highly Reliable') return m.votes >= 100000;
+                    if (cat.name === 'Reliable') return m.votes >= 50000 && m.votes < 100000;
+                    if (cat.name === 'Moderate') return m.votes >= 10000 && m.votes < 50000;
+                    return m.votes < 10000;
+                });
+
+                const avgVotes = d3.mean(moviesInCat, m => m.votes) || 0;
+                const avgScore = d3.mean(moviesInCat, m => m.score) || 0;
+                const count = moviesInCat.length;
+
+                return {
+                    ...cat,
+                    count,
+                    avgVotes,
+                    avgScore,
+                    movies: moviesInCat
+                };
             });
-        }
 
-        function toggleGenre(genre) {
-            if (activeGenres.has(genre)) {
-                if (activeGenres.size === 1) return;
-                activeGenres.delete(genre);
-                document.getElementById('genre-filter').value = 'all';
-            } else {
-                activeGenres.add(genre);
-            }
-            updateLegendState();
-            applyFilters();
-        }
+            const width = container.clientWidth - 40;
+            const height = 280;
+            const margin = { top: 30, right: 80, bottom: 40, left: 60 };
+            const innerW = width - margin.left - margin.right;
+            const innerH = height - margin.top - margin.bottom;
 
-        function updateLegendState() {
-            MAIN_GENRES.forEach(g => {
-                const el = document.getElementById(`legend-${g.toLowerCase()}`);
-                if (!el) return;
-                if (activeGenres.has(g)) {
-                    el.classList.add('active');
-                    el.classList.remove('muted');
-                } else {
-                    el.classList.remove('active');
-                    el.classList.add('muted');
-                }
-            });
-        }
-
-        // ═══════════════════════════════════════════════════════════════
-        // CHART
-        // ═══════════════════════════════════════════════════════════════
-        const margin = { top: 28, right: 40, bottom: 56, left: 68 };
-        let width, height, innerW, innerH;
-        let svg, xScale, yScale, rScale;
-        let tooltip;
-
-        function getDims() {
-            const container = document.getElementById('main-chart').parentElement;
-            width = container.clientWidth - 32;
-            height = Math.max(420, Math.min(560, window.innerHeight * 0.5));
-            innerW = width - margin.left - margin.right;
-            innerH = height - margin.top - margin.bottom;
-            return { width, height, innerW, innerH };
-        }
-
-        function buildChart() {
-            const { width, height, innerW, innerH } = getDims();
-
-            svg = d3.select('#main-chart')
+            const svg = d3.select('#bubble-chart')
+                .append('svg')
                 .attr('width', width)
-                .attr('height', height);
-
-            const g = svg.append('g')
+                .attr('height', height)
+                .append('g')
                 .attr('transform', `translate(${margin.left},${margin.top})`);
 
             // Scales
-            xScale = d3.scaleLog()
-                .domain([100, d3.max(movieData, d => d.votes) || 1000000])
+            const xScale = d3.scaleLog()
+                .domain([5000, 500000])
                 .range([0, innerW]);
 
-            yScale = d3.scaleLinear()
-                .domain([0, 10])
+            const yScale = d3.scaleLinear()
+                .domain([5, 9])
                 .range([innerH, 0]);
 
-            rScale = d3.scaleSqrt()
-                .domain([100, d3.max(movieData, d => d.votes) || 1000000])
-                .range([3, 14]);
-
-            // Grid
-            g.append('g')
-                .attr('class', 'grid')
-                .call(d3.axisLeft(yScale).ticks(8).tickSize(-innerW).tickFormat(''))
-                .selectAll('.domain, .tick line')
-                .attr('stroke', 'rgba(255,255,255,.05)');
+            const rScale = d3.scaleSqrt()
+                .domain([0, d3.max(categoryStats, d => d.count)])
+                .range([20, 70]);
 
             // Axes
-            g.append('g')
+            svg.append('g')
                 .attr('transform', `translate(0,${innerH})`)
                 .call(d3.axisBottom(xScale).tickFormat(d => formatNumber(d)));
 
-            g.append('g')
-                .call(d3.axisLeft(yScale).ticks(8));
+            svg.append('g')
+                .call(d3.axisLeft(yScale).ticks(6));
 
             // Labels
-            g.append('text')
+            svg.append('text')
                 .attr('x', innerW / 2)
-                .attr('y', innerH + 42)
+                .attr('y', innerH + 35)
                 .attr('text-anchor', 'middle')
                 .attr('fill', 'var(--text-muted)')
-                .attr('font-size', 11)
-                .attr('font-weight', 600)
-                .text('JUMLAH VOTES (Log Scale)');
+                .attr('font-size', 10)
+                .text('Rata-rata Votes (Log Scale)');
 
-            g.append('text')
+            svg.append('text')
                 .attr('transform', 'rotate(-90)')
                 .attr('x', -innerH / 2)
-                .attr('y', -48)
+                .attr('y', -45)
                 .attr('text-anchor', 'middle')
                 .attr('fill', 'var(--text-muted)')
-                .attr('font-size', 11)
-                .attr('font-weight', 600)
-                .text('IMDb SCORE');
+                .attr('font-size', 10)
+                .text('Rata-rata IMDb Score');
 
             // Reference lines
-            g.append('line')
+            svg.append('line')
                 .attr('x1', xScale(100000))
                 .attr('x2', xScale(100000))
                 .attr('y1', 0)
                 .attr('y2', innerH)
-                .attr('stroke', 'rgba(245,158,11,.3)')
-                .attr('stroke-dasharray', '5,5')
-                .attr('stroke-width', 1);
+                .attr('stroke', 'rgba(52,211,153,.3)')
+                .attr('stroke-dasharray', '4,4');
 
-            g.append('text')
-                .attr('x', xScale(100000) - 5)
-                .attr('y', 15)
-                .attr('text-anchor', 'end')
-                .attr('fill', 'rgba(245,158,11,.7)')
-                .attr('font-size', 9)
-                .text('100K votes (reliable threshold)');
-
-            g.append('line')
+            svg.append('line')
+                .attr('y1', yScale(7))
+                .attr('y2', yScale(7))
                 .attr('x1', 0)
                 .attr('x2', innerW)
-                .attr('y1', yScale(8))
-                .attr('y2', yScale(8))
-                .attr('stroke', 'rgba(52,211,153,.3)')
-                .attr('stroke-dasharray', '5,5')
-                .attr('stroke-width', 1);
+                .attr('stroke', 'rgba(255,255,255,.1)')
+                .attr('stroke-dasharray', '2,3');
 
             // Tooltip
-            tooltip = d3.select('#tooltip');
+            const tooltip = d3.select('#tooltip');
 
-            // Group for points
-            g.append('g').attr('class', 'points-group');
+            // Bubbles
+            categoryStats.forEach(cat => {
+                const x = xScale(cat.avgVotes);
+                const y = yScale(cat.avgScore);
+                const r = rScale(cat.count);
 
-            updateChart();
+                svg.append('circle')
+                    .attr('class', 'bubble')
+                    .attr('cx', x)
+                    .attr('cy', y)
+                    .attr('r', r)
+                    .attr('fill', cat.color)
+                    .attr('fill-opacity', 0.7)
+                    .attr('stroke', 'none')
+                    .attr('data-category', cat.name)
+                    .on('mouseover', function (event) {
+                        d3.select(this).attr('stroke', 'white').attr('stroke-width', 2);
+                        currentHighlightCategory = cat.name;
+                        highlightScatterByCategory(cat.name);
+                        tooltip.html(`
+                    // <div style="font-weight:700;margin-bottom:6px;color:${cat.color}">${cat.name}</div>
+                    // <div>📊 Jumlah film: ${cat.count.toLocaleString()}</div>
+                    // <div>⭐ Rata-rata score: ${cat.avgScore.toFixed(2)}</div>
+                    // <div>👍 Rata-rata votes: ${formatNumber(cat.avgVotes)}</div>
+                    // <div style="margin-top:5px;font-size:10px;color:#aaa;">💡 Hover → highlight scatter plot</div>
+                `);
+                        tooltip.classed('visible', true);
+                        const tx = Math.min(event.clientX + 12, window.innerWidth - 220);
+                        const ty = Math.min(event.clientY - 8, window.innerHeight - 140);
+                        tooltip.style('left', tx + 'px').style('top', ty + 'px');
+                    })
+                    .on('mouseout', function () {
+                        d3.select(this).attr('stroke', 'none');
+                        currentHighlightCategory = null;
+                        clearScatterHighlight();
+                        tooltip.classed('visible', false);
+                    });
 
-            // Resize handler
-            window.addEventListener('resize', () => {
-                setTimeout(() => {
-                    const newDims = getDims();
-                    svg.attr('width', newDims.width).attr('height', newDims.height);
-                    xScale.range([0, newDims.innerW]);
-                    yScale.range([newDims.innerH, 0]);
-                    updateChart();
-                }, 150);
+                // Label
+                svg.append('text')
+                    .attr('x', x)
+                    .attr('y', y)
+                    .attr('class', 'bubble-label')
+                    .attr('fill', '#0a0a10')
+                    .attr('font-weight', 800)
+                    .text(cat.count.toLocaleString());
             });
         }
 
-        function updateChart() {
-            if (!svg) return;
-            const { innerW, innerH } = getDims();
+        // ═══════════════════════════════════════════════════════════════
+        // SCATTER PLOT (Detail semua titik)
+        // ═══════════════════════════════════════════════════════════════
+        let scatterSvg, xScaleScatter, yScaleScatter;
 
-            const pointsGroup = svg.select('.points-group');
-            pointsGroup.selectAll('circle').remove();
+        function renderScatterPlot() {
+            const container = document.getElementById('scatter-chart');
+            container.innerHTML = '';
 
-            pointsGroup.selectAll('circle')
-                .data(filteredData)
+            const width = container.clientWidth - 40;
+            const height = 440;
+            const margin = { top: 20, right: 30, bottom: 50, left: 60 };
+            const innerW = width - margin.left - margin.right;
+            const innerH = height - margin.top - margin.bottom;
+
+            scatterSvg = d3.select('#scatter-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Scales
+            xScaleScatter = d3.scaleLog()
+                .domain([100, d3.max(movieData, d => d.votes)])
+                .range([0, innerW]);
+
+            yScaleScatter = d3.scaleLinear()
+                .domain([0, 10])
+                .range([innerH, 0]);
+
+            // Grid
+            scatterSvg.append('g')
+                .attr('class', 'grid')
+                .call(d3.axisLeft(yScaleScatter).ticks(8).tickSize(-innerW).tickFormat(''))
+                .selectAll('.domain, .tick line')
+                .attr('stroke', 'rgba(255,255,255,.05)');
+
+            // Axes
+            scatterSvg.append('g')
+                .attr('transform', `translate(0,${innerH})`)
+                .call(d3.axisBottom(xScaleScatter).tickFormat(d => formatNumber(d)));
+
+            scatterSvg.append('g')
+                .call(d3.axisLeft(yScaleScatter).ticks(8));
+
+            // Labels
+            scatterSvg.append('text')
+                .attr('x', innerW / 2)
+                .attr('y', innerH + 40)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'var(--text-muted)')
+                .attr('font-size', 10)
+                .text('Jumlah Votes (Log Scale)');
+
+            scatterSvg.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -innerH / 2)
+                .attr('y', -45)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'var(--text-muted)')
+                .attr('font-size', 10)
+                .text('IMDb Score');
+
+            // Reference lines
+            scatterSvg.append('line')
+                .attr('x1', xScaleScatter(100000))
+                .attr('x2', xScaleScatter(100000))
+                .attr('y1', 0)
+                .attr('y2', innerH)
+                .attr('stroke', 'rgba(52,211,153,.3)')
+                .attr('stroke-dasharray', '4,4')
+                .attr('stroke-width', 1);
+
+            scatterSvg.append('line')
+                .attr('y1', yScaleScatter(8))
+                .attr('y2', yScaleScatter(8))
+                .attr('x1', 0)
+                .attr('x2', innerW)
+                .attr('stroke', 'rgba(245,158,11,.3)')
+                .attr('stroke-dasharray', '4,4')
+                .attr('stroke-width', 1);
+
+            // Tooltip
+            const tooltip = d3.select('#tooltip');
+
+            // Points
+            scatterSvg.selectAll('.dot')
+                .data(movieData)
                 .enter()
                 .append('circle')
-                .attr('cx', d => xScale(d.votes))
-                .attr('cy', d => yScale(d.score))
-                .attr('r', d => rScale(d.votes))
+                .attr('class', 'dot')
+                .attr('cx', d => xScaleScatter(d.votes))
+                .attr('cy', d => yScaleScatter(d.score))
+                .attr('r', 3.5)
                 .attr('fill', d => GENRE_COLORS[d.genre])
-                .attr('fill-opacity', 0.65)
+                .attr('fill-opacity', 0.6)
                 .attr('stroke', 'none')
+                .attr('data-genre', d => d.genre)
                 .on('mouseover', function (event, d) {
-                    d3.select(this).attr('stroke', 'white').attr('stroke-width', 2).attr('fill-opacity', 0.95);
+                    d3.select(this).attr('r', 6).attr('stroke', 'white').attr('stroke-width', 1.5);
+                    const reliability = getReliabilityCategory(d.votes);
                     tooltip.html(`
-                <div class="tt-header">
-                    <div class="tt-dot" style="background:${GENRE_COLORS[d.genre]}"></div>
-                    <span style="font-size:12px;font-weight:700;">⭐ ${d.score.toFixed(1)}</span>
-                </div>
-                <div class="tt-title">${d.name}</div>
-                <div class="tt-genre">${d.genre} · ${d.year}</div>
-                <div class="tt-row"><span class="tt-label">Votes:</span><span class="tt-val">${formatNumber(d.votes)}</span></div>
-                <div class="tt-row"><span class="tt-label">Budget:</span><span class="tt-val">${formatCurrency(d.budget)}</span></div>
-                <div class="tt-row"><span class="tt-label">Gross:</span><span class="tt-val">${formatCurrency(d.gross)}</span></div>
-                <div class="tt-badge">${d.votes > 100000 ? '✓ Reliable rating' : d.votes < 10000 ? '⚠️ Low votes — may be biased' : '📊 Moderate confidence'}</div>
+                // <div style="font-weight:700;margin-bottom:4px;">${d.name}</div>
+                // <div style="font-size:10px;color:#aaa;margin-bottom:6px;">${d.genre} · ${d.year}</div>
+                // <div>⭐ Score: <strong>${d.score.toFixed(1)}</strong></div>
+                // <div>👍 Votes: ${formatNumber(d.votes)}</div>
+                // <div>💰 Budget: ${formatCurrency(d.budget)}</div>
+                // <div>💵 Gross: ${formatCurrency(d.gross)}</div>
+                // <div style="margin-top:5px;"><span class="reliability-badge reliability-${reliability.name.toLowerCase().replace(' ', '-')}">${reliability.name}</span></div>
+                // <div style="margin-top:5px;font-size:10px;color:#aaa;">💡 Klik untuk detail lengkap</div>
             `);
                     tooltip.classed('visible', true);
-                    const tx = Math.min(event.clientX + 12, window.innerWidth - 280);
-                    const ty = Math.min(event.clientY - 8, window.innerHeight - 160);
+                    const tx = Math.min(event.clientX + 12, window.innerWidth - 260);
+                    const ty = Math.min(event.clientY - 8, window.innerHeight - 180);
                     tooltip.style('left', tx + 'px').style('top', ty + 'px');
                 })
                 .on('mouseout', function () {
-                    d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.65);
+                    d3.select(this).attr('r', 3.5).attr('stroke', 'none');
                     tooltip.classed('visible', false);
+                })
+                .on('click', function (event, d) {
+                    currentSelectedMovie = d;
+                    showMovieDetail(d);
+                    // Highlight clicked point
+                    scatterSvg.selectAll('.dot').attr('stroke', 'none').attr('r', 3.5);
+                    d3.select(this).attr('stroke', 'white').attr('stroke-width', 2).attr('r', 6);
                 });
         }
 
-        // ═══════════════════════════════════════════════════════════════
-        // INSIGHTS
-        // ═══════════════════════════════════════════════════════════════
-        function buildInsights() {
-            const reliableFilms = movieData.filter(m => m.votes > 100000);
-            const lowVoteFilms = movieData.filter(m => m.votes < 5000 && m.score > 8);
-            const avgReliableScore = d3.mean(reliableFilms, d => d.score) || 0;
-            const avgAllScore = d3.mean(movieData, d => d.score) || 0;
-            const diff = (avgReliableScore - avgAllScore).toFixed(2);
+        function highlightScatterByCategory(categoryName) {
+            scatterSvg.selectAll('.dot')
+                .attr('class', d => {
+                    const cat = getReliabilityCategory(d.votes);
+                    return `dot ${cat.name === categoryName ? 'highlighted' : 'dimmed'}`;
+                })
+                .attr('opacity', d => {
+                    const cat = getReliabilityCategory(d.votes);
+                    return cat.name === categoryName ? 1 : 0.25;
+                });
+        }
 
-            const grid = document.getElementById('reliability-grid');
-            grid.innerHTML = `
-        <div class="reliability-card">
-            <div class="label">Rating Reliable (Votes > 100K)</div>
-            <div class="value">${avgReliableScore.toFixed(2)}</div>
-            <div class="insight">${diff > 0 ? `+${diff} poin` : `${diff} poin`} dari rata-rata semua film</div>
+        function clearScatterHighlight() {
+            scatterSvg.selectAll('.dot')
+                .attr('class', 'dot')
+                .attr('opacity', 1);
+        }
+
+        function showMovieDetail(movie) {
+            const reliability = getReliabilityCategory(movie.votes);
+            let reliabilityClass = '';
+            if (reliability.name === 'Highly Reliable') reliabilityClass = 'reliability-high';
+            else if (reliability.name === 'Reliable') reliabilityClass = 'reliability-reliable';
+            else if (reliability.name === 'Moderate') reliabilityClass = 'reliability-moderate';
+            else reliabilityClass = 'reliability-low';
+
+            const html = `
+        <div class="movie-detail-card">
+            <div class="movie-name-detail">${movie.name}</div>
+            <div class="movie-meta">
+                <span>🎭 ${movie.genre}</span>
+                <span>📅 ${movie.year}</span>
+                <span class="movie-score-badge">⭐ ${movie.score.toFixed(1)}</span>
+                <span class="reliability-badge ${reliabilityClass}">${reliability.name}</span>
+            </div>
+            <div class="movie-stat-row">
+                <span class="movie-stat-label">Jumlah Votes</span>
+                <span class="movie-stat-value">${formatNumber(movie.votes)}</span>
+            </div>
+            <div class="movie-stat-row">
+                <span class="movie-stat-label">Budget Produksi</span>
+                <span class="movie-stat-value">${formatCurrency(movie.budget)}</span>
+            </div>
+            <div class="movie-stat-row">
+                <span class="movie-stat-label">Pendapatan Kotor (Gross)</span>
+                <span class="movie-stat-value">${formatCurrency(movie.gross)}</span>
+            </div>
+            <div class="movie-stat-row">
+                <span class="movie-stat-label">Return on Investment (ROI)</span>
+                <span class="movie-stat-value">${(movie.roi * 100).toFixed(0)}%</span>
+            </div>
         </div>
-        <div class="reliability-card">
-            <div class="label">Film dengan Votes < 5K & Score > 8</div>
-            <div class="value">${lowVoteFilms.length} film</div>
-            <div class="insight">Film "hidden gem" potensial — rating mungkin belum representatif</div>
-        </div>
-        <div class="reliability-card">
-            <div class="label">Rata-rata Score Genre Drama</div>
-            <div class="value">${d3.mean(movieData.filter(m => m.genre === 'Drama'), d => d.score).toFixed(2)}</div>
-            <div class="insight">Genre dengan rating tertinggi secara konsisten</div>
-        </div>
-        <div class="reliability-card">
-            <div class="label">Film dengan Rating Tertinggi</div>
-            <div class="value">${movieData.sort((a, b) => b.score - a.score)[0]?.name?.slice(0, 30) || '-'}...</div>
-            <div class="insight">⭐ ${movieData.sort((a, b) => b.score - a.score)[0]?.score || 0} · ${formatNumber(movieData.sort((a, b) => b.score - a.score)[0]?.votes || 0)} votes</div>
+        <div style="font-size:10px;color:var(--text-muted);text-align:center;">
+            💡 Film dengan votes tinggi = rating lebih representatif
         </div>
     `;
+
+            document.getElementById('movie-detail-content').innerHTML = html;
         }
+
+        function buildLegend() {
+            const wrap = document.getElementById('legend');
+            wrap.innerHTML = '';
+            GENRES.forEach(genre => {
+                const el = document.createElement('div');
+                el.className = 'legend-item';
+                el.innerHTML = `
+            <div class="legend-dot" style="background:${GENRE_COLORS[genre]}"></div>
+            <span>${genre}</span>
+        `;
+                wrap.appendChild(el);
+            });
+        }
+
+        // Resize handler
+        window.addEventListener('resize', () => {
+            setTimeout(() => {
+                if (movieData.length) {
+                    renderBubbleChart();
+                    renderScatterPlot();
+                    buildLegend();
+                    if (currentSelectedMovie) showMovieDetail(currentSelectedMovie);
+                }
+            }, 200);
+        });
     </script>
 </body>
 
