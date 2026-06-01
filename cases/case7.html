@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 7 — Reliabilitas Rating | Visualisasi Data Film</title>
+    <meta name="description"
+        content="Scatter plot votes vs score untuk melihat korelasi jumlah penilai dengan rating IMDb.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            background: var(--bg-base);
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 13, 18, .85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 28px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .brand-text {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            color: var(--text-primary);
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: var(--accent);
+            background: var(--accent-dim);
+            border: 1px solid var(--accent-glow);
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .topbar-case {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: .04em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .topbar-case span {
+            color: var(--text-secondary);
+        }
+
+        .page-wrap {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 36px 28px 80px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            transition: color .2s, border-color .2s;
+            margin-bottom: 28px;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        .back-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .case-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: var(--gold);
+            background: rgba(245, 158, 11, .12);
+            border: 1px solid rgba(245, 158, 11, .2);
+            padding: 4px 10px;
+            border-radius: 100px;
+            margin-bottom: 14px;
+        }
+
+        .case-badge-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: var(--gold);
+        }
+
+        h1.case-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: -.03em;
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        h1.case-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, var(--gold) 0%, #f5a623 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .case-desc {
+            font-size: .975rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            line-height: 1.65;
+            margin-bottom: 32px;
+        }
+
+        .stats-strip {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 28px;
+            width: fit-content;
+        }
+
+        .sstat {
+            padding: 14px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            border-right: 1px solid var(--border);
+        }
+
+        .sstat:last-child {
+            border-right: none;
+        }
+
+        .sstat-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            color: var(--text-primary);
+        }
+
+        .sstat-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .controls-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-elevated);
+            padding: 4px 12px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .filter-group select {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 12px;
+            font-weight: 500;
+            padding: 6px 0;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-group select:focus {
+            outline: none;
+        }
+
+        .ctrl-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .03em;
+            color: var(--text-secondary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            padding: 7px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: color .2s, border-color .2s;
+            user-select: none;
+        }
+
+        .ctrl-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        .ctrl-btn.active {
+            color: var(--gold);
+            border-color: var(--gold);
+            background: rgba(245, 158, 11, .1);
+        }
+
+        .hint-text {
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: .02em;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 28px;
+            margin-bottom: 16px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--gold) 0%, #f5a623 60%, transparent 100%);
+            opacity: .5;
+        }
+
+        .legend-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 6px 12px;
+            border-radius: 100px;
+            cursor: pointer;
+            border: 1px solid transparent;
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            transition: all .2s;
+            user-select: none;
+        }
+
+        .legend-item:hover {
+            border-color: var(--border-hover);
+            color: var(--text-primary);
+        }
+
+        .legend-item.active {
+            border-color: var(--border-hover);
+            background: var(--bg-elevated);
+        }
+
+        .legend-item.muted {
+            opacity: .3;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .stats-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 20px;
+        }
+
+        .stats-panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .reliability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .reliability-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            border-left: 3px solid var(--gold);
+        }
+
+        .reliability-card .label {
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .reliability-card .value {
+            font-size: 1.1rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .reliability-card .insight {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+
+        #tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            background: rgba(10, 10, 16, .97);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, .7);
+            font-family: 'Inter', sans-serif;
+            min-width: 220px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity .15s ease, transform .15s ease;
+        }
+
+        #tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tt-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .tt-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .tt-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .tt-genre {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .tt-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .tt-label {
+            color: var(--text-muted);
+        }
+
+        .tt-val {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .tt-badge {
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px solid var(--border);
+            font-size: 10px;
+            color: var(--gold);
+        }
+
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 420px;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loading-spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .page-wrap {
+                padding: 20px 16px 60px;
+            }
+
+            .chart-card {
+                padding: 16px;
+            }
+
+            .stats-strip {
+                width: 100%;
+            }
+
+            .sstat {
+                padding: 10px 16px;
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a href="../index.html" class="topbar-brand">
+                <span class="brand-dot"></span>
+                <span class="brand-text">VISDAT</span>
+                <span class="brand-sub">KLP 10</span>
+            </a>
+            <div class="topbar-case">Case <span>07</span> · Reliabilitas Rating</div>
+        </div>
+    </div>
+
+    <div class="page-wrap">
+        <a href="../index.html" class="back-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                <path fill-rule="evenodd"
+                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" />
+            </svg>
+            Kembali ke Dashboard
+        </a>
+
+        <div class="case-badge">
+            <span class="case-badge-dot"></span>
+            Case 07 · Scatter Plot Analysis
+        </div>
+        <h1 class="case-title">Reliabilitas <em>Rating IMDb</em></h1>
+        <p class="case-desc">
+            Semakin banyak jumlah <strong style="color:var(--gold)">votes (penilai)</strong>, semakin representatif
+            rating IMDb sebuah film.
+            Visualisasi ini membantu mengidentifikasi film dengan rating yang <strong>paling kredibel</strong> vs film
+            yang ratingnya
+            mungkin bias karena jumlah penilai sedikit.
+        </p>
+
+        <div class="stats-strip" id="stats-strip">
+            <div class="sstat"><span class="sstat-val" id="stat-total">—</span><span class="sstat-lbl">Total Film</span>
+            </div>
+            <div class="sstat"><span class="sstat-val" id="stat-avg-score">—</span><span class="sstat-lbl">Rata-rata
+                    Score</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-avg-votes">—</span><span class="sstat-lbl">Rata-rata
+                    Votes</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-correlation">—</span><span
+                    class="sstat-lbl">Korelasi</span></div>
+        </div>
+
+        <div class="controls-row">
+            <div class="controls-left">
+                <div class="filter-group">
+                    <label>🎭 Genre</label>
+                    <select id="genre-filter">
+                        <option value="all">Semua Genre</option>
+                    </select>
+                </div>
+                <div class="filter-group">
+                    <label>📊 Score Range</label>
+                    <select id="score-filter">
+                        <option value="all">Semua</option>
+                        <option value="7">Score ≥ 7.0 (Bagus)</option>
+                        <option value="8">Score ≥ 8.0 (Excellent)</option>
+                        <option value="9">Score ≥ 9.0 (Legend)</option>
+                    </select>
+                </div>
+                <button class="ctrl-btn active" id="btn-all">Semua Data</button>
+                <button class="ctrl-btn" id="btn-reliable">Votes > 100K</button>
+                <button class="ctrl-btn" id="btn-lowvotes">Votes < 10K</button>
+            </div>
+            <span class="hint-text">💡 Hover titik untuk detail film · Ukuran titik = votes (log)</span>
+        </div>
+
+        <div class="chart-card">
+            <div class="loading-state" id="loading">
+                <div class="loading-spinner"></div>
+                <span class="loading-text">Memuat data film…</span>
+            </div>
+            <svg id="main-chart" style="display:none"></svg>
+            <div class="legend-wrap" id="legend"></div>
+        </div>
+
+        <div class="stats-panel" id="insight-panel" style="display:none">
+            <div class="stats-panel-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10" />
+                    <path d="M12 16v-4M12 8h.01" />
+                </svg>
+                Insight Reliabilitas Rating
+            </div>
+            <div class="reliability-grid" id="reliability-grid"></div>
+        </div>
+    </div>
+
+    <div id="tooltip"></div>
+
+    <script src="../js/d3.v7.min.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════
+        const MAIN_GENRES = ['Action', 'Adventure', 'Animation', 'Biography', 'Comedy', 'Crime', 'Drama', 'Horror'];
+        const GENRE_COLORS = {
+            'Action': '#2dd4bf', 'Adventure': '#34d399', 'Animation': '#f97316',
+            'Biography': '#60a5fa', 'Comedy': '#e05c3a', 'Crime': '#f59e0b',
+            'Drama': '#a78bfa', 'Horror': '#fb7185'
+        };
+
+        let movieData = [];
+        let filteredData = [];
+        let activeGenres = new Set(MAIN_GENRES);
+        let currentScoreFilter = 'all';
+        let currentVotesFilter = 'all';
+
+        // ═══════════════════════════════════════════════════════════════
+        // LOAD DATA
+        // ═══════════════════════════════════════════════════════════════
+        d3.csv('../data/movies.csv').then(raw => {
+            movieData = raw.filter(d => {
+                const year = +d.year;
+                const score = +d.score;
+                const votes = +d.votes;
+                const budget = +d.budget;
+                const gross = +d.gross;
+                return year >= 1986 && year <= 2016 &&
+                    !isNaN(score) && !isNaN(votes) &&
+                    votes > 0 && budget > 0 && gross > 0 &&
+                    MAIN_GENRES.includes(d.genre);
+            }).map(d => ({
+                name: d.name,
+                genre: d.genre,
+                year: +d.year,
+                score: +d.score,
+                votes: +d.votes,
+                budget: +d.budget,
+                gross: +d.gross
+            }));
+
+            filteredData = [...movieData];
+            applyFilters();
+
+            // Update stats
+            updateStats();
+            populateGenreFilter();
+            buildLegend();
+            buildChart();
+            buildInsights();
+
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('main-chart').style.display = 'block';
+            document.getElementById('insight-panel').style.display = 'block';
+
+        }).catch(err => {
+            document.getElementById('loading').innerHTML = `
+        <div style="color:var(--gold);text-align:center">
+            <strong>Gagal memuat data</strong><br>
+            <small style="color:var(--text-muted)">${err.message}</small>
+        </div>`;
+        });
+
+        function applyFilters() {
+            filteredData = movieData.filter(m => {
+                if (!activeGenres.has(m.genre)) return false;
+                if (currentScoreFilter !== 'all' && m.score < +currentScoreFilter) return false;
+                if (currentVotesFilter === 'high' && m.votes < 100000) return false;
+                if (currentVotesFilter === 'low' && m.votes > 10000) return false;
+                return true;
+            });
+            updateStats();
+            updateChart();
+        }
+
+        function updateStats() {
+            const total = filteredData.length;
+            const avgScore = d3.mean(filteredData, d => d.score) || 0;
+            const avgVotes = d3.mean(filteredData, d => d.votes) || 0;
+
+            // Correlation between votes and score
+            const votesArr = filteredData.map(d => Math.log10(d.votes));
+            const scoresArr = filteredData.map(d => d.score);
+            const corr = calculateCorrelation(votesArr, scoresArr);
+
+            document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
+            document.getElementById('stat-avg-score').textContent = avgScore.toFixed(2);
+            document.getElementById('stat-avg-votes').textContent = formatNumber(avgVotes);
+            document.getElementById('stat-correlation').innerHTML = (isNaN(corr) ? 0 : corr).toFixed(2) + '<span style="font-size:10px;margin-left:3px;">' + (corr > 0 ? '↑' : '↓') + '</span>';
+        }
+
+        function calculateCorrelation(x, y) {
+            const n = x.length;
+            const sumX = d3.sum(x);
+            const sumY = d3.sum(y);
+            const sumXY = d3.sum(x.map((v, i) => v * y[i]));
+            const sumX2 = d3.sum(x.map(v => v * v));
+            const sumY2 = d3.sum(y.map(v => v * v));
+            const numerator = n * sumXY - sumX * sumY;
+            const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+            return denominator === 0 ? 0 : numerator / denominator;
+        }
+
+        function formatNumber(num) {
+            if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K';
+            return num.toString();
+        }
+
+        function formatCurrency(value) {
+            if (value >= 1e9) return '$' + (value / 1e9).toFixed(1) + 'B';
+            if (value >= 1e6) return '$' + (value / 1e6).toFixed(0) + 'M';
+            return '$' + value.toFixed(0);
+        }
+
+        function populateGenreFilter() {
+            const select = document.getElementById('genre-filter');
+            MAIN_GENRES.forEach(g => {
+                const option = document.createElement('option');
+                option.value = g;
+                option.textContent = g;
+                select.appendChild(option);
+            });
+            select.addEventListener('change', (e) => {
+                const val = e.target.value;
+                if (val === 'all') {
+                    activeGenres = new Set(MAIN_GENRES);
+                } else {
+                    activeGenres = new Set([val]);
+                }
+                updateLegendState();
+                applyFilters();
+            });
+        }
+
+        document.getElementById('score-filter').addEventListener('change', (e) => {
+            currentScoreFilter = e.target.value;
+            applyFilters();
+        });
+
+        document.getElementById('btn-all').addEventListener('click', () => {
+            currentVotesFilter = 'all';
+            setActiveButton('btn-all');
+            applyFilters();
+        });
+
+        document.getElementById('btn-reliable').addEventListener('click', () => {
+            currentVotesFilter = 'high';
+            setActiveButton('btn-reliable');
+            applyFilters();
+        });
+
+        document.getElementById('btn-lowvotes').addEventListener('click', () => {
+            currentVotesFilter = 'low';
+            setActiveButton('btn-lowvotes');
+            applyFilters();
+        });
+
+        function setActiveButton(activeId) {
+            ['btn-all', 'btn-reliable', 'btn-lowvotes'].forEach(id => {
+                const btn = document.getElementById(id);
+                if (id === activeId) btn.classList.add('active');
+                else btn.classList.remove('active');
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // LEGEND
+        // ═══════════════════════════════════════════════════════════════
+        function buildLegend() {
+            const wrap = document.getElementById('legend');
+            wrap.innerHTML = '';
+            MAIN_GENRES.forEach(genre => {
+                const el = document.createElement('div');
+                el.className = 'legend-item active';
+                el.id = `legend-${genre.toLowerCase()}`;
+                el.innerHTML = `<span class="legend-dot" style="background:${GENRE_COLORS[genre]}"></span><span>${genre}</span>`;
+                el.addEventListener('click', () => toggleGenre(genre));
+                wrap.appendChild(el);
+            });
+        }
+
+        function toggleGenre(genre) {
+            if (activeGenres.has(genre)) {
+                if (activeGenres.size === 1) return;
+                activeGenres.delete(genre);
+                document.getElementById('genre-filter').value = 'all';
+            } else {
+                activeGenres.add(genre);
+            }
+            updateLegendState();
+            applyFilters();
+        }
+
+        function updateLegendState() {
+            MAIN_GENRES.forEach(g => {
+                const el = document.getElementById(`legend-${g.toLowerCase()}`);
+                if (!el) return;
+                if (activeGenres.has(g)) {
+                    el.classList.add('active');
+                    el.classList.remove('muted');
+                } else {
+                    el.classList.remove('active');
+                    el.classList.add('muted');
+                }
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // CHART
+        // ═══════════════════════════════════════════════════════════════
+        const margin = { top: 28, right: 40, bottom: 56, left: 68 };
+        let width, height, innerW, innerH;
+        let svg, xScale, yScale, rScale;
+        let tooltip;
+
+        function getDims() {
+            const container = document.getElementById('main-chart').parentElement;
+            width = container.clientWidth - 32;
+            height = Math.max(420, Math.min(560, window.innerHeight * 0.5));
+            innerW = width - margin.left - margin.right;
+            innerH = height - margin.top - margin.bottom;
+            return { width, height, innerW, innerH };
+        }
+
+        function buildChart() {
+            const { width, height, innerW, innerH } = getDims();
+
+            svg = d3.select('#main-chart')
+                .attr('width', width)
+                .attr('height', height);
+
+            const g = svg.append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Scales
+            xScale = d3.scaleLog()
+                .domain([100, d3.max(movieData, d => d.votes) || 1000000])
+                .range([0, innerW]);
+
+            yScale = d3.scaleLinear()
+                .domain([0, 10])
+                .range([innerH, 0]);
+
+            rScale = d3.scaleSqrt()
+                .domain([100, d3.max(movieData, d => d.votes) || 1000000])
+                .range([3, 14]);
+
+            // Grid
+            g.append('g')
+                .attr('class', 'grid')
+                .call(d3.axisLeft(yScale).ticks(8).tickSize(-innerW).tickFormat(''))
+                .selectAll('.domain, .tick line')
+                .attr('stroke', 'rgba(255,255,255,.05)');
+
+            // Axes
+            g.append('g')
+                .attr('transform', `translate(0,${innerH})`)
+                .call(d3.axisBottom(xScale).tickFormat(d => formatNumber(d)));
+
+            g.append('g')
+                .call(d3.axisLeft(yScale).ticks(8));
+
+            // Labels
+            g.append('text')
+                .attr('x', innerW / 2)
+                .attr('y', innerH + 42)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'var(--text-muted)')
+                .attr('font-size', 11)
+                .attr('font-weight', 600)
+                .text('JUMLAH VOTES (Log Scale)');
+
+            g.append('text')
+                .attr('transform', 'rotate(-90)')
+                .attr('x', -innerH / 2)
+                .attr('y', -48)
+                .attr('text-anchor', 'middle')
+                .attr('fill', 'var(--text-muted)')
+                .attr('font-size', 11)
+                .attr('font-weight', 600)
+                .text('IMDb SCORE');
+
+            // Reference lines
+            g.append('line')
+                .attr('x1', xScale(100000))
+                .attr('x2', xScale(100000))
+                .attr('y1', 0)
+                .attr('y2', innerH)
+                .attr('stroke', 'rgba(245,158,11,.3)')
+                .attr('stroke-dasharray', '5,5')
+                .attr('stroke-width', 1);
+
+            g.append('text')
+                .attr('x', xScale(100000) - 5)
+                .attr('y', 15)
+                .attr('text-anchor', 'end')
+                .attr('fill', 'rgba(245,158,11,.7)')
+                .attr('font-size', 9)
+                .text('100K votes (reliable threshold)');
+
+            g.append('line')
+                .attr('x1', 0)
+                .attr('x2', innerW)
+                .attr('y1', yScale(8))
+                .attr('y2', yScale(8))
+                .attr('stroke', 'rgba(52,211,153,.3)')
+                .attr('stroke-dasharray', '5,5')
+                .attr('stroke-width', 1);
+
+            // Tooltip
+            tooltip = d3.select('#tooltip');
+
+            // Group for points
+            g.append('g').attr('class', 'points-group');
+
+            updateChart();
+
+            // Resize handler
+            window.addEventListener('resize', () => {
+                setTimeout(() => {
+                    const newDims = getDims();
+                    svg.attr('width', newDims.width).attr('height', newDims.height);
+                    xScale.range([0, newDims.innerW]);
+                    yScale.range([newDims.innerH, 0]);
+                    updateChart();
+                }, 150);
+            });
+        }
+
+        function updateChart() {
+            if (!svg) return;
+            const { innerW, innerH } = getDims();
+
+            const pointsGroup = svg.select('.points-group');
+            pointsGroup.selectAll('circle').remove();
+
+            pointsGroup.selectAll('circle')
+                .data(filteredData)
+                .enter()
+                .append('circle')
+                .attr('cx', d => xScale(d.votes))
+                .attr('cy', d => yScale(d.score))
+                .attr('r', d => rScale(d.votes))
+                .attr('fill', d => GENRE_COLORS[d.genre])
+                .attr('fill-opacity', 0.65)
+                .attr('stroke', 'none')
+                .on('mouseover', function (event, d) {
+                    d3.select(this).attr('stroke', 'white').attr('stroke-width', 2).attr('fill-opacity', 0.95);
+                    tooltip.html(`
+                <div class="tt-header">
+                    <div class="tt-dot" style="background:${GENRE_COLORS[d.genre]}"></div>
+                    <span style="font-size:12px;font-weight:700;">⭐ ${d.score.toFixed(1)}</span>
+                </div>
+                <div class="tt-title">${d.name}</div>
+                <div class="tt-genre">${d.genre} · ${d.year}</div>
+                <div class="tt-row"><span class="tt-label">Votes:</span><span class="tt-val">${formatNumber(d.votes)}</span></div>
+                <div class="tt-row"><span class="tt-label">Budget:</span><span class="tt-val">${formatCurrency(d.budget)}</span></div>
+                <div class="tt-row"><span class="tt-label">Gross:</span><span class="tt-val">${formatCurrency(d.gross)}</span></div>
+                <div class="tt-badge">${d.votes > 100000 ? '✓ Reliable rating' : d.votes < 10000 ? '⚠️ Low votes — may be biased' : '📊 Moderate confidence'}</div>
+            `);
+                    tooltip.classed('visible', true);
+                    const tx = Math.min(event.clientX + 12, window.innerWidth - 280);
+                    const ty = Math.min(event.clientY - 8, window.innerHeight - 160);
+                    tooltip.style('left', tx + 'px').style('top', ty + 'px');
+                })
+                .on('mouseout', function () {
+                    d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.65);
+                    tooltip.classed('visible', false);
+                });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // INSIGHTS
+        // ═══════════════════════════════════════════════════════════════
+        function buildInsights() {
+            const reliableFilms = movieData.filter(m => m.votes > 100000);
+            const lowVoteFilms = movieData.filter(m => m.votes < 5000 && m.score > 8);
+            const avgReliableScore = d3.mean(reliableFilms, d => d.score) || 0;
+            const avgAllScore = d3.mean(movieData, d => d.score) || 0;
+            const diff = (avgReliableScore - avgAllScore).toFixed(2);
+
+            const grid = document.getElementById('reliability-grid');
+            grid.innerHTML = `
+        <div class="reliability-card">
+            <div class="label">Rating Reliable (Votes > 100K)</div>
+            <div class="value">${avgReliableScore.toFixed(2)}</div>
+            <div class="insight">${diff > 0 ? `+${diff} poin` : `${diff} poin`} dari rata-rata semua film</div>
+        </div>
+        <div class="reliability-card">
+            <div class="label">Film dengan Votes < 5K & Score > 8</div>
+            <div class="value">${lowVoteFilms.length} film</div>
+            <div class="insight">Film "hidden gem" potensial — rating mungkin belum representatif</div>
+        </div>
+        <div class="reliability-card">
+            <div class="label">Rata-rata Score Genre Drama</div>
+            <div class="value">${(d3.mean(movieData.filter(m => m.genre === 'Drama'), d => d.score) || 0).toFixed(2)}</div>
+            <div class="insight">Genre dengan rating tertinggi secara konsisten</div>
+        </div>
+        <div class="reliability-card">
+            <div class="label">Film dengan Rating Tertinggi</div>
+            <div class="value">${movieData.sort((a, b) => b.score - a.score)[0]?.name?.slice(0, 30) || '-'}...</div>
+            <div class="insight">⭐ ${movieData.sort((a, b) => b.score - a.score)[0]?.score || 0} · ${formatNumber(movieData.sort((a, b) => b.score - a.score)[0]?.votes || 0)} votes</div>
+        </div>
+    `;
+        }
+    </script>
+</body>
+
+</html>

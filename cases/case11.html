@@ -1,0 +1,490 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 11 — Popcorn vs Bermutu | Visualisasi Data Film</title>
+    <meta name="description" content="Mengidentifikasi film popcorn vs film bermutu pada Bubble Scatter Plot berdasarkan ukuran bubble dan posisi.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body { background: var(--bg-base); }
+        .topbar { position: sticky; top: 0; z-index: 100;
+            background: rgba(13,13,18,.85); backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border); }
+        .topbar-inner { max-width: 1320px; margin: 0 auto; padding: 0 28px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between; }
+        .topbar-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .brand-dot { width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
+        .brand-sub { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
+            background: var(--accent-dim); border: 1px solid var(--accent-glow);
+            padding: 2px 7px; border-radius: 4px; }
+        .topbar-case { font-size: 12px; font-weight: 500; color: var(--text-muted);
+            letter-spacing: .04em; display: flex; align-items: center; gap: 6px; }
+        .topbar-case span { color: var(--text-secondary); }
+
+        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
+        .back-btn { display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--text-muted); text-decoration: none;
+            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-elevated); transition: color .2s, border-color .2s; margin-bottom: 28px; }
+        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+
+        .case-badge { display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: #c084fc; background: rgba(192, 132, 252, .12);
+            border: 1px solid rgba(192, 132, 252, .2); padding: 4px 10px; border-radius: 100px;
+            margin-bottom: 14px; }
+        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #c084fc; }
+
+        h1.case-title { font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary); margin-bottom: 12px; }
+        h1.case-title em { font-style: normal;
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .case-desc { font-size: .975rem; color: var(--text-secondary); max-width: 680px;
+            line-height: 1.65; margin-bottom: 32px; }
+
+        /* Stats Strip */
+        .stats-strip { display: flex; gap: 0; flex-wrap: wrap;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 24px; width: fit-content; }
+        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
+            border-right: 1px solid var(--border); }
+        .sstat:last-child { border-right: none; }
+        .sstat-val { font-size: 1.25rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
+        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .06em;
+            text-transform: uppercase; color: var(--text-muted); }
+
+        /* Controls */
+        .controls-row { display: flex; align-items: center; flex-wrap: wrap; gap: 20px;
+            margin-bottom: 20px; background: var(--bg-card); padding: 16px 24px;
+            border-radius: var(--radius-md); border: 1px solid var(--border); }
+        .filter-group { display: flex; align-items: center; gap: 12px; }
+        .filter-group label { font-size: 12px; font-weight: 600; color: var(--text-muted);
+            text-transform: uppercase; letter-spacing: .05em; }
+        .filter-group select, .filter-group input[type="number"] {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            color: var(--text-primary); padding: 6px 12px; border-radius: 6px;
+            font-family: 'Inter', sans-serif; font-size: 13px; outline: none; }
+        .filter-group select:focus, .filter-group input:focus { border-color: #c084fc; }
+        .range-slider-wrap { display: flex; align-items: center; gap: 12px; }
+        .range-slider-wrap input[type=range] { width: 100px; accent-color: #c084fc; }
+        .btn-reset { background: transparent; border: 1px solid var(--border);
+            color: var(--text-muted); padding: 6px 16px; border-radius: 6px;
+            font-size: 12px; font-weight: 600; cursor: pointer; transition: all .2s; margin-left: auto; }
+        .btn-reset:hover { color: var(--text-primary); border-color: var(--text-primary); }
+
+        /* Chart */
+        .chart-card { background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 24px; position: relative; overflow: hidden; margin-bottom: 24px; }
+        .chart-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, #c084fc 0%, #a78bfa 60%, transparent 100%); opacity: .5; }
+        #main-chart { width: 100%; height: 500px; }
+        
+        .axis-label { fill: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.05em; }
+        .tick text { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 10px; }
+        .tick line { stroke: rgba(255,255,255,0.05); }
+        .domain { display: none; }
+
+        .zone-label { font-size: 14px; font-weight: 800; opacity: 0.2; pointer-events: none; text-transform: uppercase; letter-spacing: 0.1em; }
+
+        .bubble { transition: opacity 0.2s, stroke-width 0.2s; }
+        .bubble:hover { filter: brightness(1.2); }
+
+        /* Tooltip */
+        #tooltip { position: fixed; pointer-events: none; z-index: 999;
+            background: rgba(10,10,16,.97); border: 1px solid var(--border-hover);
+            border-radius: var(--radius-md); padding: 14px 18px; box-shadow: 0 12px 48px rgba(0,0,0,.7);
+            font-family: 'Inter', sans-serif; min-width: 240px; opacity: 0; transform: translateY(6px);
+            transition: opacity .15s, transform .15s; }
+        #tooltip.visible { opacity: 1; transform: translateY(0); }
+        .tt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+        .tt-dot { width: 10px; height: 10px; border-radius: 50%; }
+        .tt-title { font-size: 14px; font-weight: 800; color: var(--text-primary); margin-bottom: 2px; }
+        .tt-genre { font-size: 12px; color: var(--text-muted); margin-bottom: 12px; }
+        .tt-row { display: flex; justify-content: space-between; align-items: center; font-size: 12px; margin-bottom: 4px; }
+        .tt-label { color: var(--text-muted); }
+        .tt-val { color: var(--text-primary); font-weight: 700; }
+        .tt-badge { margin-top: 10px; padding: 4px 8px; border-radius: 4px; font-size: 10px; font-weight: 800; text-transform: uppercase; text-align: center; border: 1px solid; }
+
+        /* Insight */
+        .insight-panel { background: rgba(167, 139, 250, 0.05); border: 1px solid rgba(167, 139, 250, 0.2);
+            border-radius: var(--radius-lg); padding: 20px 24px; display: flex; gap: 16px; align-items: flex-start; }
+        .insight-icon { color: #a78bfa; flex-shrink: 0; background: rgba(167, 139, 250, 0.15); padding: 10px; border-radius: 50%; }
+        .insight-text p { margin: 0; font-size: 14px; line-height: 1.6; color: var(--text-secondary); }
+
+        @media (max-width: 768px) { .controls-row { flex-direction: column; align-items: flex-start; } .btn-reset { margin-left: 0; width: 100%; } }
+    </style>
+</head>
+<body>
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a href="../index.html" class="topbar-brand">
+                <span class="brand-dot"></span>
+                <span class="brand-text">VISDAT</span>
+                <span class="brand-sub">KLP 10</span>
+            </a>
+            <div class="topbar-case">Case <span>11</span> · Popcorn vs Bermutu</div>
+        </div>
+    </div>
+
+    <div class="page-wrap">
+        <a href="../index.html" class="back-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14"><path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" /></svg>
+            Kembali ke Dashboard
+        </a>
+
+        <div class="case-badge">
+            <span class="case-badge-dot"></span>
+            Case 11 · Bubble Scatter
+        </div>
+        <h1 class="case-title">Popcorn vs <em>Bermutu</em></h1>
+        <p class="case-desc">
+            Mengidentifikasi film popcorn vs film bermutu berdasarkan hubungan antara <strong>Score IMDb</strong>, <strong>Gross Revenue</strong>, <strong>Budget</strong>, dan Genre. 
+            Sumbu X adalah Skor IMDb (0–10) dan Sumbu Y adalah Gross (skala Log). Semakin besar ukuran <em>bubble</em>, semakin besar budget yang dialokasikan.
+        </p>
+
+        <!-- Stats Strip -->
+        <div class="stats-strip" id="stats-strip">
+            <div class="sstat"><span class="sstat-val" id="stat-total">—</span><span class="sstat-lbl">Total Tampil</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-popcorn" style="color: #fb7185">—</span><span class="sstat-lbl">Film Popcorn</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-gem" style="color: #34d399">—</span><span class="sstat-lbl">Film Bermutu</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-max-gross">—</span><span class="sstat-lbl">Gross Tertinggi</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-max-score">—</span><span class="sstat-lbl">Score Tertinggi</span></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-row">
+            <div class="filter-group">
+                <label>Genre:</label>
+                <select id="sel-genre">
+                    <option value="All">Semua Genre</option>
+                    <option value="Action">Action</option>
+                    <option value="Adventure">Adventure</option>
+                    <option value="Animation">Animation</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Crime">Crime</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Fantasy">Fantasy</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Sci-Fi">Sci-Fi</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label>Min Score:</label>
+                <input type="number" id="sel-min-score" min="0" max="10" step="0.5" value="0" style="width:70px">
+            </div>
+            <div class="filter-group">
+                <label>Tahun:</label>
+                <div class="range-slider-wrap">
+                    <span id="lbl-year-min" style="color:var(--text-primary);font-size:12px;font-weight:700">1980</span>
+                    <input type="range" id="sel-year-min" min="1980" max="2020" value="1980">
+                    <span style="color:var(--text-muted);font-weight:700;">-</span>
+                    <input type="range" id="sel-year-max" min="1980" max="2020" value="2020">
+                    <span id="lbl-year-max" style="color:var(--text-primary);font-size:12px;font-weight:700">2020</span>
+                </div>
+            </div>
+            <button class="btn-reset" id="btn-reset">↺ Reset</button>
+        </div>
+
+        <!-- Chart Area -->
+        <div class="chart-card">
+            <div id="main-chart"></div>
+        </div>
+
+        <!-- Insight Panel -->
+        <div class="insight-panel">
+            <div class="insight-icon">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+            </div>
+            <div class="insight-text">
+                <p>
+                    <strong style="color:var(--text-primary)">Insight:</strong> 
+                    Visualisasi ini menunjukkan bahwa film yang sangat laris belum tentu memiliki rating tinggi. Sebaliknya, beberapa film dengan kualitas tinggi bisa memiliki pendapatan yang lebih kecil karena faktor promosi, distribusi, atau target pasar.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div id="tooltip"></div>
+
+    <script src="../js/d3.v7.min.js"></script>
+    <script>
+        const GENRE_COLORS = {
+            'Action': '#e05c3a', 'Adventure': '#34d399', 'Animation': '#f59e0b',
+            'Biography': '#60a5fa', 'Comedy': '#fb7185', 'Crime': '#f97316',
+            'Drama': '#a78bfa', 'Horror': '#6b705c', 'Fantasy': '#c084fc',
+            'Mystery': '#2dd4bf', 'Sci-Fi': '#818cf8', 'Thriller': '#ef4444',
+            'Romance': '#f472b6', 'Family': '#fbbf24'
+        };
+        const colorFallback = d3.scaleOrdinal(d3.schemeSet2);
+
+        function formatMoney(value) {
+            if (value >= 1e9) return "$" + (value / 1e9).toFixed(2) + "B";
+            if (value >= 1e6) return "$" + (value / 1e6).toFixed(2) + "M";
+            return "$" + value.toLocaleString();
+        }
+
+        let rawData = [], filteredData = [];
+        let thresholdGross = 0;
+
+        const container = document.getElementById('main-chart');
+        let svg, g, xAxisG, yAxisG;
+        let xScale, yScale, rScale;
+
+        d3.csv('../data/movies.csv').then(data => {
+            rawData = data.map(d => ({
+                name: d.name,
+                genre: d.genre,
+                year: parseInt(d.year),
+                score: parseFloat(d.score),
+                votes: parseInt(d.votes),
+                budget: parseFloat(d.budget),
+                gross: parseFloat(d.gross)
+            })).filter(d => 
+                !isNaN(d.score) && !isNaN(d.gross) && d.gross > 0 && 
+                !isNaN(d.budget) && d.budget > 0 && !isNaN(d.year) && d.genre
+            );
+
+            const minYear = d3.min(rawData, d => d.year) || 1980;
+            const maxYear = d3.max(rawData, d => d.year) || 2020;
+            
+            document.getElementById('sel-year-min').min = minYear;
+            document.getElementById('sel-year-min').max = maxYear;
+            document.getElementById('sel-year-min').value = minYear;
+            document.getElementById('lbl-year-min').textContent = minYear;
+            
+            document.getElementById('sel-year-max').min = minYear;
+            document.getElementById('sel-year-max').max = maxYear;
+            document.getElementById('sel-year-max').value = maxYear;
+            document.getElementById('lbl-year-max').textContent = maxYear;
+
+            // Hitung threshold gross tinggi (persentil 75 dari keseluruhan data)
+            const allGross = rawData.map(d => d.gross).sort(d3.ascending);
+            thresholdGross = d3.quantile(allGross, 0.75) || 50000000;
+
+            setupChart();
+            setupControls();
+            applyFilters();
+        });
+
+        function setupControls() {
+            const elGen = document.getElementById('sel-genre');
+            const elMinScore = document.getElementById('sel-min-score');
+            const elYMin = document.getElementById('sel-year-min');
+            const elYMax = document.getElementById('sel-year-max');
+            
+            const updateFilter = () => { applyFilters(); };
+
+            elGen.addEventListener('change', updateFilter);
+            elMinScore.addEventListener('input', updateFilter);
+            elYMin.addEventListener('input', (e) => {
+                if(parseInt(e.target.value) > parseInt(elYMax.value)) elYMax.value = e.target.value;
+                document.getElementById('lbl-year-min').textContent = e.target.value;
+                document.getElementById('lbl-year-max').textContent = elYMax.value;
+                updateFilter();
+            });
+            elYMax.addEventListener('input', (e) => {
+                if(parseInt(e.target.value) < parseInt(elYMin.value)) elYMin.value = e.target.value;
+                document.getElementById('lbl-year-max').textContent = e.target.value;
+                document.getElementById('lbl-year-min').textContent = elYMin.value;
+                updateFilter();
+            });
+
+            document.getElementById('btn-reset').addEventListener('click', () => {
+                elGen.value = 'All';
+                elMinScore.value = 0;
+                elYMin.value = elYMin.min; elYMax.value = elYMax.max;
+                document.getElementById('lbl-year-min').textContent = elYMin.min;
+                document.getElementById('lbl-year-max').textContent = elYMax.max;
+                updateFilter();
+            });
+
+            window.addEventListener('resize', () => {
+                setupChart();
+                renderChart();
+            });
+        }
+
+        function getCategory(d) {
+            if (d.score < 6.5 && d.gross >= thresholdGross) return "Popcorn";
+            if (d.score >= 7.5 && d.gross < thresholdGross) return "Bermutu";
+            return "Netral";
+        }
+
+        function applyFilters() {
+            const gen = document.getElementById('sel-genre').value;
+            const ms = parseFloat(document.getElementById('sel-min-score').value) || 0;
+            const yMin = parseInt(document.getElementById('sel-year-min').value);
+            const yMax = parseInt(document.getElementById('sel-year-max').value);
+
+            filteredData = rawData.filter(d => {
+                return (gen === 'All' || d.genre === gen) &&
+                       d.score >= ms &&
+                       d.year >= yMin && d.year <= yMax;
+            });
+
+            updateStats();
+            renderChart();
+        }
+
+        function updateStats() {
+            let countPopcorn = 0, countGem = 0;
+            let maxGrossFilm = null, maxScoreFilm = null;
+
+            filteredData.forEach(d => {
+                const cat = getCategory(d);
+                if(cat === 'Popcorn') countPopcorn++;
+                if(cat === 'Bermutu') countGem++;
+                if(!maxGrossFilm || d.gross > maxGrossFilm.gross) maxGrossFilm = d;
+                if(!maxScoreFilm || d.score > maxScoreFilm.score) maxScoreFilm = d;
+            });
+
+            document.getElementById('stat-total').textContent = filteredData.length.toLocaleString('id-ID');
+            document.getElementById('stat-popcorn').textContent = countPopcorn;
+            document.getElementById('stat-gem').textContent = countGem;
+            document.getElementById('stat-max-gross').textContent = maxGrossFilm ? maxGrossFilm.name.substring(0,20) : '-';
+            document.getElementById('stat-max-score').textContent = maxScoreFilm ? maxScoreFilm.name.substring(0,20) : '-';
+        }
+
+        function setupChart() {
+            container.innerHTML = "";
+            const w = container.clientWidth;
+            const h = container.clientHeight;
+            const margin = { top: 30, right: 30, bottom: 50, left: 70 };
+            const innerW = w - margin.left - margin.right;
+            const innerH = h - margin.top - margin.bottom;
+
+            svg = d3.select(container).append('svg').attr('width', w).attr('height', h);
+            g = svg.append('g').attr('transform', `translate(${margin.left},${margin.top})`);
+
+            // Setup scales
+            xScale = d3.scaleLinear().domain([0, 10]).range([0, innerW]);
+            yScale = d3.scaleLog().domain([100000, 3e9]).range([innerH, 0]).clamp(true); // gross 100k to 3B
+            rScale = d3.scaleSqrt().domain([10000, 350000000]).range([3, 20]).clamp(true); // budget 10k to 350M
+
+            // Background Zones & Annotations
+            // Popcorn Zone (Score < 6.5, Gross >= threshold)
+            g.append('rect')
+                .attr('x', xScale(0))
+                .attr('y', yScale(3e9))
+                .attr('width', xScale(6.5) - xScale(0))
+                .attr('height', yScale(thresholdGross) - yScale(3e9))
+                .attr('fill', 'rgba(251, 113, 133, 0.05)');
+            
+            g.append('text').attr('class', 'zone-label').attr('fill', '#fb7185')
+                .attr('x', xScale(3.25)).attr('y', yScale(thresholdGross) - 20)
+                .attr('text-anchor', 'middle').text('POPCORN ZONE');
+
+            // Quality Gem Zone (Score >= 7.5, Gross < threshold)
+            g.append('rect')
+                .attr('x', xScale(7.5))
+                .attr('y', yScale(thresholdGross))
+                .attr('width', xScale(10) - xScale(7.5))
+                .attr('height', innerH - yScale(thresholdGross))
+                .attr('fill', 'rgba(52, 211, 153, 0.05)');
+                
+            g.append('text').attr('class', 'zone-label').attr('fill', '#34d399')
+                .attr('x', xScale(8.75)).attr('y', yScale(thresholdGross) + 30)
+                .attr('text-anchor', 'middle').text('QUALITY GEM');
+
+            // Threshold lines
+            g.append('line').attr('x1', xScale(6.5)).attr('x2', xScale(6.5)).attr('y1', 0).attr('y2', innerH)
+                .attr('stroke', 'rgba(255,255,255,0.2)').attr('stroke-dasharray', '4 4');
+            g.append('text').attr('x', xScale(6.5)+5).attr('y', 15).attr('fill', 'rgba(255,255,255,0.4)').attr('font-size', '10px').text('Score 6.5');
+            
+            g.append('line').attr('x1', xScale(7.5)).attr('x2', xScale(7.5)).attr('y1', 0).attr('y2', innerH)
+                .attr('stroke', 'rgba(255,255,255,0.2)').attr('stroke-dasharray', '4 4');
+            g.append('text').attr('x', xScale(7.5)+5).attr('y', 15).attr('fill', 'rgba(255,255,255,0.4)').attr('font-size', '10px').text('Score 7.5');
+
+            g.append('line').attr('x1', 0).attr('x2', innerW).attr('y1', yScale(thresholdGross)).attr('y2', yScale(thresholdGross))
+                .attr('stroke', 'rgba(255,255,255,0.2)').attr('stroke-dasharray', '4 4');
+            g.append('text').attr('x', innerW - 5).attr('y', yScale(thresholdGross)-5).attr('text-anchor', 'end').attr('fill', 'rgba(255,255,255,0.4)').attr('font-size', '10px').text('Gross ke-75%');
+
+            // Axes
+            xAxisG = g.append('g').attr('transform', `translate(0,${innerH})`)
+                .call(d3.axisBottom(xScale).ticks(10));
+            yAxisG = g.append('g')
+                .call(d3.axisLeft(yScale).ticks(5, "~s").tickFormat(d => "$" + (d >= 1e9 ? d/1e9 + "B" : d >= 1e6 ? d/1e6 + "M" : d)));
+            
+            // Grid lines inside axis ticks
+            yAxisG.selectAll('.tick line').clone().attr('x2', innerW).attr('stroke', 'rgba(255,255,255,0.05)');
+
+            // Labels
+            g.append('text').attr('class', 'axis-label').attr('x', innerW/2).attr('y', innerH + 40).attr('text-anchor', 'middle').text('IMDb SCORE (Kualitas)');
+            g.append('text').attr('class', 'axis-label').attr('transform', 'rotate(-90)').attr('x', -innerH/2).attr('y', -50).attr('text-anchor', 'middle').text('GROSS REVENUE (Komersial) — Log Scale');
+
+            // Group for bubbles
+            g.append('g').attr('class', 'bubbles-group');
+        }
+
+        function renderChart() {
+            if(!svg) return;
+            const tooltip = d3.select('#tooltip');
+            const group = g.select('.bubbles-group');
+
+            const bubbles = group.selectAll('.bubble')
+                .data(filteredData, d => d.name);
+
+            bubbles.exit().transition().duration(300).attr('r', 0).remove();
+
+            const enter = bubbles.enter().append('circle')
+                .attr('class', 'bubble')
+                .attr('cx', d => xScale(d.score))
+                .attr('cy', d => yScale(d.gross))
+                .attr('r', 0)
+                .attr('fill', d => GENRE_COLORS[d.genre] || colorFallback(d.genre))
+                .attr('fill-opacity', 0.65)
+                .attr('stroke', 'none')
+                .on('mouseover', function(event, d) {
+                    const el = d3.select(this);
+                    const origR = rScale(d.budget);
+                    el.attr('stroke', 'white').attr('stroke-width', 2).attr('r', origR * 1.3).attr('fill-opacity', 1).raise();
+
+                    const cat = getCategory(d);
+                    let catColor = 'var(--border)';
+                    if(cat === 'Popcorn') catColor = '#fb7185';
+                    if(cat === 'Bermutu') catColor = '#34d399';
+
+                    tooltip.html(`
+                        <div class="tt-header">
+                            <div class="tt-dot" style="background:${GENRE_COLORS[d.genre] || colorFallback(d.genre)}"></div>
+                            <span class="tt-title">${d.name}</span>
+                        </div>
+                        <div class="tt-genre">${d.genre} · ${d.year}</div>
+                        <div class="tt-row"><span class="tt-label">Score IMDb:</span><span class="tt-val">⭐ ${d.score.toFixed(1)}</span></div>
+                        <div class="tt-row"><span class="tt-label">Gross Revenue:</span><span class="tt-val">${formatMoney(d.gross)}</span></div>
+                        <div class="tt-row"><span class="tt-label">Budget:</span><span class="tt-val">${formatMoney(d.budget)}</span></div>
+                        <div class="tt-row"><span class="tt-label">Votes:</span><span class="tt-val">${d.votes.toLocaleString('id-ID')}</span></div>
+                        <div class="tt-badge" style="border-color:${catColor}; color:${catColor === 'var(--border)' ? 'var(--text-secondary)' : catColor}; background:rgba(255,255,255,0.05)">${cat}</div>
+                    `);
+                    tooltip.classed('visible', true);
+                    
+                    const tx = Math.min(event.clientX + 16, window.innerWidth - 260);
+                    const ty = Math.min(event.clientY - 10, window.innerHeight - 200);
+                    tooltip.style('left', tx + 'px').style('top', ty + 'px');
+                })
+                .on('mouseout', function(event, d) {
+                    d3.select(this).attr('stroke', 'none').attr('r', rScale(d.budget)).attr('fill-opacity', 0.65);
+                    tooltip.classed('visible', false);
+                });
+
+            bubbles.merge(enter)
+                .transition().duration(600)
+                .attr('cx', d => xScale(d.score))
+                .attr('cy', d => yScale(d.gross))
+                .attr('r', d => rScale(d.budget));
+        }
+    </script>
+</body>
+</html>

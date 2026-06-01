@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 10 — Era Keemasan Genre | Visualisasi Data Film</title>
+    <meta name="description" content="Stacked area chart menampilkan tren jumlah film per genre dari 1986 hingga 2016.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        /* ── Page-level overrides ── */
+        body { background: var(--bg-base); }
+
+        /* Top bar (reuse from index) */
+        .topbar { position: sticky; top: 0; z-index: 100;
+            background: rgba(13,13,18,.85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border); }
+        .topbar-inner { max-width: 1320px; margin: 0 auto; padding: 0 28px;
+            height: 56px; display: flex; align-items: center; justify-content: space-between; }
+        .topbar-brand { display: flex; align-items: center; gap: 8px; text-decoration: none; }
+        .brand-dot { width: 10px; height: 10px; border-radius: 50%;
+            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow); }
+        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
+        .brand-sub { font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
+            background: var(--accent-dim); border: 1px solid var(--accent-glow);
+            padding: 2px 7px; border-radius: 4px; }
+        .topbar-case { font-size: 12px; font-weight: 500; color: var(--text-muted);
+            letter-spacing: .04em; display: flex; align-items: center; gap: 6px; }
+        .topbar-case span { color: var(--text-secondary); }
+
+        /* Page layout */
+        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
+
+        /* Back button */
+        .back-btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
+            color: var(--text-muted); text-decoration: none;
+            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
+            background: var(--bg-elevated); transition: color .2s, border-color .2s;
+            margin-bottom: 28px;
+        }
+        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .back-btn svg { width: 14px; height: 14px; }
+
+        /* Case header */
+        .case-badge { display: inline-flex; align-items: center; gap: 6px;
+            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
+            color: var(--teal); background: var(--teal-dim);
+            border: 1px solid rgba(45,212,191,.2); padding: 4px 10px; border-radius: 100px;
+            margin-bottom: 14px; }
+        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--teal); }
+
+        h1.case-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
+            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+        h1.case-title em { font-style: normal;
+            background: linear-gradient(135deg, var(--accent) 0%, #f5a623 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+
+        .case-desc { font-size: .975rem; color: var(--text-secondary);
+            max-width: 680px; line-height: 1.65; margin-bottom: 32px; }
+
+        /* Stats strip */
+        .stats-strip { display: flex; gap: 0; flex-wrap: wrap;
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
+            width: fit-content; }
+        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
+            border-right: 1px solid var(--border); }
+        .sstat:last-child { border-right: none; }
+        .sstat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
+        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .08em;
+            text-transform: uppercase; color: var(--text-muted); }
+
+        /* Controls row */
+        .controls-row { display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: 12px; margin-bottom: 16px; }
+        .controls-left { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .ctrl-btn { display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 600; letter-spacing: .03em;
+            color: var(--text-secondary); background: var(--bg-elevated);
+            border: 1px solid var(--border); padding: 7px 14px; border-radius: 6px;
+            cursor: pointer; transition: color .2s, border-color .2s; user-select: none; }
+        .ctrl-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
+        .ctrl-btn.active { color: var(--accent); border-color: var(--accent);
+            background: var(--accent-dim); }
+        .ctrl-btn svg { width: 13px; height: 13px; }
+        .hint-text { font-size: 11px; color: var(--text-muted); letter-spacing: .02em; }
+
+        /* Chart card */
+        .chart-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 28px; margin-bottom: 16px;
+            position: relative; overflow: hidden;
+        }
+        .chart-card::before { /* subtle top accent line */
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent) 0%, #f5a623 60%, transparent 100%);
+            opacity: .5;
+        }
+        /* Insight Panel */
+        .insight-panel {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 28px; margin-bottom: 28px;
+            display: flex; gap: 20px; align-items: center;
+        }
+        .insight-icon { width: 48px; height: 48px; border-radius: 12px;
+            background: var(--accent-dim); color: var(--accent);
+            display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .insight-text { font-size: 14px; color: var(--text-secondary); line-height: 1.6; }
+
+        /* Brush card */
+        .brush-card { background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 16px 28px; margin-bottom: 28px; }
+        .brush-label { font-size: 10px; font-weight: 600; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 8px; }
+
+        /* Legend */
+        .legend-wrap { display: flex; flex-wrap: wrap; gap: 8px;
+            margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--border); }
+        .legend-item {
+            display: flex; align-items: center; gap: 7px;
+            padding: 6px 12px; border-radius: 100px; cursor: pointer;
+            border: 1px solid transparent;
+            font-size: 12px; font-weight: 500; color: var(--text-secondary);
+            transition: border-color .2s, background .2s, color .2s, opacity .2s;
+            user-select: none;
+        }
+        .legend-item:hover { border-color: var(--border-hover); color: var(--text-primary); }
+        .legend-item.active {
+            border-color: var(--border-hover); color: var(--text-primary);
+            background: var(--bg-elevated);
+        }
+        .legend-item.muted { opacity: .3; }
+        .legend-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+
+        /* SVG styles */
+        #main-chart { width: 100%; display: block; }
+        .area-path { cursor: pointer; transition: opacity .3s ease, filter .3s ease; }
+        .area-path.faded { opacity: .07; }
+        .area-path.highlighted { filter: brightness(1.25); }
+
+        .axis text { fill: var(--text-muted); font-family: 'Inter', sans-serif;
+            font-size: 11px; font-weight: 500; }
+        .axis line, .axis path { stroke: rgba(255,255,255,.07); }
+        .axis .domain { display: none; }
+        .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
+        .grid .domain { display: none; }
+
+        /* Crosshair */
+        .crosshair-line { stroke: rgba(255,255,255,.2); stroke-width: 1;
+            stroke-dasharray: 4 3; pointer-events: none; }
+
+        /* Tooltip */
+        #tooltip {
+            position: fixed; pointer-events: none; z-index: 999;
+            background: rgba(10,10,16,.97); border: 1px solid var(--border-hover);
+            border-radius: var(--radius-md); padding: 14px 16px;
+            box-shadow: 0 12px 48px rgba(0,0,0,.7);
+            font-family: 'Inter', sans-serif; min-width: 200px;
+            opacity: 0; transform: translateY(6px);
+            transition: opacity .15s ease, transform .15s ease;
+        }
+        #tooltip.visible { opacity: 1; transform: translateY(0); }
+        .tt-header { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; }
+        .tt-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+        .tt-genre { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+        .tt-row { display: flex; justify-content: space-between; gap: 24px;
+            font-size: 12px; margin-bottom: 4px; }
+        .tt-label { color: var(--text-muted); font-weight: 500; }
+        .tt-val { color: var(--text-primary); font-weight: 700; }
+        .tt-peak { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border);
+            font-size: 11px; color: var(--text-muted); display: flex; align-items: center; gap: 5px; }
+        .tt-peak strong { color: var(--gold); font-weight: 700; }
+
+        /* Insight panel */
+        .insight-panel {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: var(--radius-lg); padding: 28px; margin-bottom: 28px;
+        }
+        .insight-header { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; }
+        .insight-icon { width: 36px; height: 36px; border-radius: var(--radius-sm);
+            background: var(--accent-dim); border: 1px solid rgba(224,92,58,.2);
+            display: flex; align-items: center; justify-content: center; color: var(--accent); }
+        .insight-icon svg { width: 18px; height: 18px; }
+        .insight-title { font-size: 13px; font-weight: 700; letter-spacing: .05em;
+            text-transform: uppercase; color: var(--text-primary); }
+        .insight-subtitle { font-size: 11px; color: var(--text-muted); }
+        .insights-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; }
+        .insight-card {
+            background: var(--bg-elevated); border: 1px solid var(--border);
+            border-radius: var(--radius-md); padding: 16px;
+            border-left: 3px solid var(--accent);
+        }
+        .insight-card.teal { border-left-color: var(--teal); }
+        .insight-card.gold { border-left-color: var(--gold); }
+        .insight-card.purple { border-left-color: #a78bfa; }
+        .ic-num { font-size: 1.4rem; font-weight: 900; letter-spacing: -.02em;
+            color: var(--text-primary); margin-bottom: 4px; }
+        .ic-label { font-size: 11px; font-weight: 600; letter-spacing: .06em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+        .ic-desc { font-size: 12px; color: var(--text-secondary); line-height: 1.5; }
+
+        /* Annotation on chart */
+        .annotation-group text { fill: var(--text-muted); font-family: 'Inter', sans-serif;
+            font-size: 10px; font-weight: 500; }
+        .annotation-line { stroke: var(--text-muted); stroke-dasharray: 3 3; stroke-width: 1; }
+
+        /* Loading */
+        .loading-state { display: flex; align-items: center; justify-content: center;
+            height: 420px; flex-direction: column; gap: 16px; }
+        .loading-spinner { width: 36px; height: 36px; border: 3px solid var(--border);
+            border-top-color: var(--accent); border-radius: 50%;
+            animation: spin .7s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text { font-size: 13px; color: var(--text-muted); }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .page-wrap { padding: 20px 16px 60px; }
+            .chart-card { padding: 16px; }
+            .stats-strip { width: 100%; }
+            .sstat { padding: 10px 16px; flex: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="topbar">
+    <div class="topbar-inner">
+        <a href="../index.html" class="topbar-brand" style="text-decoration:none">
+            <span class="brand-dot"></span>
+            <span class="brand-text">VISDAT</span>
+            <span class="brand-sub">KLP 10</span>
+        </a>
+        <div class="topbar-case">
+            Case <span>10</span> · Era Keemasan Genre
+        </div>
+    </div>
+</div>
+
+<div class="page-wrap">
+
+    <!-- Back button -->
+    <a href="../index.html" class="back-btn" id="back-to-home">
+        <svg viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
+        </svg>
+        Kembali ke Dashboard
+    </a>
+
+    <!-- Case header -->
+    <div class="case-badge">
+        <span class="case-badge-dot"></span>
+        Case 10 · Stacked Area Chart
+    </div>
+    <h1 class="case-title">Era Keemasan <em>Genre</em></h1>
+    <p class="case-desc">
+        Membantu pengguna melihat tahun puncak atau “tahun keemasan” setiap genre film berdasarkan jumlah film yang diproduksi per tahun. 
+        Mengarahkan hover ke area genre pada Stacked Area Chart untuk melihat tahun puncak.
+    </p>
+
+    <!-- Stats strip -->
+    <div class="stats-strip" id="stats-strip">
+        <div class="sstat">
+            <span class="sstat-val" id="stat-total">—</span>
+            <span class="sstat-lbl">Total Film</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-genres">—</span>
+            <span class="sstat-lbl">Genre Aktif</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-peak-year">—</span>
+            <span class="sstat-lbl">Tahun Paling Produktif</span>
+        </div>
+        <div class="sstat">
+            <span class="sstat-val" id="stat-top-genre">—</span>
+            <span class="sstat-lbl">Genre Dominan</span>
+        </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="controls-row">
+        <div class="controls-left">
+            <button class="ctrl-btn active" id="btn-stacked" title="Tampilan stacked area">
+                <svg viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M0 12h16v1.5H0zm0-4h16v1.5H0zm0-4h16v1.5H0z" opacity=".4"/>
+                    <path d="M0 14l4-6 4 4 4-8 4 3v3H0z"/>
+                </svg>
+                Stacked
+            </button>
+            <button class="ctrl-btn" id="btn-normalized" title="Tampilan 100% normalized">
+                <svg viewBox="0 0 16 16" fill="currentColor">
+                    <path d="M0 14l4-8 4 2 4-6 4 4v4H0z"/>
+                </svg>
+                Normalized
+            </button>
+            <button class="ctrl-btn" id="btn-reset-zoom" title="Reset zoom">
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+                    <path d="M3 8a5 5 0 105 5"/>
+                    <path d="M3 5V8H6"/>
+                </svg>
+                Reset Zoom
+            </button>
+        </div>
+        <span class="hint-text">💡 Hover area untuk detail · Klik legenda untuk toggle genre</span>
+    </div>
+
+    <!-- Main chart card -->
+    <div class="chart-card" id="main-chart-card">
+        <div class="loading-state" id="loading">
+            <div class="loading-spinner"></div>
+            <span class="loading-text">Memuat data film…</span>
+        </div>
+        <svg id="main-chart" style="display:none"></svg>
+        <div class="legend-wrap" id="legend"></div>
+    </div>
+
+    <!-- Brush / mini chart -->
+    <div class="brush-card" id="brush-card" style="display:none">
+        <div class="brush-label">Zoom Rentang Tahun — seret untuk seleksi, klik luar untuk reset</div>
+        <svg id="brush-chart"></svg>
+    </div>
+
+    <!-- Insight Panel -->
+    <div class="insight-panel">
+        <div class="insight-icon">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="16" x2="12" y2="12"></line>
+                <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+        </div>
+        <div class="insight-text">
+            <p>
+                <strong style="color:var(--text-primary)">Insight:</strong> 
+                Dengan fitur hover tahun puncak, pengguna dapat mengetahui kapan suatu genre berada pada masa paling dominan. 
+                Hal ini membantu melihat perubahan selera penonton dari waktu ke waktu.
+            </p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Tooltip -->
+<div id="tooltip">
+    <div class="tt-header">
+        <div class="tt-dot" id="tt-dot"></div>
+        <span class="tt-genre" id="tt-genre">—</span>
+    </div>
+    <div class="tt-row">
+        <span class="tt-label">Tahun</span>
+        <span class="tt-val" id="tt-year">—</span>
+    </div>
+    <div class="tt-row">
+        <span class="tt-label">Jumlah Film</span>
+        <span class="tt-val" id="tt-count">—</span>
+    </div>
+    <div class="tt-row">
+        <span class="tt-label">% Total Tahun ini</span>
+        <span class="tt-val" id="tt-pct">—</span>
+    </div>
+    <div class="tt-peak">
+        <svg viewBox="0 0 16 16" fill="currentColor" width="12" height="12" style="color:var(--gold)">
+            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>
+        </svg>
+        Tahun Keemasan: <strong id="tt-peak-year">—</strong>
+        <span id="tt-peak-count" style="margin-left:2px"></span>
+    </div>
+</div>
+
+<script src="../js/d3.v7.min.js"></script>
+<script>
+// ═══════════════════════════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════════════════════════
+const MAIN_GENRES = ['Comedy','Action','Drama','Crime','Biography','Adventure','Animation','Horror'];
+const GENRE_COLORS = {
+    'Comedy':    '#e05c3a',
+    'Action':    '#2dd4bf',
+    'Drama':     '#a78bfa',
+    'Crime':     '#f59e0b',
+    'Biography': '#60a5fa',
+    'Adventure': '#34d399',
+    'Animation': '#f97316',
+    'Horror':    '#fb7185',
+};
+
+const MARGIN       = { top: 24, right: 32, bottom: 50, left: 56 };
+const BRUSH_MARGIN = { top: 8,  right: 32, bottom: 24, left: 56 };
+const BRUSH_H      = 60;
+
+let fullData, pivotByYear, allYears, peakByGenre;
+let activeGenres = new Set(MAIN_GENRES);
+let highlightedGenre = null;
+let isNormalized = false;
+let currentXDomain = null; // null = full range
+
+// ═══════════════════════════════════════════════════════════════
+// LOAD & PROCESS DATA
+// ═══════════════════════════════════════════════════════════════
+d3.csv('../data/movies.csv').then(raw => {
+
+    // Filter to 1986–2016, only known genres, valid year
+    fullData = raw.filter(d => {
+        const y = +d.year;
+        return y >= 1986 && y <= 2016 && MAIN_GENRES.includes(d.genre);
+    });
+
+    // Roll up: { year → { genre → count } }
+    allYears = d3.range(1986, 2017);
+
+    const nested = d3.rollup(fullData,
+        v => v.length,
+        d => +d.year,
+        d => d.genre
+    );
+
+    pivotByYear = allYears.map(year => {
+        const row = { year };
+        MAIN_GENRES.forEach(g => row[g] = (nested.get(year)?.get(g) ?? 0));
+        return row;
+    });
+
+    // Peak year per genre
+    peakByGenre = {};
+    MAIN_GENRES.forEach(genre => {
+        let peak = pivotByYear.reduce((best, d) => d[genre] > best[genre] ? d : best, pivotByYear[0]);
+        peakByGenre[genre] = { year: peak.year, count: peak[genre] };
+    });
+
+    // Stats
+    const totalFilms = fullData.length;
+    const peakYearRow = pivotByYear.reduce((best, d) => {
+        const sum = MAIN_GENRES.reduce((s, g) => s + d[g], 0);
+        const bSum = MAIN_GENRES.reduce((s, g) => s + best[g], 0);
+        return sum > bSum ? d : best;
+    }, pivotByYear[0]);
+    const topGenre = MAIN_GENRES.reduce((best, g) => {
+        const total = d3.sum(pivotByYear, d => d[g]);
+        const bestTotal = d3.sum(pivotByYear, d => d[best]);
+        return total > bestTotal ? g : best;
+    }, MAIN_GENRES[0]);
+
+    document.getElementById('stat-total').textContent    = totalFilms.toLocaleString('id-ID');
+    document.getElementById('stat-genres').textContent   = MAIN_GENRES.length;
+    document.getElementById('stat-peak-year').textContent = peakYearRow.year;
+    document.getElementById('stat-top-genre').textContent = topGenre;
+
+    // buildInsights(topGenre, peakYearRow);
+
+    document.getElementById('loading').style.display     = 'none';
+    document.getElementById('main-chart').style.display  = 'block';
+    document.getElementById('brush-card').style.display  = 'block';
+
+    buildLegend();
+    buildChart();
+    buildBrush();
+
+}).catch(err => {
+    document.getElementById('loading').innerHTML =
+        `<div style="color:var(--accent);text-align:center">
+            <strong>Gagal memuat data</strong><br>
+            <small style="color:var(--text-muted)">${err.message}</small>
+        </div>`;
+});
+
+// ═══════════════════════════════════════════════════════════════
+// (Insight panel logic removed for Task 10 static requirement)
+// ═══════════════════════════════════════════════════════════════
+
+// ═══════════════════════════════════════════════════════════════
+// LEGEND
+// ═══════════════════════════════════════════════════════════════
+function buildLegend() {
+    const wrap = document.getElementById('legend');
+    wrap.innerHTML = '';
+    MAIN_GENRES.forEach(genre => {
+        const el = document.createElement('div');
+        el.className = 'legend-item active';
+        el.id = `legend-${genre.toLowerCase()}`;
+        el.innerHTML = `
+            <span class="legend-dot" style="background:${GENRE_COLORS[genre]}"></span>
+            <span>${genre}</span>
+        `;
+        el.addEventListener('click', () => toggleGenre(genre));
+        wrap.appendChild(el);
+    });
+}
+
+function toggleGenre(genre) {
+    if (activeGenres.has(genre)) {
+        if (activeGenres.size === 1) return; // keep at least 1
+        activeGenres.delete(genre);
+    } else {
+        activeGenres.add(genre);
+    }
+    updateLegendState();
+    updateChart();
+}
+
+function updateLegendState() {
+    MAIN_GENRES.forEach(g => {
+        const el = document.getElementById(`legend-${g.toLowerCase()}`);
+        if (!el) return;
+        if (activeGenres.has(g)) {
+            el.classList.add('active');
+            el.classList.remove('muted');
+        } else {
+            el.classList.remove('active');
+            el.classList.add('muted');
+        }
+    });
+}
+
+// ═══════════════════════════════════════════════════════════════
+// MAIN CHART
+// ═══════════════════════════════════════════════════════════════
+const svgEl = document.getElementById('main-chart');
+let svgSel, gMain;
+let xScale, yScale, yScaleNorm;
+let xAxisG, yAxisG, gridG;
+
+function getChartDims() {
+    const W = svgEl.parentElement.clientWidth - 32; // subtract card padding
+    const H = Math.max(360, Math.min(520, window.innerHeight * 0.48));
+    return {
+        W,
+        H,
+        innerW: W - MARGIN.left - MARGIN.right,
+        innerH: H - MARGIN.top - MARGIN.bottom,
+    };
+}
+
+function buildChart() {
+    const { W, H, innerW, innerH } = getChartDims();
+
+    svgSel = d3.select('#main-chart')
+        .attr('width', W)
+        .attr('height', H);
+
+    svgSel.append('defs').html(`
+        <clipPath id="chart-clip">
+            <rect width="${innerW}" height="${innerH + 4}" y="-4"/>
+        </clipPath>
+    `);
+
+    gMain = svgSel.append('g')
+        .attr('class', 'g-main')
+        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+
+    // Grid
+    gridG = gMain.append('g').attr('class', 'grid');
+
+    // Areas group (clipped)
+    gMain.append('g').attr('class', 'areas-group')
+        .attr('clip-path', 'url(#chart-clip)');
+
+    // Annotations group
+    gMain.append('g').attr('class', 'annotation-group')
+        .attr('clip-path', 'url(#chart-clip)');
+
+    // Axes
+    xAxisG = gMain.append('g').attr('class', 'axis x-axis').attr('transform', `translate(0,${innerH})`);
+    yAxisG = gMain.append('g').attr('class', 'axis y-axis');
+
+    // Axis labels
+    gMain.append('text')
+        .attr('class', 'axis-label')
+        .attr('x', innerW / 2)
+        .attr('y', innerH + 42)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-family', 'Inter, sans-serif')
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('TAHUN');
+
+    gMain.append('text')
+        .attr('class', 'axis-label')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerH / 2)
+        .attr('y', -44)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-family', 'Inter, sans-serif')
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('JUMLAH FILM');
+
+    // Crosshair
+    const crossV = gMain.append('line')
+        .attr('class', 'crosshair-line')
+        .attr('y1', 0).attr('y2', innerH)
+        .style('display', 'none');
+
+    // Hover overlay
+    const overlay = gMain.append('rect')
+        .attr('class', 'hover-overlay')
+        .attr('width', innerW)
+        .attr('height', innerH)
+        .attr('fill', 'transparent')
+        .style('cursor', 'crosshair');
+
+    overlay.on('mousemove', (event) => {
+        const [mx] = d3.pointer(event);
+        const hovYear = Math.round(xScale.invert(mx));
+        const clampedYear = Math.max(allYears[0], Math.min(allYears[allYears.length - 1], hovYear));
+        const yearData = pivotByYear.find(d => d.year === clampedYear);
+        if (!yearData || !highlightedGenre) return;
+
+        const x = xScale(clampedYear);
+        crossV.attr('x1', x).attr('x2', x).style('display', null);
+
+        showTooltip(event, highlightedGenre, yearData);
+    });
+
+    overlay.on('mouseleave', () => {
+        crossV.style('display', 'none');
+        hideTooltip();
+    });
+
+    // Scales
+    xScale = d3.scaleLinear()
+        .domain([1986, 2016])
+        .range([0, innerW]);
+
+    yScale = d3.scaleLinear().range([innerH, 0]);
+    yScaleNorm = d3.scaleLinear().domain([0, 1]).range([innerH, 0]);
+
+    currentXDomain = [1986, 2016];
+    updateChart(true);
+}
+
+// ─── Update (redraw areas + axes) ───────────────────────────────
+function updateChart(initial = false) {
+    const { innerW, innerH } = getChartDims();
+
+    const visGenres = MAIN_GENRES.filter(g => activeGenres.has(g));
+    const xDomain = currentXDomain || [1986, 2016];
+
+    // Filter pivot to x domain
+    const dataInView = pivotByYear.filter(d => d.year >= xDomain[0] && d.year <= xDomain[1]);
+
+    xScale.domain(xDomain).range([0, innerW]);
+
+    // Stack
+    const stack = d3.stack()
+        .keys(visGenres)
+        .order(d3.stackOrderNone)
+        .offset(isNormalized ? d3.stackOffsetExpand : d3.stackOffsetNone);
+
+    const stacked = stack(pivotByYear);
+
+    // Y domain
+    if (isNormalized) {
+        yScale.domain([0, 1]);
+    } else {
+        const yMax = d3.max(stacked[stacked.length - 1] || [[0,0]], d => d[1]) || 100;
+        yScale.domain([0, yMax * 1.05]).nice();
+    }
+
+    // Area generator
+    const area = d3.area()
+        .x(d => xScale(d.data.year))
+        .y0(d => (isNormalized ? yScaleNorm : yScale)(d[0]))
+        .y1(d => (isNormalized ? yScaleNorm : yScale)(d[1]))
+        .curve(d3.curveCatmullRom.alpha(0.5));
+
+    // Draw areas
+    const areasG = svgSel.select('.areas-group');
+
+    const paths = areasG.selectAll('.area-path')
+        .data(stacked, d => d.key);
+
+    // EXIT
+    paths.exit()
+        .transition().duration(400)
+        .style('opacity', 0)
+        .remove();
+
+    // ENTER
+    const pathsEnter = paths.enter()
+        .append('path')
+        .attr('class', 'area-path')
+        .attr('fill', d => GENRE_COLORS[d.key])
+        .attr('fill-opacity', 0.82)
+        .style('opacity', 0)
+        .attr('d', area);
+
+    // UPDATE
+    const allPaths = pathsEnter.merge(paths);
+
+    allPaths
+        .on('mouseenter', function(event, d) {
+            highlightedGenre = d.key;
+            applyHighlight(d.key);
+        })
+        .on('mouseleave', function() {
+            highlightedGenre = null;
+            clearHighlight();
+            hideTooltip();
+        })
+        .on('mousemove', function(event, d) {
+            const [mx] = d3.pointer(event);
+            const hovYear = Math.round(xScale.invert(mx));
+            const clampedYear = Math.max(xDomain[0], Math.min(xDomain[1], hovYear));
+            const yearData = pivotByYear.find(row => row.year === clampedYear);
+            if (!yearData) return;
+
+            // crosshair
+            svgSel.select('.crosshair-line')
+                .attr('x1', mx).attr('x2', mx)
+                .style('display', null);
+
+            showTooltip(event, d.key, yearData);
+        });
+
+    allPaths
+        .transition().duration(initial ? 800 : 450)
+        .ease(d3.easeCubicOut)
+        .style('opacity', 1)
+        .attr('d', area);
+
+    // Grid
+    const gridY = d3.axisLeft(isNormalized ? yScaleNorm : yScale)
+        .ticks(5)
+        .tickSize(-innerW)
+        .tickFormat('');
+
+    svgSel.select('.grid')
+        .transition().duration(400)
+        .call(gridY);
+
+    // X Axis
+    const xAxis = d3.axisBottom(xScale)
+        .tickValues(d3.range(Math.ceil(xDomain[0] / 2) * 2, xDomain[1] + 1, xDomain[1] - xDomain[0] > 15 ? 4 : 2))
+        .tickFormat(d => d.toString())
+        .tickSize(6);
+
+    svgSel.select('.x-axis')
+        .transition().duration(400)
+        .call(xAxis);
+
+    // Y Axis
+    const yAxis = d3.axisLeft(isNormalized ? yScaleNorm : yScale)
+        .ticks(5)
+        .tickFormat(isNormalized ? d3.format('.0%') : d => d);
+
+    svgSel.select('.y-axis')
+        .transition().duration(400)
+        .call(yAxis);
+
+    // Annotations (only when full range)
+    drawAnnotations(xDomain);
+}
+
+// ─── Annotations ───────────────────────────────────────────────
+function drawAnnotations(xDomain) {
+    if (isNormalized) {
+        svgSel.select('.annotation-group').selectAll('*').remove();
+        return;
+    }
+
+    const annotG = svgSel.select('.annotation-group');
+    annotG.selectAll('*').remove();
+
+    const annotations = [
+        { year: 2000, label: 'Era CGI Blockbuster', genre: 'Action' },
+        { year: 1994, label: 'Golden Age of Comedy', genre: 'Comedy' },
+    ];
+
+    annotations.forEach(a => {
+        if (a.year < xDomain[0] || a.year > xDomain[1]) return;
+        const x = xScale(a.year);
+        const { innerH } = getChartDims();
+
+        annotG.append('line')
+            .attr('class', 'annotation-line')
+            .attr('x1', x).attr('x2', x)
+            .attr('y1', 0).attr('y2', innerH)
+            .attr('stroke', 'rgba(255,255,255,.15)')
+            .attr('stroke-dasharray', '3 3');
+
+        annotG.append('text')
+            .attr('x', x + 5)
+            .attr('y', 16)
+            .attr('fill', 'rgba(255,255,255,.35)')
+            .attr('font-size', 10)
+            .attr('font-family', 'Inter, sans-serif')
+            .attr('font-weight', 600)
+            .text(a.label);
+    });
+}
+
+// ─── Highlight ─────────────────────────────────────────────────
+function applyHighlight(genre) {
+    svgSel.selectAll('.area-path')
+        .classed('faded', d => d.key !== genre)
+        .classed('highlighted', d => d.key === genre);
+}
+
+function clearHighlight() {
+    svgSel.selectAll('.area-path')
+        .classed('faded', false)
+        .classed('highlighted', false);
+    svgSel.select('.crosshair-line').style('display', 'none');
+}
+
+// ─── Tooltip ───────────────────────────────────────────────────
+const tooltipEl = document.getElementById('tooltip');
+
+function showTooltip(event, genre, yearData) {
+    const count = yearData[genre] ?? 0;
+    const yearTotal = MAIN_GENRES.filter(g => activeGenres.has(g))
+        .reduce((s, g) => s + (yearData[g] ?? 0), 0);
+    const pct = yearTotal > 0 ? Math.round(count / yearTotal * 100) : 0;
+    const peak = peakByGenre[genre];
+
+    document.getElementById('tt-dot').style.background = GENRE_COLORS[genre];
+    document.getElementById('tt-genre').textContent    = genre;
+    document.getElementById('tt-year').textContent     = yearData.year;
+    document.getElementById('tt-count').textContent    = count + ' film';
+    document.getElementById('tt-pct').textContent      = pct + '%';
+    document.getElementById('tt-peak-year').textContent = peak?.year ?? '—';
+    document.getElementById('tt-peak-count').textContent = peak ? `(${peak.count} film)` : '';
+
+    // Position near cursor
+    const tx = Math.min(event.clientX + 16, window.innerWidth - 240);
+    const ty = Math.min(event.clientY - 10, window.innerHeight - 180);
+
+    tooltipEl.style.left = tx + 'px';
+    tooltipEl.style.top  = ty + 'px';
+    tooltipEl.classList.add('visible');
+}
+
+function hideTooltip() {
+    tooltipEl.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════════
+// BRUSH / MINI CHART
+// ═══════════════════════════════════════════════════════════════
+function buildBrush() {
+    const { W } = getChartDims();
+    const innerW = W - BRUSH_MARGIN.left - BRUSH_MARGIN.right;
+    const innerH = BRUSH_H - BRUSH_MARGIN.top - BRUSH_MARGIN.bottom;
+
+    const brushSvg = d3.select('#brush-chart')
+        .attr('width', W)
+        .attr('height', BRUSH_H);
+
+    const gBrush = brushSvg.append('g')
+        .attr('transform', `translate(${BRUSH_MARGIN.left},${BRUSH_MARGIN.top})`);
+
+    const xB = d3.scaleLinear().domain([1986, 2016]).range([0, innerW]);
+
+    // Total per year (sum of all active genres)
+    const totalByYear = pivotByYear.map(d => ({
+        year: d.year,
+        total: MAIN_GENRES.reduce((s, g) => s + d[g], 0)
+    }));
+
+    const yB = d3.scaleLinear()
+        .domain([0, d3.max(totalByYear, d => d.total)])
+        .range([innerH, 0]);
+
+    const areaB = d3.area()
+        .x(d => xB(d.year))
+        .y0(innerH)
+        .y1(d => yB(d.total))
+        .curve(d3.curveCatmullRom.alpha(0.5));
+
+    gBrush.append('path')
+        .datum(totalByYear)
+        .attr('fill', 'rgba(224,92,58,0.25)')
+        .attr('stroke', 'rgba(224,92,58,0.5)')
+        .attr('stroke-width', 1.5)
+        .attr('d', areaB);
+
+    gBrush.append('g')
+        .attr('transform', `translate(0,${innerH})`)
+        .call(d3.axisBottom(xB).tickValues(d3.range(1986, 2017, 5)).tickFormat(d => d).tickSize(3))
+        .select('.domain').remove();
+
+    gBrush.select('.tick text').style('fill', 'var(--text-muted)');
+
+    // Brush
+    const brush = d3.brushX()
+        .extent([[0, 0], [innerW, innerH]])
+        .on('end', ({ selection }) => {
+            if (!selection) {
+                currentXDomain = [1986, 2016];
+            } else {
+                const [x0, x1] = selection.map(xB.invert);
+                currentXDomain = [Math.round(x0), Math.round(x1)];
+            }
+            updateChart();
+        });
+
+    gBrush.append('g')
+        .attr('class', 'brush')
+        .call(brush);
+
+    // Style brush handles
+    brushSvg.selectAll('.brush .handle')
+        .attr('fill', 'var(--accent)')
+        .attr('rx', 2);
+    brushSvg.selectAll('.brush .selection')
+        .attr('fill', 'rgba(224,92,58,0.15)')
+        .attr('stroke', 'var(--accent)')
+        .attr('stroke-width', 1);
+}
+
+// ═══════════════════════════════════════════════════════════════
+// CONTROLS
+// ═══════════════════════════════════════════════════════════════
+document.getElementById('btn-stacked').addEventListener('click', () => {
+    isNormalized = false;
+    document.getElementById('btn-stacked').classList.add('active');
+    document.getElementById('btn-normalized').classList.remove('active');
+    updateChart();
+});
+
+document.getElementById('btn-normalized').addEventListener('click', () => {
+    isNormalized = true;
+    document.getElementById('btn-normalized').classList.add('active');
+    document.getElementById('btn-stacked').classList.remove('active');
+    updateChart();
+});
+
+document.getElementById('btn-reset-zoom').addEventListener('click', () => {
+    currentXDomain = [1986, 2016];
+    // Clear brush selection
+    d3.select('.brush').call(d3.brushX().move, null);
+    updateChart();
+});
+
+// ═══════════════════════════════════════════════════════════════
+// RESIZE
+// ═══════════════════════════════════════════════════════════════
+let resizeTimer;
+window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        if (!fullData) return;
+        // Rebuild chart with new dims
+        svgSel.selectAll('*').remove();
+        const { W, H, innerW, innerH } = getChartDims();
+        svgSel.attr('width', W).attr('height', H);
+        svgSel.append('defs').html(`
+            <clipPath id="chart-clip">
+                <rect width="${innerW}" height="${innerH + 4}" y="-4"/>
+            </clipPath>
+        `);
+        gMain = svgSel.append('g')
+            .attr('class', 'g-main')
+            .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+        gridG = gMain.append('g').attr('class', 'grid');
+        gMain.append('g').attr('class', 'areas-group').attr('clip-path', 'url(#chart-clip)');
+        gMain.append('g').attr('class', 'annotation-group').attr('clip-path', 'url(#chart-clip)');
+        xAxisG = gMain.append('g').attr('class', 'axis x-axis').attr('transform', `translate(0,${innerH})`);
+        yAxisG = gMain.append('g').attr('class', 'axis y-axis');
+        gMain.append('text').attr('x', innerW/2).attr('y', innerH+42)
+            .attr('text-anchor','middle').attr('fill','var(--text-muted)')
+            .attr('font-size',11).attr('font-family','Inter,sans-serif')
+            .attr('font-weight',600).attr('letter-spacing','.08em').text('TAHUN');
+        gMain.append('text').attr('transform','rotate(-90)').attr('x',-innerH/2).attr('y',-44)
+            .attr('text-anchor','middle').attr('fill','var(--text-muted)')
+            .attr('font-size',11).attr('font-family','Inter,sans-serif')
+            .attr('font-weight',600).attr('letter-spacing','.08em').text('JUMLAH FILM');
+        const crossV = gMain.append('line')
+            .attr('class','crosshair-line').attr('y1',0).attr('y2',innerH).style('display','none');
+        const overlay = gMain.append('rect')
+            .attr('width',innerW).attr('height',innerH)
+            .attr('fill','transparent').style('cursor','crosshair');
+        overlay.on('mousemove', (event) => {
+            const [mx] = d3.pointer(event);
+            const hovYear = Math.round(xScale.invert(mx));
+            const clampedYear = Math.max(allYears[0], Math.min(allYears[allYears.length-1], hovYear));
+            const yearData = pivotByYear.find(d => d.year === clampedYear);
+            if (!yearData || !highlightedGenre) return;
+            crossV.attr('x1', xScale(clampedYear)).attr('x2', xScale(clampedYear)).style('display',null);
+            showTooltip(event, highlightedGenre, yearData);
+        });
+        overlay.on('mouseleave', () => { crossV.style('display','none'); hideTooltip(); });
+
+        xScale.range([0, innerW]);
+        yScale.range([innerH, 0]);
+        updateChart();
+
+        // Rebuild brush
+        d3.select('#brush-chart').selectAll('*').remove();
+        buildBrush();
+    }, 200);
+});
+</script>
+</body>
+</html>
