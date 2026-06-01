@@ -1,0 +1,1111 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 6 — Genre Score Comparison | Visualisasi Data Film</title>
+    <meta name="description" content="Perbandingan rata-rata skor IMDb antar genre dengan bar chart dan radar chart.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            background: var(--bg-base);
+        }
+
+        .topbar {
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: rgba(13, 13, 18, .85);
+            backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .topbar-inner {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 0 28px;
+            height: 56px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .topbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .brand-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--accent);
+            box-shadow: 0 0 10px var(--accent-glow);
+        }
+
+        .brand-text {
+            font-size: 14px;
+            font-weight: 800;
+            letter-spacing: .12em;
+            color: var(--text-primary);
+        }
+
+        .brand-sub {
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            color: var(--accent);
+            background: var(--accent-dim);
+            border: 1px solid var(--accent-glow);
+            padding: 2px 7px;
+            border-radius: 4px;
+        }
+
+        .topbar-case {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: .04em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .topbar-case span {
+            color: var(--text-secondary);
+        }
+
+        .page-wrap {
+            max-width: 1320px;
+            margin: 0 auto;
+            padding: 36px 28px 80px;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            text-decoration: none;
+            padding: 7px 14px;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+            background: var(--bg-elevated);
+            transition: color .2s, border-color .2s;
+            margin-bottom: 28px;
+        }
+
+        .back-btn:hover {
+            color: var(--text-primary);
+            border-color: var(--border-hover);
+        }
+
+        .back-btn svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .case-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #a78bfa;
+            background: rgba(167, 139, 250, .12);
+            border: 1px solid rgba(167, 139, 250, .2);
+            padding: 4px 10px;
+            border-radius: 100px;
+            margin-bottom: 14px;
+        }
+
+        .case-badge-dot {
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            background: #a78bfa;
+        }
+
+        h1.case-title {
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            font-weight: 900;
+            letter-spacing: -.03em;
+            line-height: 1.1;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        h1.case-title em {
+            font-style: normal;
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .case-desc {
+            font-size: .975rem;
+            color: var(--text-secondary);
+            max-width: 680px;
+            line-height: 1.65;
+            margin-bottom: 32px;
+        }
+
+        /* Stats strip */
+        .stats-strip {
+            display: flex;
+            gap: 0;
+            flex-wrap: wrap;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            margin-bottom: 28px;
+            width: fit-content;
+        }
+
+        .sstat {
+            padding: 14px 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 3px;
+            border-right: 1px solid var(--border);
+        }
+
+        .sstat:last-child {
+            border-right: none;
+        }
+
+        .sstat-val {
+            font-size: 1.3rem;
+            font-weight: 800;
+            letter-spacing: -.02em;
+            color: var(--text-primary);
+        }
+
+        .sstat-lbl {
+            font-size: 10px;
+            font-weight: 600;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+        }
+
+        /* Controls */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .chart-type-switch {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-elevated);
+            padding: 4px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .chart-type-btn {
+            padding: 6px 18px;
+            border-radius: 32px;
+            font-size: 12px;
+            font-weight: 600;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .chart-type-btn.active {
+            background: #a78bfa;
+            color: #0a0a10;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--bg-elevated);
+            padding: 4px 16px;
+            border-radius: 40px;
+            border: 1px solid var(--border);
+        }
+
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .filter-group input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            width: 100px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .filter-group input:focus {
+            outline: none;
+        }
+
+        .sort-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-secondary);
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            padding: 6px 14px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all .2s;
+        }
+
+        .sort-btn:hover {
+            border-color: #a78bfa;
+            color: #a78bfa;
+        }
+
+        .sort-btn.active {
+            background: rgba(167, 139, 250, .15);
+            border-color: #a78bfa;
+            color: #a78bfa;
+        }
+
+        /* Chart Containers */
+        .chart-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: linear-gradient(90deg, #a78bfa 0%, #c084fc 60%, transparent 100%);
+            opacity: .5;
+        }
+
+        .chart-title {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: .05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-wrapper {
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Top Movies Panel */
+        .top-movies-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .panel-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-genre-badge {
+            background: rgba(167, 139, 250, .15);
+            border: 1px solid rgba(167, 139, 250, .3);
+            border-radius: 40px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #c084fc;
+        }
+
+        .movies-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 12px;
+        }
+
+        .movie-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px 16px;
+            transition: all .2s;
+            cursor: pointer;
+        }
+
+        .movie-card:hover {
+            border-color: #a78bfa;
+            transform: translateX(4px);
+        }
+
+        .movie-card-title {
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+            font-size: 14px;
+        }
+
+        .movie-card-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+
+        .movie-card-score {
+            color: #c084fc;
+            font-weight: 700;
+        }
+
+        /* Tooltip */
+        #tooltip {
+            position: fixed;
+            pointer-events: none;
+            z-index: 999;
+            background: rgba(10, 10, 16, .97);
+            border: 1px solid var(--border-hover);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            box-shadow: 0 12px 48px rgba(0, 0, 0, .7);
+            font-family: 'Inter', sans-serif;
+            min-width: 180px;
+            opacity: 0;
+            transform: translateY(6px);
+            transition: opacity .15s ease, transform .15s ease;
+        }
+
+        #tooltip.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .tt-genre {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .tt-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            font-size: 11px;
+            margin-bottom: 4px;
+        }
+
+        .tt-label {
+            color: var(--text-muted);
+        }
+
+        .tt-val {
+            color: var(--text-primary);
+            font-weight: 700;
+        }
+
+        .tt-divider {
+            height: 1px;
+            background: var(--border);
+            margin: 8px 0;
+        }
+
+        /* Radar Chart specific */
+        .radar-tooltip {
+            position: absolute;
+            background: rgba(0, 0, 0, .9);
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            pointer-events: none;
+        }
+
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 380px;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .loading-spinner {
+            width: 36px;
+            height: 36px;
+            border: 3px solid var(--border);
+            border-top-color: #a78bfa;
+            border-radius: 50%;
+            animation: spin .7s linear infinite;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @media (max-width: 968px) {
+            .chart-row {
+                grid-template-columns: 1fr;
+            }
+
+            .page-wrap {
+                padding: 20px 16px 60px;
+            }
+
+            .stats-strip {
+                width: 100%;
+            }
+
+            .sstat {
+                padding: 10px 16px;
+                flex: 1;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="topbar">
+        <div class="topbar-inner">
+            <a href="../index.html" class="topbar-brand">
+                <span class="brand-dot"></span>
+                <span class="brand-text">VISDAT</span>
+                <span class="brand-sub">KLP 10</span>
+            </a>
+            <div class="topbar-case">Case <span>06</span> · Genre Score Comparison</div>
+        </div>
+    </div>
+
+    <div class="page-wrap">
+        <a href="../index.html" class="back-btn">
+            <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
+                <path fill-rule="evenodd"
+                    d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" />
+            </svg>
+            Kembali ke Dashboard
+        </a>
+
+        <div class="case-badge">
+            <span class="case-badge-dot"></span>
+            Case 06 · Multi-Chart Analysis
+        </div>
+        <h1 class="case-title">Perbandingan Skor <em>IMDb Antar Genre</em></h1>
+        <p class="case-desc">
+            Genre <strong style="color:#c084fc">Drama</strong> dan <strong style="color:#c084fc">Biography</strong>
+            cenderung mendapatkan skor lebih tinggi dari penonton.
+            Visualisasi ini membandingkan rata-rata, distribusi, dan konsistensi rating antar genre film.
+        </p>
+
+        <!-- Stats Strip -->
+        <div class="stats-strip" id="stats-strip">
+            <div class="sstat"><span class="sstat-val" id="stat-total">—</span><span class="sstat-lbl">Total Film</span>
+            </div>
+            <div class="sstat"><span class="sstat-val" id="stat-top-genre">—</span><span class="sstat-lbl">Skor
+                    Tertinggi</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-bottom-genre">—</span><span class="sstat-lbl">Skor
+                    Terendah</span></div>
+            <div class="sstat"><span class="sstat-val" id="stat-avg-all">—</span><span class="sstat-lbl">Rata-rata
+                    Global</span></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls-row">
+            <div class="chart-type-switch">
+                <button class="chart-type-btn active" id="show-both">📊 Bar + Radar</button>
+                <button class="chart-type-btn" id="show-bar-only">📊 Bar Chart Only</button>
+                <button class="chart-type-btn" id="show-radar-only">🕸️ Radar Only</button>
+            </div>
+            <div class="filter-group">
+                <label>📅 Tahun</label>
+                <input type="range" id="year-range" min="1986" max="2016" step="1" value="2016">
+                <span id="year-value" style="font-size:11px;color:#a78bfa">2016</span>
+            </div>
+            <div>
+                <button class="sort-btn active" id="sort-desc">⬇️ Skor Tertinggi</button>
+                <button class="sort-btn" id="sort-asc">⬆️ Skor Terendah</button>
+            </div>
+        </div>
+
+        <!-- Charts Row -->
+        <div class="chart-row" id="chart-row">
+            <div class="chart-card" id="bar-chart-card">
+                <div class="chart-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="4" y="12" width="4" height="8" rx="1" />
+                        <rect x="10" y="8" width="4" height="12" rx="1" />
+                        <rect x="16" y="4" width="4" height="16" rx="1" />
+                    </svg>
+                    Bar Chart · Rata-rata Skor per Genre
+                </div>
+                <div class="chart-wrapper" id="bar-chart"></div>
+            </div>
+            <div class="chart-card" id="radar-chart-card">
+                <div class="chart-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="12 2 22 7 22 17 12 22 2 17 2 7 12 2" />
+                        <line x1="12" y1="2" x2="12" y2="22" />
+                        <line x1="2" y1="12" x2="22" y2="12" />
+                    </svg>
+                    Radar Chart · Multi-Dimensional Comparison
+                </div>
+                <div class="chart-wrapper" id="radar-chart"></div>
+            </div>
+        </div>
+
+        <!-- Top Movies Panel -->
+        <div class="top-movies-panel" id="top-movies-panel">
+            <div class="panel-header">
+                <div class="panel-title">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path
+                            d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" />
+                    </svg>
+                    Top 5 Film Terbaik
+                    <span class="selected-genre-badge" id="selected-genre-badge">Klik genre untuk melihat film</span>
+                </div>
+                <div id="no-genre-selected" style="font-size:11px;color:var(--text-muted);">
+                    💡 Klik pada bar atau titik radar untuk melihat detail
+                </div>
+            </div>
+            <div id="top-movies-grid" class="movies-grid">
+                <div style="text-align:center;padding:40px;color:var(--text-muted);">
+                    Belum ada genre dipilih. Klik salah satu bar di bar chart atau titik di radar chart.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="tooltip"></div>
+
+    <script src="../js/d3.v7.min.js"></script>
+    <script>
+        // ═══════════════════════════════════════════════════════════════
+        // CONFIGURATION
+        // ═══════════════════════════════════════════════════════════════
+        const GENRES = ['Drama', 'Biography', 'Animation', 'Crime', 'Adventure', 'Action', 'Comedy', 'Horror'];
+        const GENRE_COLORS = {
+            'Drama': '#a78bfa', 'Biography': '#c084fc', 'Animation': '#34d399',
+            'Crime': '#f59e0b', 'Adventure': '#2dd4bf', 'Action': '#e05c3a',
+            'Comedy': '#fb7185', 'Horror': '#6b705c'
+        };
+
+        let movieData = [];
+        let genreStats = [];
+        let currentYearMax = 2016;
+        let currentSort = 'desc';
+        let selectedGenre = null;
+        let currentView = 'both';
+
+        // ═══════════════════════════════════════════════════════════════
+        // LOAD DATA
+        // ═══════════════════════════════════════════════════════════════
+        d3.csv('../data/movies.csv').then(raw => {
+            movieData = raw.filter(d => {
+                const year = +d.year;
+                const score = +d.score;
+                const votes = +d.votes;
+                return year >= 1986 && year <= 2016 &&
+                    !isNaN(score) && !isNaN(votes) &&
+                    votes > 0 && GENRES.includes(d.genre);
+            }).map(d => ({
+                name: d.name,
+                genre: d.genre,
+                year: +d.year,
+                score: +d.score,
+                votes: +d.votes,
+                budget: +d.budget,
+                gross: +d.gross
+            }));
+
+            calculateStats();
+            updateStatsDisplay();
+            renderCharts();
+
+        }).catch(err => {
+            console.error('Error loading data:', err);
+            document.getElementById('bar-chart').innerHTML = `
+        <div style="color:var(--accent);text-align:center">
+            <strong>Gagal memuat data</strong><br>
+            <small style="color:var(--text-muted)">Pastikan file movies.csv ada di folder data/</small>
+        </div>`;
+        });
+
+        function calculateStats() {
+            const filteredByYear = movieData.filter(m => m.year <= currentYearMax);
+
+            genreStats = GENRES.map(genre => {
+                const genreMovies = filteredByYear.filter(m => m.genre === genre);
+                const scores = genreMovies.map(m => m.score);
+                const mean = d3.mean(scores) || 0;
+                const median = d3.median(scores) || 0;
+                const stdDev = d3.deviation(scores) || 0;
+                const count = genreMovies.length;
+
+                return {
+                    genre,
+                    mean,
+                    median,
+                    stdDev,
+                    count,
+                    min: d3.min(scores) || 0,
+                    max: d3.max(scores) || 0,
+                    movies: genreMovies.sort((a, b) => b.score - a.score)
+                };
+            });
+
+            // Sort by mean
+            genreStats.sort((a, b) => currentSort === 'desc' ? b.mean - a.mean : a.mean - b.mean);
+        }
+
+        function updateStatsDisplay() {
+            const totalFilms = movieData.filter(m => m.year <= currentYearMax).length;
+            const topGenre = genreStats[0];
+            const bottomGenre = genreStats[genreStats.length - 1];
+            const globalAvg = d3.mean(genreStats, g => g.mean) || 0;
+
+            document.getElementById('stat-total').textContent = totalFilms.toLocaleString('id-ID');
+            document.getElementById('stat-top-genre').innerHTML = `${topGenre?.genre || '-'}<span style="font-size:11px;margin-left:4px;">⭐ ${topGenre?.mean.toFixed(2) || '-'}</span>`;
+            document.getElementById('stat-bottom-genre').innerHTML = `${bottomGenre?.genre || '-'}<span style="font-size:11px;margin-left:4px;">⭐ ${bottomGenre?.mean.toFixed(2) || '-'}</span>`;
+            document.getElementById('stat-avg-all').textContent = globalAvg.toFixed(2);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // BAR CHART
+        // ═══════════════════════════════════════════════════════════════
+        function renderBarChart() {
+            const container = document.getElementById('bar-chart');
+            container.innerHTML = '';
+
+            const width = Math.min(550, container.parentElement.clientWidth - 48);
+            const height = 400;
+            const margin = { top: 20, right: 30, bottom: 40, left: 100 };
+            const innerW = width - margin.left - margin.right;
+            const innerH = height - margin.top - margin.bottom;
+
+            const svg = d3.select('#bar-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${margin.left},${margin.top})`);
+
+            const xScale = d3.scaleLinear()
+                .domain([0, 9.5])
+                .range([0, innerW]);
+
+            const yScale = d3.scaleBand()
+                .domain(genreStats.map(d => d.genre))
+                .range([0, innerH])
+                .padding(0.3);
+
+            // Grid lines
+            svg.append('g')
+                .call(d3.axisLeft(yScale).tickSize(0))
+                .selectAll('.domain, .tick line')
+                .remove();
+
+            svg.selectAll('.tick text')
+                .attr('font-size', 11)
+                .attr('font-weight', 600)
+                .attr('fill', 'var(--text-secondary)');
+
+            // X axis
+            svg.append('g')
+                .attr('transform', `translate(0,${innerH})`)
+                .call(d3.axisBottom(xScale).ticks(8))
+                .selectAll('text')
+                .attr('fill', 'var(--text-muted)')
+                .attr('font-size', 10);
+
+            // Reference line at global average
+            const globalAvg = d3.mean(genreStats, g => g.mean);
+            svg.append('line')
+                .attr('x1', xScale(globalAvg))
+                .attr('x2', xScale(globalAvg))
+                .attr('y1', 0)
+                .attr('y2', innerH)
+                .attr('stroke', 'rgba(167,139,250,.4)')
+                .attr('stroke-dasharray', '4,4')
+                .attr('stroke-width', 1.5);
+
+            svg.append('text')
+                .attr('x', xScale(globalAvg) + 5)
+                .attr('y', 12)
+                .attr('fill', 'rgba(167,139,250,.7)')
+                .attr('font-size', 9)
+                .text(`Rata-rata global: ${globalAvg.toFixed(2)}`);
+
+            // Tooltip
+            const tooltip = d3.select('#tooltip');
+
+            // Bars
+            svg.selectAll('.bar')
+                .data(genreStats)
+                .enter()
+                .append('rect')
+                .attr('class', 'bar')
+                .attr('y', d => yScale(d.genre))
+                .attr('height', yScale.bandwidth())
+                .attr('x', 0)
+                .attr('width', d => xScale(d.mean))
+                .attr('fill', d => GENRE_COLORS[d.genre])
+                .attr('fill-opacity', 0.8)
+                .attr('rx', 4)
+                .attr('cursor', 'pointer')
+                .on('mouseover', function (event, d) {
+                    d3.select(this).attr('fill-opacity', 1).attr('stroke', 'white').attr('stroke-width', 1);
+                    tooltip.html(`
+                <div class="tt-genre" style="color:${GENRE_COLORS[d.genre]}">${d.genre}</div>
+                <div class="tt-row"><span class="tt-label">Rata-rata Score:</span><span class="tt-val">${d.mean.toFixed(2)}</span></div>
+                <div class="tt-row"><span class="tt-label">Median:</span><span class="tt-val">${d.median.toFixed(2)}</span></div>
+                <div class="tt-row"><span class="tt-label">Standar Deviasi:</span><span class="tt-val">${d.stdDev.toFixed(2)}</span></div>
+                <div class="tt-row"><span class="tt-label">Jumlah Film:</span><span class="tt-val">${d.count.toLocaleString()}</span></div>
+                <div class="tt-row"><span class="tt-label">Range Score:</span><span class="tt-val">${d.min.toFixed(1)} - ${d.max.toFixed(1)}</span></div>
+                <div class="tt-divider"></div>
+                <div class="tt-row"><span class="tt-label">💡 Klik untuk lihat Top 5 film</span></div>
+            `);
+                    tooltip.classed('visible', true);
+                    const tx = Math.min(event.clientX + 12, window.innerWidth - 220);
+                    const ty = Math.min(event.clientY - 8, window.innerHeight - 140);
+                    tooltip.style('left', tx + 'px').style('top', ty + 'px');
+                })
+                .on('mouseout', function () {
+                    d3.select(this).attr('fill-opacity', 0.8).attr('stroke', 'none');
+                    tooltip.classed('visible', false);
+                })
+                .on('click', function (event, d) {
+                    selectedGenre = d.genre;
+                    document.getElementById('selected-genre-badge').innerHTML = `🎬 ${d.genre} · ⭐ ${d.mean.toFixed(2)} (${d.count} film)`;
+                    showTopMovies(d.genre);
+
+                    // Highlight selected bar
+                    svg.selectAll('.bar').attr('stroke', 'none').attr('stroke-width', 0);
+                    d3.select(this).attr('stroke', 'white').attr('stroke-width', 2);
+                });
+
+            // Value labels
+            svg.selectAll('.bar-label')
+                .data(genreStats)
+                .enter()
+                .append('text')
+                .attr('x', d => xScale(d.mean) + 5)
+                .attr('y', d => yScale(d.genre) + yScale.bandwidth() / 2 + 4)
+                .text(d => d.mean.toFixed(2))
+                .attr('font-size', 10)
+                .attr('fill', 'var(--text-primary)')
+                .attr('font-weight', 600);
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // RADAR CHART
+        // ═══════════════════════════════════════════════════════════════
+        function renderRadarChart() {
+            const container = document.getElementById('radar-chart');
+            container.innerHTML = '';
+
+            const width = Math.min(450, container.parentElement.clientWidth - 48);
+            const height = 400;
+            const radius = Math.min(width, height) * 0.35;
+            const centerX = width / 2;
+            const centerY = height / 2;
+
+            const svg = d3.select('#radar-chart')
+                .append('svg')
+                .attr('width', width)
+                .attr('height', height)
+                .append('g')
+                .attr('transform', `translate(${centerX},${centerY})`);
+
+            const angleSlice = Math.PI * 2 / GENRES.length;
+
+            // Scale for radar values (score 0-10)
+            const rScale = d3.scaleLinear()
+                .domain([0, 10])
+                .range([0, radius]);
+
+            // Background circles
+            const levels = [2, 4, 6, 8, 10];
+            levels.forEach(level => {
+                svg.append('circle')
+                    .attr('r', rScale(level))
+                    .attr('fill', 'none')
+                    .attr('stroke', 'rgba(255,255,255,.08)')
+                    .attr('stroke-width', 1);
+
+                svg.append('text')
+                    .attr('x', 5)
+                    .attr('y', -rScale(level))
+                    .attr('fill', 'var(--text-muted)')
+                    .attr('font-size', 8)
+                    .text(level);
+            });
+
+            // Axis lines and labels
+            GENRES.forEach((genre, i) => {
+                const angle = i * angleSlice - Math.PI / 2;
+                const x1 = rScale(10) * Math.cos(angle);
+                const y1 = rScale(10) * Math.sin(angle);
+
+                svg.append('line')
+                    .attr('x1', 0).attr('y1', 0)
+                    .attr('x2', x1).attr('y2', y1)
+                    .attr('stroke', 'rgba(255,255,255,.1)')
+                    .attr('stroke-width', 1);
+
+                const labelX = (rScale(10) + 15) * Math.cos(angle);
+                const labelY = (rScale(10) + 15) * Math.sin(angle);
+
+                svg.append('text')
+                    .attr('x', labelX)
+                    .attr('y', labelY)
+                    .attr('text-anchor', 'middle')
+                    .attr('dominant-baseline', 'middle')
+                    .attr('fill', 'var(--text-secondary)')
+                    .attr('font-size', 10)
+                    .attr('font-weight', 600)
+                    .text(genre);
+            });
+
+            // Get values for current sorting order (use sorted genreStats)
+            const values = GENRES.map(genre => {
+                const stat = genreStats.find(s => s.genre === genre);
+                return stat ? stat.mean : 0;
+            });
+
+            // Radar line generator
+            const radarLine = d3.lineRadial()
+                .radius(d => rScale(d))
+                .angle((d, i) => i * angleSlice)
+                .curve(d3.curveLinearClosed);
+
+            // Draw radar area
+            svg.append('path')
+                .datum(values)
+                .attr('d', radarLine)
+                .attr('fill', 'rgba(167,139,250,.3)')
+                .attr('stroke', '#a78bfa')
+                .attr('stroke-width', 2);
+
+            // Draw points with tooltip
+            const tooltip = d3.select('#tooltip');
+
+            values.forEach((value, i) => {
+                const angle = i * angleSlice - Math.PI / 2;
+                const x = rScale(value) * Math.cos(angle);
+                const y = rScale(value) * Math.sin(angle);
+                const genre = GENRES[i];
+                const stat = genreStats.find(s => s.genre === genre);
+
+                svg.append('circle')
+                    .attr('cx', x)
+                    .attr('cy', y)
+                    .attr('r', 6)
+                    .attr('fill', GENRE_COLORS[genre])
+                    .attr('stroke', 'white')
+                    .attr('stroke-width', 1.5)
+                    .attr('cursor', 'pointer')
+                    .on('mouseover', function (event) {
+                        d3.select(this).attr('r', 9);
+                        tooltip.html(`
+                    <div class="tt-genre" style="color:${GENRE_COLORS[genre]}">${genre}</div>
+                    <div class="tt-row"><span class="tt-label">Rata-rata Score:</span><span class="tt-val">${stat.mean.toFixed(2)}</span></div>
+                    <div class="tt-row"><span class="tt-label">Jumlah Film:</span><span class="tt-val">${stat.count.toLocaleString()}</span></div>
+                    <div class="tt-divider"></div>
+                    <div class="tt-row"><span class="tt-label">💡 Klik untuk lihat Top 5 film</span></div>
+                `);
+                        tooltip.classed('visible', true);
+                        const tx = Math.min(event.clientX + 12, window.innerWidth - 220);
+                        const ty = Math.min(event.clientY - 8, window.innerHeight - 140);
+                        tooltip.style('left', tx + 'px').style('top', ty + 'px');
+                    })
+                    .on('mouseout', function () {
+                        d3.select(this).attr('r', 6);
+                        tooltip.classed('visible', false);
+                    })
+                    .on('click', () => {
+                        selectedGenre = genre;
+                        document.getElementById('selected-genre-badge').innerHTML = `🎬 ${genre} · ⭐ ${stat.mean.toFixed(2)} (${stat.count} film)`;
+                        showTopMovies(genre);
+
+                        // Highlight in bar chart as well
+                        d3.select('#bar-chart').selectAll('.bar')
+                            .attr('stroke', 'none').attr('stroke-width', 0);
+                        d3.select('#bar-chart').selectAll('.bar')
+                            .filter(function (d) { return d.genre === genre; })
+                            .attr('stroke', 'white').attr('stroke-width', 2);
+                    });
+            });
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // TOP MOVIES DISPLAY
+        // ═══════════════════════════════════════════════════════════════
+        function showTopMovies(genre) {
+            const stat = genreStats.find(s => s.genre === genre);
+            if (!stat) return;
+
+            const topMovies = stat.movies.slice(0, 5);
+            const grid = document.getElementById('top-movies-grid');
+
+            grid.innerHTML = topMovies.map(movie => `
+        <div class="movie-card">
+            <div class="movie-card-title">${movie.name}</div>
+            <div class="movie-card-details">
+                <span>📅 ${movie.year}</span>
+                <span class="movie-card-score">⭐ ${movie.score.toFixed(1)}</span>
+                <span>👍 ${formatNumber(movie.votes)}</span>
+            </div>
+        </div>
+    `).join('');
+
+            if (topMovies.length === 0) {
+                grid.innerHTML = '<div style="text-align:center;padding:40px;color:var(--text-muted);">Tidak ada film untuk genre ini dalam rentang tahun yang dipilih.</div>';
+            }
+        }
+
+        function formatNumber(num) {
+            if (num >= 1e6) return (num / 1e6).toFixed(1) + 'M';
+            if (num >= 1e3) return (num / 1e3).toFixed(0) + 'K';
+            return num.toString();
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // RENDER CONTROLS
+        // ═══════════════════════════════════════════════════════════════
+        function renderCharts() {
+            if (currentView === 'both' || currentView === 'bar') {
+                document.getElementById('bar-chart-card').style.display = 'block';
+                renderBarChart();
+            } else {
+                document.getElementById('bar-chart-card').style.display = 'none';
+            }
+
+            if (currentView === 'both' || currentView === 'radar') {
+                document.getElementById('radar-chart-card').style.display = 'block';
+                renderRadarChart();
+            } else {
+                document.getElementById('radar-chart-card').style.display = 'none';
+            }
+
+            if (selectedGenre) {
+                document.getElementById('selected-genre-badge').innerHTML = `🎬 ${selectedGenre}`;
+                showTopMovies(selectedGenre);
+            }
+        }
+
+        // ═══════════════════════════════════════════════════════════════
+        // EVENT LISTENERS
+        // ═══════════════════════════════════════════════════════════════
+        document.getElementById('year-range').addEventListener('input', (e) => {
+            currentYearMax = parseInt(e.target.value);
+            document.getElementById('year-value').textContent = currentYearMax;
+            calculateStats();
+            updateStatsDisplay();
+            renderCharts();
+        });
+
+        document.getElementById('sort-desc').addEventListener('click', () => {
+            currentSort = 'desc';
+            document.getElementById('sort-desc').classList.add('active');
+            document.getElementById('sort-asc').classList.remove('active');
+            calculateStats();
+            renderCharts();
+        });
+
+        document.getElementById('sort-asc').addEventListener('click', () => {
+            currentSort = 'asc';
+            document.getElementById('sort-asc').classList.add('active');
+            document.getElementById('sort-desc').classList.remove('active');
+            calculateStats();
+            renderCharts();
+        });
+
+        document.getElementById('show-both').addEventListener('click', () => {
+            currentView = 'both';
+            document.getElementById('show-both').classList.add('active');
+            document.getElementById('show-bar-only').classList.remove('active');
+            document.getElementById('show-radar-only').classList.remove('active');
+            renderCharts();
+        });
+
+        document.getElementById('show-bar-only').addEventListener('click', () => {
+            currentView = 'bar';
+            document.getElementById('show-bar-only').classList.add('active');
+            document.getElementById('show-both').classList.remove('active');
+            document.getElementById('show-radar-only').classList.remove('active');
+            renderCharts();
+        });
+
+        document.getElementById('show-radar-only').addEventListener('click', () => {
+            currentView = 'radar';
+            document.getElementById('show-radar-only').classList.add('active');
+            document.getElementById('show-both').classList.remove('active');
+            document.getElementById('show-bar-only').classList.remove('active');
+            renderCharts();
+        });
+    </script>
+</body>
+
+</html>
