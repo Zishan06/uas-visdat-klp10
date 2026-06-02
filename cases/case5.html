@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 5: Dampak Proyek terhadap Komunikasi & Penempatan Kerja</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* =============================================
+         * DESIGN SYSTEM — selaras dengan case3 & case6
+         * Font      : Plus Jakarta Sans
+         * Accent    : Emerald (#059669) — case5
+         * Border r  : 20px (card), 12px (sm)
+         * ============================================= */
+        :root {
+            --card-bg:      #ffffff;
+            --text:         #0f172a;
+            --text-2:       #475569;
+            --accent:       #059669;
+            --accent-light: #d1fae5;
+            --accent-dark:  #047857;
+            --border:       #e2e8f0;
+            --sh-sm: 0 1px 2px rgba(0,0,0,.05);
+            --sh:    0 4px 6px -1px rgba(0,0,0,.05), 0 2px 4px -2px rgba(0,0,0,.05);
+            --sh-lg: 0 20px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.04);
+            --r:     20px;
+            --r-sm:  12px;
+            --ease:  0.3s cubic-bezier(.4,0,.2,1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;
+            background: linear-gradient(160deg,#f0fdfa 0%,#f8fafc 40%,#fffbeb 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px 28px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== CONTAINER ===== */
+        .dash {
+            width: 100%;
+            max-width: 1160px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeUp .7s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== HEADER ===== */
+        .hdr { text-align: center; padding-top: 4px; }
+
+        .hdr .eyebrow {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 100px;
+            margin-bottom: 10px;
+        }
+
+        .hdr h1 {
+            font-size: clamp(1.3rem,2.6vw,2rem);
+            font-weight: 900;
+            letter-spacing: -.02em;
+            margin-bottom: 5px;
+        }
+
+        .hdr p {
+            font-size: .88rem;
+            color: var(--text-2);
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        /* ===== SECTION 1: KPI GRID ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 12px;
+        }
+
+        /* Kartu KPI bergaya StatMuse — garis aksen di atas */
+        .kpi {
+            background: var(--card-bg);
+            border-radius: var(--r-sm);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            box-shadow: var(--sh-sm);
+            transition: all var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .kpi::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--c, var(--accent));
+            border-radius: var(--r-sm) var(--r-sm) 0 0;
+        }
+
+        .kpi:hover { transform: translateY(-3px); box-shadow: var(--sh-lg); border-color: var(--c,var(--accent)); }
+
+        .kpi-ico  { font-size: 1.35rem; display: block; margin-bottom: 6px; }
+        .kpi-val  { font-size: 1.8rem; font-weight: 900; color: var(--c,var(--accent-dark)); letter-spacing: -.03em; line-height: 1; display: block; margin-bottom: 3px; }
+        .kpi-lbl  { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-2); }
+        .kpi-sub  { font-size: .68rem; color: var(--text-2); margin-top: 3px; }
+
+        /* ===== LAYOUT UTAMA: chart (2/3) + insight panel (1/3) ===== */
+        .main-row {
+            display: grid;
+            grid-template-columns: 1fr 290px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        /* ===== KARTU GENERIK ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--r);
+            padding: 22px 26px;
+            box-shadow: var(--sh);
+            border: 1px solid var(--border);
+            transition: box-shadow .3s;
+        }
+        .card:hover { box-shadow: var(--sh-lg); }
+
+        .card-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-hdr h2 { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+
+        .badge {
+            background: linear-gradient(135deg,var(--accent-light),#a7f3d0);
+            color: #065f46;
+            font-size: .58rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        /* ===== SECTION 3: FILTER PILLS ===== */
+        .filter-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .filter-lbl { font-size: .68rem; font-weight: 700; color: var(--text-2); text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; }
+
+        .filter-pills {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 100px;
+            padding: 3px;
+            border: 1px solid var(--border);
+            gap: 2px;
+        }
+
+        .fp {
+            padding: 5px 12px;
+            border-radius: 100px;
+            font-size: .73rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-2);
+            transition: all var(--ease);
+            font-family: inherit;
+        }
+        .fp:hover:not(.active) { background: #e2e8f0; color: #334155; }
+        .fp.active { background: var(--accent); color: #fff; box-shadow: 0 4px 12px -4px rgba(5,150,105,.45); }
+
+        /* ===== TOOLTIP ===== */
+        .tooltip {
+            position: fixed;
+            background: rgba(15,23,42,.97);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: .8rem;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .15s, visibility .15s;
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,.6);
+            z-index: 99999;
+            border: 1px solid rgba(255,255,255,.13);
+            max-width: 260px;
+            min-width: 190px;
+            line-height: 1.65;
+        }
+        .tooltip.vis { opacity: 1 !important; visibility: visible !important; }
+
+        .tt-ttl { font-weight: 800; font-size: .88rem; color: #fff; display: block; margin-bottom: 7px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.13); }
+        .tt-row { display: flex; justify-content: space-between; gap: 12px; font-size: .74rem; padding: 2px 0; }
+        .tt-row .l { color: #94a3b8; }
+        .tt-row .v { color: #fbbf24; font-weight: 700; }
+
+        /* ===== CHART AREA ===== */
+        .vis-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chart-box {
+            width: 100%;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+
+        /* ===== BUBBLE CSS ===== */
+        .bbl { cursor: pointer; }
+
+        /* ===== COLOR LEGEND ===== */
+        .clr-legend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: .7rem;
+            font-weight: 600;
+            color: var(--text-2);
+            padding: 9px 20px;
+            background: #f8fafc;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .clr-grad {
+            width: 120px;
+            height: 10px;
+            border-radius: 100px;
+            background: linear-gradient(to right, #ef4444, #f59e0b, #059669);
+        }
+
+        /* ===== SECTION 4: INSIGHT PANEL ===== */
+        .ins-panel {
+            background: var(--card-bg);
+            border-radius: var(--r);
+            padding: 20px 20px;
+            box-shadow: var(--sh);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            transition: box-shadow .3s;
+        }
+        .ins-panel:hover { box-shadow: var(--sh-lg); }
+
+        .ins-ttl {
+            font-size: .8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Badge "Live" pulsing */
+        .live {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: .58rem;
+            font-weight: 700;
+            color: var(--accent-dark);
+            background: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 100px;
+        }
+        .live-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pulse 1.6s infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.35; transform:scale(.7); } }
+
+        /* Item insight dalam panel samping */
+        .ii {
+            padding: 9px 11px;
+            border-radius: 10px;
+            font-size: .74rem;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            border-left: 3px solid;
+            transition: transform .2s;
+            line-height: 1.5;
+        }
+        .ii:hover { transform: translateX(2px); }
+        .ii.tip   { background: #f0fdf4; border-color: #10b981; color: #065f46; }
+        .ii.warn  { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+        .ii.info  { background: #ede9fe; border-color: #8b5cf6; color: #4c1d95; }
+        .ii.alert { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+        .ii-ico   { font-size: 1.1rem; flex-shrink: 0; line-height: 1; margin-top: 1px; }
+        .ii b     { font-weight: 900; }
+
+        /* ===== SECTION 5: BOTTOM INSIGHT CARDS ===== */
+        .ins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(275px,1fr));
+            gap: 14px;
+        }
+
+        .ic {
+            padding: 16px 18px;
+            border-radius: var(--r-sm);
+            font-size: .82rem;
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+            border-left: 5px solid;
+            box-shadow: var(--sh-sm);
+            transition: transform .3s, box-shadow .3s;
+            line-height: 1.55;
+        }
+        .ic:hover { transform: translateY(-2px); box-shadow: var(--sh); }
+        .ic.findings { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+        .ic.story    { background: #ede9fe; border-color: #8b5cf6; color: #4c1d95; }
+        .ic.action   { background: #d1fae5; border-color: #10b981; color: #065f46; }
+        .ic .ico  { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+        .hl       { font-weight: 900; font-size: 1rem; }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 880px) {
+            .main-row  { grid-template-columns: 1fr; }
+            .kpi-grid  { grid-template-columns: repeat(2,1fr); }
+        }
+        @media (max-width: 520px) {
+            body       { padding: 10px; }
+            .card      { padding: 14px 12px; }
+            .kpi-grid  { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dash">
+
+    <!-- ============================================================
+         SECTION 1 — HEADER
+    ============================================================ -->
+    <div class="hdr">
+        <div class="eyebrow">📖 Case Study #5</div>
+        <h1>🫧 Proyek, Komunikasi & Peluang Kerja Mahasiswa</h1>
+        <p>Dari <strong>10.000 mahasiswa</strong> — apakah semakin banyak proyek yang diselesaikan
+            meningkatkan kemampuan komunikasi dan memperbesar peluang mendapatkan pekerjaan?</p>
+    </div>
+
+    <!-- ============================================================
+         SECTION 1 — KPI CARDS
+         Berubah saat filter Academic Performance aktif
+    ============================================================ -->
+    <div class="kpi-grid">
+        <div class="kpi" style="--c:#059669;">
+            <span class="kpi-ico">🎓</span>
+            <span class="kpi-val" id="kv-total">—</span>
+            <div class="kpi-lbl">Total Mahasiswa</div>
+            <div class="kpi-sub" id="ks-total">Memuat...</div>
+        </div>
+        <div class="kpi" style="--c:#0284c7;">
+            <span class="kpi-ico">📁</span>
+            <span class="kpi-val" id="kv-proj">—</span>
+            <div class="kpi-lbl">Rata-rata Proyek</div>
+            <div class="kpi-sub" id="ks-proj">Memuat...</div>
+        </div>
+        <div class="kpi" style="--c:#7c3aed;">
+            <span class="kpi-ico">💬</span>
+            <span class="kpi-val" id="kv-comm">—</span>
+            <div class="kpi-lbl">Avg Communication</div>
+            <div class="kpi-sub" id="ks-comm">Skala 1–10</div>
+        </div>
+        <div class="kpi" style="--c:#dc2626;">
+            <span class="kpi-ico">🏆</span>
+            <span class="kpi-val" id="kv-place">—</span>
+            <div class="kpi-lbl">Placement Rate</div>
+            <div class="kpi-sub" id="ks-place">Memuat...</div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         LAYOUT UTAMA: Bubble Chart (kiri) + Insight Panel (kanan)
+    ============================================================ -->
+    <div class="main-row">
+
+        <!-- ===== KOLOM KIRI: BUBBLE CHART ===== -->
+        <div class="card">
+            <div class="card-hdr">
+                <h2>🫧 Bubble Chart per Jumlah Proyek <span class="badge">6 Kelompok</span></h2>
+                <!-- SECTION 3 — FILTER ACADEMIC PERFORMANCE -->
+                <div class="filter-row">
+                    <span class="filter-lbl">🎓 Filter:</span>
+                    <div class="filter-pills" id="filter-pills"><!-- JS --></div>
+                </div>
+            </div>
+
+            <div class="vis-wrap">
+                <!-- Tooltip (fixed, muncul saat hover) -->
+                <div id="tt" class="tooltip"></div>
+
+                <!-- SVG container -->
+                <div class="chart-box" id="chart-box">
+                    <svg id="main-svg"></svg>
+                </div>
+
+                <!-- Legend warna (continuous gradient) -->
+                <div class="clr-legend">
+                    <span style="color:#ef4444;font-weight:700;">Rendah</span>
+                    <div class="clr-grad"></div>
+                    <span style="color:#059669;font-weight:700;">Tinggi</span>
+                    <span style="font-size:.62rem;color:#94a3b8;margin-left:4px;">= Placement Rate</span>
+                    <span style="font-size:.62rem;color:#94a3b8;">| Ukuran = Jumlah Mahasiswa</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KOLOM KANAN: SECTION 4 — AUTO INSIGHT PANEL ===== -->
+        <div class="ins-panel" id="ins-panel">
+            <div class="ins-ttl">
+                🧠 Auto-Insight
+                <span class="live"><span class="live-dot"></span> Live</span>
+            </div>
+            <!-- Konten diisi dinamis dari data aktif -->
+            <div id="ins-items">
+                <p style="font-size:.76rem;color:#94a3b8;text-align:center;padding:20px 0;">Memuat data...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================
+         SECTION 5 — BOTTOM INSIGHT CARDS (Storytelling)
+         Update otomatis saat filter berubah
+    ============================================================ -->
+    <div class="ins-grid" id="ins-bottom">
+        <div class="ic findings"><span class="ico">🔍</span><div><strong>Memuat temuan...</strong></div></div>
+        <div class="ic story">  <span class="ico">📖</span><div><strong>Memuat cerita...</strong></div></div>
+        <div class="ic action"> <span class="ico">💡</span><div><strong>Memuat rekomendasi...</strong></div></div>
+    </div>
+
+</div><!-- /.dash -->
+
+<script>
+// ============================================================
+// CASE 5 — Bubble Chart: Proyek → Komunikasi → Penempatan
+//
+// PENDEKATAN BARU (v3):
+//   • Agregasi HANYA per Projects_Completed → 6 bubble bersih
+//   • X = jumlah proyek (0–5)
+//   • Y = rata-rata Communication Skills per kelompok
+//   • Ukuran = jumlah mahasiswa
+//   • Warna = Placement Rate (skala kontinu, bukan 3 tier)
+//   • Trend line linier (dihitung dari data)
+//   • Tanpa zoom / pan / area highlights berlebihan
+// ============================================================
+
+// ------------------------------------------------------------------
+// 1. CONFIG
+// ------------------------------------------------------------------
+const CFG = {
+    CSV: '../data/college_student_placement_dataset.csv',
+
+    // Filter Academic Performance (range 1–10 dari dataset)
+    FILTERS: [
+        { key:'all',       label:'🌐 All',       min:1,  max:10 },
+        { key:'excellent', label:'⭐ Excellent',  min:9,  max:10 },
+        { key:'good',      label:'✅ Good',       min:7,  max:8  },
+        { key:'average',   label:'📊 Average',    min:5,  max:6  },
+        { key:'fair',      label:'⚠️ Fair',       min:1,  max:4  },
+    ],
+
+    // Margin SVG
+    M: { top:50, right:40, bottom:62, left:68 },
+
+    // Skala warna kontinu: merah → kuning → hijau
+    // Domain disesuaikan distribusi nyata dataset (overall rate ~16.6%)
+    // Proj 0–1 → ~2% (merah), Proj 2–5 → ~23% (hijau)
+    COLOR_DOMAIN: [0, 12, 25],
+    COLOR_RANGE:  ['#ef4444', '#f59e0b', '#059669'],
+
+    // Ukuran bubble (radius)
+    // Semua kelompok proyek memiliki jumlah mhs hampir sama (~1600–1700),
+    // maka bubble size akan serupa — jujur secara statistik.
+    R_MIN: 32,
+    R_MAX: 50,
+};
+
+// ------------------------------------------------------------------
+// 2. STATE GLOBAL
+// ------------------------------------------------------------------
+let fullData      = [];   // 10.000 baris dari CSV
+let currentFilter = 'all';
+
+// ------------------------------------------------------------------
+// 3. LOAD DATA CSV
+// ------------------------------------------------------------------
+async function loadData() {
+    const box = document.getElementById('chart-box');
+    try {
+        const raw = await d3.csv(CFG.CSV);
+        if (!raw || raw.length === 0) throw new Error('Dataset kosong');
+
+        // Parse hanya kolom yang diperlukan untuk case5
+        fullData = raw.map(d => ({
+            Projects_Completed:   +d.Projects_Completed   || 0,
+            Communication_Skills: +d.Communication_Skills || 0,
+            Academic_Performance: +d.Academic_Performance || 0,
+            Placement_Yes: (d.Placement||'').trim().toLowerCase() === 'yes' ? 1 : 0,
+            CGPA: +d.CGPA || 0,
+        })).filter(d => d.Communication_Skills >= 1 && !isNaN(d.Projects_Completed));
+
+        console.log(`✅ ${fullData.length} baris dimuat`);
+        refresh();
+
+    } catch (e) {
+        console.error('❌', e);
+        if (box) box.innerHTML = `
+            <div style="text-align:center;padding:60px;color:#b91c1c;">
+                <p style="font-size:2rem;">⚠️</p>
+                <p style="font-weight:800;margin:8px 0;">Gagal Memuat Data</p>
+                <p style="font-size:.8rem;color:#64748b;">
+                    Pastikan <code>data/college_student_placement_dataset.csv</code> tersedia.<br>${e.message}
+                </p>
+            </div>`;
+    }
+}
+
+// ------------------------------------------------------------------
+// 4. AGREGASI: group by Projects_Completed
+//    Hasil: tepat 6 titik data (Projects 0–5)
+//    Masing-masing mewakili seluruh mahasiswa di level proyek tersebut.
+// ------------------------------------------------------------------
+function aggregate(data) {
+    return d3.rollups(
+        data,
+        g => ({
+            count:   g.length,
+            placed:  d3.sum(g, d => d.Placement_Yes),
+            pct:     d3.sum(g, d => d.Placement_Yes) / g.length * 100,
+            avgComm: d3.mean(g, d => d.Communication_Skills),
+            avgCGPA: d3.mean(g, d => d.CGPA),
+        }),
+        d => d.Projects_Completed
+    )
+    .map(([proj, s]) => ({ proj, ...s }))
+    .sort((a, b) => a.proj - b.proj);  // Urut 0→5
+}
+
+// ------------------------------------------------------------------
+// 5. SKALA WARNA KONTINU
+//    Merah (placement rendah) → Kuning → Hijau (placement tinggi)
+// ------------------------------------------------------------------
+const colorScale = d3.scaleLinear()
+    .domain(CFG.COLOR_DOMAIN)
+    .range(CFG.COLOR_RANGE)
+    .clamp(true);
+
+// ------------------------------------------------------------------
+// 6. REGRESI LINIER
+//    Dihitung dari data aktif → untuk trend line
+//    Input: array of {x, y}
+//    Output: { slope, intercept, r }
+// ------------------------------------------------------------------
+function linReg(pts) {
+    if (!pts || pts.length < 2) return null;
+    const mx = d3.mean(pts, p => p.x);
+    const my = d3.mean(pts, p => p.y);
+    let num = 0, dx2 = 0, dy2 = 0;
+    pts.forEach(p => {
+        const dx = p.x - mx, dy = p.y - my;
+        num += dx * dy; dx2 += dx * dx; dy2 += dy * dy;
+    });
+    const slope     = dx2 > 0 ? num / dx2 : 0;
+    const intercept = my - slope * mx;
+    const r         = (dx2 * dy2) > 0 ? num / Math.sqrt(dx2 * dy2) : 0;
+    return { slope, intercept, r: +(r.toFixed(3)) };
+}
+
+// ------------------------------------------------------------------
+// 7. RENDER BUBBLE CHART
+//    Hanya 6 bubble — satu per Projects_Completed (0–5)
+//    Tanpa zoom, tanpa pan, tanpa highlight zone berlebihan
+// ------------------------------------------------------------------
+function renderChart(agg, raw) {
+    const box = document.getElementById('chart-box');
+    if (!box || agg.length === 0) return;
+
+    const W  = Math.min(box.clientWidth - 2, 820);
+    const H  = Math.min(W * 0.62, 460);
+    const m  = CFG.M;
+    const iW = W - m.left - m.right;
+    const iH = H - m.top  - m.bottom;
+
+    // ===== SVG =====
+    const svg = d3.select('#main-svg');
+    svg.selectAll('*').remove();
+    svg.attr('viewBox', `0 0 ${W} ${H}`)
+       .attr('preserveAspectRatio', 'xMidYMid meet')
+       .style('width', '100%')
+       .style('height', 'auto')
+       .style('max-height', H + 'px');
+
+    // ===== SKALA =====
+    // X: Projects 0–5, padding agar bubble tidak terpotong di tepi
+    const xScale = d3.scaleLinear().domain([-0.5, 5.5]).range([0, iW]);
+
+    // Y: rata-rata Communication Skills per kelompok
+    //    Variasi data nyata: ~5.48 – ~5.64. Tight domain agar pola terlihat.
+    const commVals  = agg.map(d => d.avgComm);
+    const commPad   = 0.5;  // Padding Y axis agar bubble tidak mepet tepi
+    const yMin      = Math.max(1, d3.min(commVals) - commPad);
+    const yMax      = Math.min(10, d3.max(commVals) + commPad);
+    const yScale    = d3.scaleLinear().domain([yMin, yMax]).range([iH, 0]).nice();
+
+    // Ukuran bubble: proporsional terhadap jumlah mahasiswa
+    const counts = agg.map(d => d.count);
+    const rScale = d3.scaleSqrt()
+        .domain([0, d3.max(counts)])
+        .range([CFG.R_MIN, CFG.R_MAX])
+        .clamp(true);
+
+    // ===== GROUP UTAMA =====
+    const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+
+    // ===== CLIP PATH ===== (agar konten tidak keluar area chart)
+    svg.append('defs').append('clipPath').attr('id', 'c5clip')
+        .append('rect').attr('width', iW).attr('height', iH);
+
+    // ===== BACKGROUND ZONE: kiri (rendah) vs kanan (tinggi) =====
+    // Bagi chart di x = Projects 1.5 (antara proj 1 dan 2) — titik dimana
+    // placement rate melesat dari ~2% ke ~24% berdasarkan data nyata.
+    const breakX = xScale(1.5);
+
+    const bg = g.append('g').attr('clip-path', 'url(#c5clip)');
+    // Zona kiri: placement rendah
+    bg.append('rect')
+        .attr('x', 0).attr('y', 0)
+        .attr('width', breakX).attr('height', iH)
+        .attr('fill', '#fff5f5').attr('opacity', 0.7);
+
+    // Zona kanan: placement tinggi
+    bg.append('rect')
+        .attr('x', breakX).attr('y', 0)
+        .attr('width', iW - breakX).attr('height', iH)
+        .attr('fill', '#f0fdf4').attr('opacity', 0.7);
+
+    // Label zona (pojok kiri atas / kanan atas)
+    const bgLabel = g.append('g').attr('clip-path', 'url(#c5clip)');
+    bgLabel.append('text')
+        .attr('x', 6).attr('y', 14)
+        .style('font-size', '.6rem').style('font-weight', '800')
+        .style('fill', '#dc2626').style('opacity', .7)
+        .text('⚠️ Placement Rendah');
+
+    bgLabel.append('text')
+        .attr('x', breakX + 6).attr('y', 14)
+        .style('font-size', '.6rem').style('font-weight', '800')
+        .style('fill', '#059669').style('opacity', .7)
+        .text('✅ Placement Tinggi');
+
+    // ===== GARIS PEMISAH ZONA =====
+    g.append('line')
+        .attr('x1', breakX).attr('x2', breakX)
+        .attr('y1', 0).attr('y2', iH)
+        .attr('stroke', '#94a3b8').attr('stroke-width', 1.5)
+        .attr('stroke-dasharray', '6,4').attr('opacity', .5);
+
+    // Label garis pemisah
+    g.append('text')
+        .attr('x', breakX - 4).attr('y', iH - 4)
+        .attr('text-anchor', 'end')
+        .style('font-size', '.56rem').style('font-weight', '700')
+        .style('fill', '#64748b').style('opacity', .75)
+        .text('Threshold ≥2 proyek');
+
+    // ===== GRID LINES (tipis & ringan) =====
+    const gridG = g.append('g').attr('clip-path', 'url(#c5clip)');
+
+    // Grid horizontal (per 0.1 comm — karena range sempit)
+    gridG.selectAll('.gy')
+        .data(yScale.ticks(6))
+        .enter().append('line').attr('class', 'gy')
+        .attr('x1', 0).attr('x2', iW)
+        .attr('y1', d => yScale(d)).attr('y2', d => yScale(d))
+        .attr('stroke', '#e2e8f0').attr('stroke-width', 1)
+        .attr('stroke-dasharray', '3,4');
+
+    // Grid vertikal (per proyek)
+    gridG.selectAll('.gx')
+        .data([0,1,2,3,4,5])
+        .enter().append('line').attr('class', 'gx')
+        .attr('x1', d => xScale(d)).attr('x2', d => xScale(d))
+        .attr('y1', 0).attr('y2', iH)
+        .attr('stroke', '#e2e8f0').attr('stroke-width', 1)
+        .attr('stroke-dasharray', '3,4');
+
+    // ===== TREND LINE (Regresi Linier) =====
+    // Dihitung dari titik (proj, avgComm) — menunjukkan tren komunikasi
+    const regPts = agg.map(d => ({ x: d.proj, y: d.avgComm }));
+    const reg    = linReg(regPts);
+
+    if (reg) {
+        const x0 = -0.3, x1 = 5.3;
+        const y0 = reg.slope * x0 + reg.intercept;
+        const y1 = reg.slope * x1 + reg.intercept;
+
+        const trendG = g.append('g').attr('clip-path', 'url(#c5clip)');
+
+        // Garis trend
+        trendG.append('line')
+            .attr('x1', xScale(x0)).attr('y1', yScale(y0))
+            .attr('x2', xScale(x1)).attr('y2', yScale(y1))
+            .attr('stroke', '#7c3aed')
+            .attr('stroke-width', 2)
+            .attr('stroke-dasharray', '7,4')
+            .attr('opacity', .65);
+
+        // Label tren
+        trendG.append('text')
+            .attr('x', xScale(5.15))
+            .attr('y', yScale(y1) - 8)
+            .attr('text-anchor', 'end')
+            .style('font-size', '.58rem')
+            .style('font-weight', '700')
+            .style('fill', '#7c3aed')
+            .style('opacity', .8)
+            .text(`Trend Komunikasi (r = ${reg.r})`);
+    }
+
+    // ===== BUBBLES =====
+    // Tiap bubble = satu kelompok Projects_Completed
+    // Rendered sebelum label agar label tidak tertimpa bubble
+    const tooltip = d3.select('#tt');
+    const bblG    = g.append('g').attr('clip-path', 'url(#c5clip)');
+
+    const circles = bblG.selectAll('.bbl')
+        .data(agg, d => d.proj)
+        .enter().append('circle').attr('class', 'bbl')
+        .attr('cx', d => xScale(d.proj))
+        .attr('cy', d => yScale(d.avgComm))
+        .attr('r', 0)                           // Mulai dari 0 → animasi masuk
+        .attr('fill', d => colorScale(d.pct))
+        .attr('fill-opacity', .85)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2.5);
+
+    // Animasi masuk: bubble pop dengan staggered delay
+    circles.transition()
+        .delay((d, i) => i * 80)
+        .duration(600)
+        .ease(d3.easeBackOut.overshoot(1.1))
+        .attr('r', d => rScale(d.count));
+
+    // ===== LABEL DI DALAM BUBBLE =====
+    // Ditampilkan setelah transisi selesai agar tidak terpotong
+    const lblG = g.append('g').attr('clip-path', 'url(#c5clip)');
+
+    // Label atas: "N Proyek"
+    lblG.selectAll('.lbl-proj')
+        .data(agg)
+        .enter().append('text').attr('class', 'lbl-proj')
+        .attr('x', d => xScale(d.proj))
+        .attr('y', d => yScale(d.avgComm) - 7)
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .style('font-size', '0.75rem')
+        .style('font-weight', '900')
+        .style('fill', '#fff')
+        .style('pointer-events', 'none')
+        .style('opacity', 0)
+        .text(d => `${d.proj} Proj`)
+        .transition().delay((d,i) => i*80 + 400).duration(300)
+        .style('opacity', 1);
+
+    // Label bawah: placement rate persen
+    lblG.selectAll('.lbl-pct')
+        .data(agg)
+        .enter().append('text').attr('class', 'lbl-pct')
+        .attr('x', d => xScale(d.proj))
+        .attr('y', d => yScale(d.avgComm) + 9)
+        .attr('text-anchor', 'middle')
+        .attr('dominant-baseline', 'middle')
+        .style('font-size', '0.68rem')
+        .style('font-weight', '700')
+        .style('fill', '#fff')
+        .style('pointer-events', 'none')
+        .style('opacity', 0)
+        .text(d => `${d.pct.toFixed(1)}%`)
+        .transition().delay((d,i) => i*80 + 440).duration(300)
+        .style('opacity', .92);
+
+    // ===== HOVER INTERACTION =====
+    circles
+        .on('mouseenter', function(event, d) {
+            // Highlight bubble ini, dim yang lain
+            d3.select(this).raise()
+                .transition().duration(120)
+                .attr('fill-opacity', 1)
+                .attr('stroke', '#0f172a')
+                .attr('stroke-width', 3.5);
+
+            d3.selectAll('.bbl').filter(b => b !== d)
+                .transition().duration(120)
+                .attr('fill-opacity', .15);
+
+            // Tooltip content
+            const deltaComm = d.proj > 0
+                ? (d.avgComm - agg[0].avgComm).toFixed(2)
+                : null;
+
+            tooltip.classed('vis', true).html(`
+                <span class="tt-ttl">📁 ${d.proj} Proyek Diselesaikan</span>
+                <div class="tt-row"><span class="l">Projects Completed</span><span class="v">${d.proj}</span></div>
+                <div class="tt-row"><span class="l">Avg Communication Skills</span><span class="v">${d.avgComm.toFixed(3)}</span></div>
+                <div class="tt-row"><span class="l">Total Mahasiswa</span><span class="v">${d.count.toLocaleString()}</span></div>
+                <div class="tt-row"><span class="l">Placement Rate</span><span class="v">${d.pct.toFixed(2)}%</span></div>
+                <div class="tt-row"><span class="l">Yang Ditempatkan</span><span class="v">${d.placed} mhs</span></div>
+                <div class="tt-row"><span class="l">Avg CGPA</span><span class="v">${d.avgCGPA.toFixed(2)}</span></div>
+                ${deltaComm !== null
+                    ? `<div class="tt-row"><span class="l">Δ Comm vs 0 Proyek</span><span class="v">${deltaComm > 0 ? '+' : ''}${deltaComm}</span></div>`
+                    : ''}
+            `);
+        })
+        .on('mousemove', function(event) {
+            const tn = tooltip.node();
+            if (!tn) return;
+            const tw = tn.offsetWidth, th = tn.offsetHeight;
+            let L = event.clientX + 14;
+            let T = event.clientY - th - 10;
+            if (L + tw > window.innerWidth  - 10) L = event.clientX - tw - 14;
+            if (T < 10)                            T = event.clientY + 14;
+            if (L < 10)                            L = 10;
+            if (T + th > window.innerHeight - 10)  T = window.innerHeight - th - 10;
+            tooltip.style('left', L + 'px').style('top', T + 'px');
+        })
+        .on('mouseleave', function() {
+            d3.selectAll('.bbl')
+                .transition().duration(200)
+                .attr('fill-opacity', .85)
+                .attr('stroke', '#fff')
+                .attr('stroke-width', 2.5);
+            tooltip.classed('vis', false);
+        });
+
+    // ===== AXES =====
+    // Sumbu X: 0, 1, 2, 3, 4, 5
+    const xAxisG = g.append('g').attr('transform', `translate(0,${iH})`);
+    xAxisG.call(d3.axisBottom(xScale).tickValues([0,1,2,3,4,5]).tickFormat(d3.format('d')));
+    styleAxis(xAxisG);
+
+    // Label X
+    g.append('text')
+        .attr('x', iW / 2).attr('y', iH + m.bottom - 10)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '.78rem').style('font-weight', '800').style('fill', '#334155')
+        .text('📁 Projects Completed (Jumlah Proyek Diselesaikan)');
+
+    // Sumbu Y: rata-rata Communication Skills
+    const yAxisG = g.append('g');
+    yAxisG.call(d3.axisLeft(yScale).ticks(5).tickFormat(d3.format('.1f')));
+    styleAxis(yAxisG);
+
+    // Label Y
+    g.append('text')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -iH / 2).attr('y', -m.left + 15)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '.75rem').style('font-weight', '800').style('fill', '#334155')
+        .text('💬 Rata-rata Communication Skills');
+
+    // Catatan: Y axis tight (bukan dari 0) karena variasi data kecil
+    g.append('text')
+        .attr('x', iW).attr('y', iH + m.bottom - 10)
+        .attr('text-anchor', 'end')
+        .style('font-size', '.55rem').style('fill', '#94a3b8')
+        .text('*Y axis dipersempit untuk menampilkan variasi');
+}
+
+// Helper: seragamkan style axis
+function styleAxis(sel) {
+    sel.select('.domain').attr('stroke', '#e2e8f0');
+    sel.selectAll('line').attr('stroke', '#e2e8f0');
+    sel.selectAll('text')
+        .style('font-size', '.75rem')
+        .style('font-weight', '600')
+        .style('fill', '#475569');
+}
+
+// ------------------------------------------------------------------
+// 8. UPDATE KPI CARDS
+//    Berubah setiap kali filter diterapkan
+// ------------------------------------------------------------------
+function updateKPI(data) {
+    const total   = data.length;
+    const placed  = d3.sum(data, d => d.Placement_Yes);
+    const pct     = total > 0 ? placed / total * 100 : 0;
+    const avgProj = d3.mean(data, d => d.Projects_Completed) || 0;
+    const avgComm = d3.mean(data, d => d.Communication_Skills) || 0;
+    const fLabel  = CFG.FILTERS.find(f => f.key === currentFilter)?.label || 'All';
+
+    animVal('kv-total', total,   0, 'int');
+    animVal('kv-proj',  avgProj, 2, 'dec');
+    animVal('kv-comm',  avgComm, 2, 'dec');
+    animVal('kv-place', pct,     1, 'pct');
+
+    setText('ks-total', `Filter: ${fLabel}`);
+    setText('ks-proj',  `Min 0 – Max 5 proyek`);
+    setText('ks-comm',  `Skala 1–10`);
+    setText('ks-place', `${placed.toLocaleString()} dari ${total.toLocaleString()} mhs`);
+}
+
+// Animasi counter smooth (ease-out cubic)
+function animVal(id, target, dec, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const from = parseFloat(el.dataset.v || 0), to = target || 0;
+    const dur = 550, t0 = performance.now();
+    function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const e = 1 - Math.pow(1 - p, 3);
+        const v = from + (to - from) * e;
+        el.textContent = type === 'pct' ? v.toFixed(dec) + '%'
+                       : type === 'dec' ? v.toFixed(dec)
+                       : Math.round(v).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
+        else el.dataset.v = to;
+    }
+    requestAnimationFrame(tick);
+}
+
+function setText(id, txt) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+}
+
+// ------------------------------------------------------------------
+// 9. SECTION 4 — AUTO INSIGHT PANEL
+//    Semua insight dihitung dari data aktif, tidak hardcoded.
+// ------------------------------------------------------------------
+function updateInsights(raw, agg) {
+    const el = document.getElementById('ins-items');
+    if (!el || agg.length === 0) return;
+
+    // a) Kelompok proyek dengan placement rate tertinggi
+    const best = [...agg].sort((a,b) => b.pct - a.pct)[0];
+    const worst = [...agg].sort((a,b) => a.pct - b.pct)[0];
+
+    // b) Tren komunikasi: kelompok atas vs bawah
+    const highProj = agg.filter(d => d.proj >= 3);
+    const lowProj  = agg.filter(d => d.proj <= 1);
+    const hComm    = d3.mean(highProj, d => d.avgComm) || 0;
+    const lComm    = d3.mean(lowProj,  d => d.avgComm) || 0;
+    const dComm    = hComm - lComm;
+
+    // c) Threshold: placement sebelum dan sesudah 2 proyek
+    const below2 = raw.filter(d => d.Projects_Completed <= 1);
+    const above2 = raw.filter(d => d.Projects_Completed >= 2);
+    const pBelow = below2.length > 0 ? d3.sum(below2,d=>d.Placement_Yes)/below2.length*100 : 0;
+    const pAbove = above2.length > 0 ? d3.sum(above2,d=>d.Placement_Yes)/above2.length*100 : 0;
+    const ratio  = pBelow > 0 ? (pAbove / pBelow).toFixed(1) : '∞';
+
+    // d) Regression info
+    const reg = linReg(agg.map(d => ({x: d.proj, y: d.avgComm})));
+
+    const fLabel = CFG.FILTERS.find(f => f.key === currentFilter)?.label || 'All';
+
+    el.innerHTML = `
+        <div class="ii tip">
+            <span class="ii-ico">🏆</span>
+            <div>
+                <b>Placement Tertinggi</b><br>
+                Kelompok <b>${best.proj} proyek</b>: <b>${best.pct.toFixed(1)}%</b>
+                dari ${best.count.toLocaleString()} mhs ditempatkan.
+            </div>
+        </div>
+        <div class="ii alert">
+            <span class="ii-ico">📉</span>
+            <div>
+                <b>Placement Terendah</b><br>
+                Kelompok <b>${worst.proj} proyek</b>: hanya <b>${worst.pct.toFixed(1)}%</b>
+                — jauh di bawah rata-rata.
+            </div>
+        </div>
+        <div class="ii warn">
+            <span class="ii-ico">⚡</span>
+            <div>
+                <b>Threshold Kritis: 2 Proyek</b><br>
+                ≤1 proyek: <b>${pBelow.toFixed(1)}%</b> placed.<br>
+                ≥2 proyek: <b>${pAbove.toFixed(1)}%</b> placed.<br>
+                Rasio: <b>${ratio}×</b> lebih tinggi.
+            </div>
+        </div>
+        <div class="ii info">
+            <span class="ii-ico">💬</span>
+            <div>
+                <b>Tren Komunikasi</b><br>
+                Proj ≥3 avg comm: <b>${hComm.toFixed(2)}</b><br>
+                Proj ≤1 avg comm: <b>${lComm.toFixed(2)}</b><br>
+                Δ = <b>${dComm >= 0 ? '+' : ''}${dComm.toFixed(3)}</b>
+                ${reg ? `(r = ${reg.r})` : ''}
+            </div>
+        </div>
+        <div style="font-size:.6rem;color:#94a3b8;text-align:center;padding-top:2px;">
+            Filter: ${fLabel} · ${raw.length.toLocaleString()} mahasiswa
+        </div>
+    `;
+}
+
+// ------------------------------------------------------------------
+// 10. SECTION 5 — BOTTOM INSIGHT CARDS (Storytelling)
+//     Berubah saat filter aktif, dihitung dari data nyata.
+// ------------------------------------------------------------------
+function updateBottomCards(raw, agg) {
+    const el = document.getElementById('ins-bottom');
+    if (!el || raw.length === 0) return;
+
+    // Placement rate proj tinggi (≥2) vs rendah (0–1)
+    const hi = raw.filter(d => d.Projects_Completed >= 2);
+    const lo = raw.filter(d => d.Projects_Completed <= 1);
+    const hiPct = hi.length > 0 ? d3.sum(hi,d=>d.Placement_Yes)/hi.length*100 : 0;
+    const loPct = lo.length > 0 ? d3.sum(lo,d=>d.Placement_Yes)/lo.length*100 : 0;
+
+    // Komunikasi: Comm ≥8 vs ≤4
+    const hiC = raw.filter(d => d.Communication_Skills >= 8);
+    const loC = raw.filter(d => d.Communication_Skills <= 4);
+    const hiCP = hiC.length > 0 ? d3.sum(hiC,d=>d.Placement_Yes)/hiC.length*100 : 0;
+    const loCP = loC.length > 0 ? d3.sum(loC,d=>d.Placement_Yes)/loC.length*100 : 0;
+
+    // Bubble terbaik di kelompok ≥2 proyek
+    const bestAgg = [...agg].sort((a,b) => b.pct - a.pct)[0];
+
+    // Rata-rata komunikasi per level proyek (trend)
+    const trendUp = agg[agg.length-1]?.avgComm > agg[0]?.avgComm;
+    const commDiff = ((agg[agg.length-1]?.avgComm || 0) - (agg[0]?.avgComm || 0));
+
+    el.innerHTML = `
+        <div class="ic findings">
+            <span class="ico">🔍</span>
+            <div>
+                <strong>Temuan Utama: Ada Ambang Batas di 2 Proyek</strong>
+                <p style="margin-top:5px;font-size:.8rem;">
+                    Mahasiswa dengan <strong>0–1 proyek</strong> hanya mendapat
+                    <span class="hl">${loPct.toFixed(1)}%</span> placement rate.
+                    Begitu mencapai <strong>≥2 proyek</strong>, rate
+                    melesat ke <span class="hl">${hiPct.toFixed(1)}%</span>
+                    — selisih <strong>${Math.abs(hiPct-loPct).toFixed(0)} poin persentase</strong>.
+                </p>
+            </div>
+        </div>
+        <div class="ic story">
+            <span class="ico">📖</span>
+            <div>
+                <strong>Cerita Data: Communication Skills Lebih Penting</strong>
+                <p style="margin-top:5px;font-size:.8rem;">
+                    Meski tren komunikasi antar kelompok proyek
+                    ${trendUp ? `naik tipis (+${commDiff.toFixed(3)})` : `bervariasi (${commDiff.toFixed(3)})`},
+                    mahasiswa dengan <strong>Comm ≥8</strong> memiliki placement
+                    <span class="hl">${hiCP.toFixed(1)}%</span> —
+                    vs <span class="hl">${loCP.toFixed(1)}%</span> untuk Comm ≤4.
+                    <strong>Komunikasi tinggi adalah pembeda terbesar.</strong>
+                </p>
+            </div>
+        </div>
+        <div class="ic action">
+            <span class="ico">💡</span>
+            <div>
+                <strong>Rekomendasi: Proyek + Komunikasi = Formula Sukses</strong>
+                <p style="margin-top:5px;font-size:.8rem;">
+                    Kelompok paling sukses (${bestAgg.proj} proyek,
+                    placement <span class="hl">${bestAgg.pct.toFixed(1)}%</span>)
+                    membuktikan: <strong>selesaikan minimal 2–3 proyek</strong>
+                    sambil aktif melatih kemampuan komunikasi.
+                    Keduanya bekerja sinergis untuk memperbesar peluang kerja.
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+// ------------------------------------------------------------------
+// 11. FILTER PILLS — build & handle
+// ------------------------------------------------------------------
+function buildPills() {
+    const el = document.getElementById('filter-pills');
+    if (!el) return;
+    el.innerHTML = '';
+    CFG.FILTERS.forEach(f => {
+        const btn = document.createElement('button');
+        btn.className   = 'fp' + (f.key === currentFilter ? ' active' : '');
+        btn.textContent  = f.label;
+        btn.dataset.key  = f.key;
+        btn.addEventListener('click', () => applyFilter(f.key));
+        el.appendChild(btn);
+    });
+}
+
+function applyFilter(key) {
+    currentFilter = key;
+    document.querySelectorAll('.fp').forEach(b => b.classList.toggle('active', b.dataset.key === key));
+    refresh();
+}
+
+// ------------------------------------------------------------------
+// 12. REFRESH — dipanggil setiap kali filter berubah
+// ------------------------------------------------------------------
+function refresh() {
+    // Filter raw data berdasarkan Academic Performance
+    const fc = CFG.FILTERS.find(f => f.key === currentFilter);
+    const filtered = (fc && fc.key !== 'all')
+        ? fullData.filter(d => d.Academic_Performance >= fc.min && d.Academic_Performance <= fc.max)
+        : fullData;
+
+    // Agregasi per Projects_Completed → hanya 6 titik
+    const agg = aggregate(filtered);
+    console.log(`🔄 Filter: ${currentFilter} | ${filtered.length} mhs | ${agg.length} kelompok proyek`);
+
+    // Update semua komponen UI
+    updateKPI(filtered);
+    renderChart(agg, filtered);
+    updateInsights(filtered, agg);
+    updateBottomCards(filtered, agg);
+}
+
+// ------------------------------------------------------------------
+// 13. INIT
+// ------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    buildPills();
+    loadData();
+
+    // Resize handler — re-render chart saat lebar berubah
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => { if (fullData.length > 0) refresh(); }, 300);
+    });
+});
+</script>
+
+</body>
+</html>

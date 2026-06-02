@@ -1,0 +1,1420 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 4: Efektivitas Program Magang terhadap Penempatan Kerja</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        /* =============================================
+         * DESIGN SYSTEM — identik dengan case5.html
+         * Font   : Plus Jakarta Sans
+         * Accent : Emerald (#059669)
+         * Radius : 20px (card), 12px (sm)
+         * ============================================= */
+        :root {
+            --card-bg:      #ffffff;
+            --text:         #0f172a;
+            --text-2:       #475569;
+            --accent:       #059669;
+            --accent-light: #d1fae5;
+            --accent-dark:  #047857;
+            --border:       #e2e8f0;
+            --sh-sm: 0 1px 2px rgba(0,0,0,.05);
+            --sh:    0 4px 6px -1px rgba(0,0,0,.05), 0 2px 4px -2px rgba(0,0,0,.05);
+            --sh-lg: 0 20px 25px -5px rgba(0,0,0,.08), 0 8px 10px -6px rgba(0,0,0,.04);
+            --r:    20px;
+            --r-sm: 12px;
+            --ease: 0.3s cubic-bezier(.4,0,.2,1);
+
+            /* Warna semantik untuk donut */
+            --col-intern:     #0284c7;   /* Biru — pernah magang */
+            --col-no-intern:  #f59e0b;   /* Kuning — tidak magang */
+            --col-placed:     #059669;   /* Hijau — ditempatkan */
+            --col-not-placed: #ef4444;   /* Merah — tidak ditempatkan */
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Plus Jakarta Sans','Inter','Segoe UI',system-ui,sans-serif;
+            background: linear-gradient(160deg,#f0fdfa 0%,#f8fafc 40%,#fffbeb 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 16px 28px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ===== CONTAINER ===== */
+        .dash {
+            width: 100%;
+            max-width: 1160px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeUp .7s ease forwards;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ===== HEADER ===== */
+        .hdr { text-align: center; padding-top: 4px; }
+
+        .hdr .eyebrow {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            font-size: .68rem;
+            font-weight: 800;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 100px;
+            margin-bottom: 10px;
+        }
+
+        .hdr h1 {
+            font-size: clamp(1.3rem,2.6vw,2rem);
+            font-weight: 900;
+            letter-spacing: -.02em;
+            margin-bottom: 5px;
+        }
+
+        .hdr p {
+            font-size: .88rem;
+            color: var(--text-2);
+            max-width: 640px;
+            margin: 0 auto;
+        }
+
+        /* ===== SECTION 1: KPI GRID ===== */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(4,1fr);
+            gap: 12px;
+        }
+
+        /* KPI Card bergaya StatMuse/FotMob */
+        .kpi {
+            background: var(--card-bg);
+            border-radius: var(--r-sm);
+            padding: 16px 18px;
+            border: 1px solid var(--border);
+            box-shadow: var(--sh-sm);
+            transition: all var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Garis aksen warna di atas card */
+        .kpi::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--c, var(--accent));
+            border-radius: var(--r-sm) var(--r-sm) 0 0;
+        }
+
+        .kpi:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sh-lg);
+            border-color: var(--c, var(--accent));
+        }
+
+        .kpi-ico  { font-size: 1.35rem; display: block; margin-bottom: 6px; }
+        .kpi-val  { font-size: 1.8rem; font-weight: 900; color: var(--c,var(--accent-dark)); letter-spacing: -.03em; line-height: 1; display: block; margin-bottom: 3px; }
+        .kpi-lbl  { font-size: .62rem; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; color: var(--text-2); }
+        .kpi-sub  { font-size: .68rem; color: var(--text-2); margin-top: 3px; }
+
+        /* ===== LAYOUT UTAMA: chart + panel ===== */
+        .main-row {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 18px;
+            align-items: start;
+        }
+
+        /* ===== KARTU GENERIK ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--r);
+            padding: 22px 26px;
+            box-shadow: var(--sh);
+            border: 1px solid var(--border);
+            transition: box-shadow .3s;
+        }
+        .card:hover { box-shadow: var(--sh-lg); }
+
+        .card-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-hdr h2 { font-size: 1.05rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+
+        .badge {
+            background: linear-gradient(135deg,var(--accent-light),#a7f3d0);
+            color: #065f46;
+            font-size: .58rem;
+            font-weight: 700;
+            padding: 3px 10px;
+            border-radius: 100px;
+            letter-spacing: .06em;
+            text-transform: uppercase;
+        }
+
+        /* ===== TOOLTIP — dark glassmorphism ===== */
+        .tooltip {
+            position: fixed;
+            background: rgba(15,23,42,.97);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 14px;
+            font-size: .8rem;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity .15s, visibility .15s;
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,.6);
+            z-index: 99999;
+            border: 1px solid rgba(255,255,255,.13);
+            max-width: 260px;
+            min-width: 190px;
+            line-height: 1.65;
+        }
+        .tooltip.vis { opacity: 1 !important; visibility: visible !important; }
+
+        .tt-ttl { font-weight: 800; font-size: .88rem; color: #fff; display: block; margin-bottom: 7px; padding-bottom: 6px; border-bottom: 1px solid rgba(255,255,255,.13); }
+        .tt-row { display: flex; justify-content: space-between; gap: 12px; font-size: .74rem; padding: 2px 0; }
+        .tt-row .l { color: #94a3b8; }
+        .tt-row .v { color: #fbbf24; font-weight: 700; }
+
+        /* ===== VIS WRAPPER ===== */
+        .vis-wrap {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chart-box {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* ===== DONUT SLICE ===== */
+        .slice path {
+            cursor: pointer;
+            transition: filter .2s, transform .15s;
+        }
+
+        .slice path:hover {
+            filter: brightness(1.1) drop-shadow(0 4px 8px rgba(0,0,0,.25));
+        }
+
+        /* ===== BREADCRUMB (Overview / Drill-down) ===== */
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--text-2);
+            margin-bottom: 2px;
+        }
+
+        .breadcrumb .crumb {
+            cursor: default;
+            color: var(--text-2);
+        }
+
+        .breadcrumb .crumb.link {
+            cursor: pointer;
+            color: var(--accent-dark);
+            text-decoration: underline;
+            text-underline-offset: 2px;
+        }
+
+        .breadcrumb .sep { color: #cbd5e1; }
+
+        /* ===== TOMBOL BACK ===== */
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 16px;
+            background: var(--card-bg);
+            border: 1.5px solid var(--border);
+            border-radius: 100px;
+            font-size: .73rem;
+            font-weight: 700;
+            color: var(--text-2);
+            cursor: pointer;
+            font-family: inherit;
+            transition: all var(--ease);
+        }
+
+        .btn-back:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent-dark);
+        }
+
+        /* ===== LEGEND DONUT ===== */
+        .donut-legend {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 18px;
+            flex-wrap: wrap;
+            font-size: .72rem;
+            font-weight: 600;
+            color: var(--text-2);
+            padding: 9px 22px;
+            background: #f8fafc;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .leg-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .leg-dot {
+            width: 10px; height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        /* ===== SECTION 3: COMPARISON PANEL ===== */
+        .cmp-panel {
+            background: var(--card-bg);
+            border-radius: var(--r);
+            padding: 20px 20px;
+            box-shadow: var(--sh);
+            border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: box-shadow .3s;
+        }
+        .cmp-panel:hover { box-shadow: var(--sh-lg); }
+
+        .cmp-ttl {
+            font-size: .8rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        /* Badge Live */
+        .live {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: .58rem;
+            font-weight: 700;
+            color: var(--accent-dark);
+            background: var(--accent-light);
+            padding: 2px 8px;
+            border-radius: 100px;
+        }
+        .live-dot {
+            width: 5px; height: 5px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: pls 1.6s infinite;
+        }
+        @keyframes pls { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:.35; transform:scale(.7); } }
+
+        /* Row stat dalam comparison panel */
+        .cmp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 10px;
+            border-radius: 8px;
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            font-size: .75rem;
+        }
+
+        .cmp-row .cr-lbl { color: var(--text-2); font-weight: 600; }
+        .cmp-row .cr-val { font-weight: 800; color: var(--text); font-size: .85rem; }
+
+        /* Pill warna kecil di dalam row */
+        .pill {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 100px;
+            font-size: .65rem;
+            font-weight: 700;
+            letter-spacing: .03em;
+        }
+
+        /* Insight item dalam panel samping */
+        .ii {
+            padding: 9px 11px;
+            border-radius: 10px;
+            font-size: .74rem;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            border-left: 3px solid;
+            transition: transform .2s;
+            line-height: 1.5;
+        }
+        .ii:hover { transform: translateX(2px); }
+        .ii.tip   { background: #f0fdf4; border-color: #10b981; color: #065f46; }
+        .ii.warn  { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+        .ii.info  { background: #ede9fe; border-color: #8b5cf6; color: #4c1d95; }
+        .ii.alert { background: #fee2e2; border-color: #ef4444; color: #7f1d1d; }
+        .ii-ico   { font-size: 1.1rem; flex-shrink: 0; line-height: 1; margin-top: 1px; }
+        .ii b     { font-weight: 900; }
+
+        /* ===== SECTION 4: BOTTOM INSIGHT CARDS ===== */
+        .ins-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit,minmax(275px,1fr));
+            gap: 14px;
+        }
+
+        .ic {
+            padding: 16px 18px;
+            border-radius: var(--r-sm);
+            font-size: .82rem;
+            display: flex;
+            gap: 11px;
+            align-items: flex-start;
+            border-left: 5px solid;
+            box-shadow: var(--sh-sm);
+            transition: transform .3s, box-shadow .3s;
+            line-height: 1.55;
+        }
+        .ic:hover { transform: translateY(-2px); box-shadow: var(--sh); }
+        .ic.findings { background: #fef3c7; border-color: #f59e0b; color: #78350f; }
+        .ic.story    { background: #ede9fe; border-color: #8b5cf6; color: #4c1d95; }
+        .ic.action   { background: #d1fae5; border-color: #10b981; color: #065f46; }
+        .ic .ico  { font-size: 1.5rem; line-height: 1; flex-shrink: 0; }
+        .hl       { font-weight: 900; font-size: 1rem; }
+
+        /* ===== HEADLINE INSIGHT BAR ===== */
+        /* Muncul di atas chart, menjawab research question dalam 1 baris */
+        .headline-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0;
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--r-sm);
+            padding: 0;
+            overflow: hidden;
+            box-shadow: var(--sh-sm);
+            flex-wrap: wrap;
+        }
+
+        .hl-block {
+            flex: 1;
+            min-width: 160px;
+            padding: 14px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            border-right: 1px solid var(--border);
+        }
+
+        .hl-block:last-child { border-right: none; }
+
+        .hl-lbl {
+            font-size: .62rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-2);
+        }
+
+        .hl-val {
+            font-size: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -.02em;
+            line-height: 1;
+        }
+
+        .hl-sub {
+            font-size: .68rem;
+            font-weight: 600;
+            color: var(--text-2);
+            margin-top: 1px;
+        }
+
+        /* Blok tengah: selisih — warna bergantung arah data */
+        .hl-diff {
+            background: #f8fafc;
+            flex: 0.8;
+        }
+
+        /* ===== KPI ADVANTAGE: 2-line format ===== */
+        .kpi-val-2 {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: var(--c,var(--accent-dark));
+            letter-spacing: -.03em;
+            line-height: 1;
+            display: block;
+            margin-bottom: 1px;
+        }
+
+        .kpi-mult {
+            font-size: .68rem;
+            font-weight: 700;
+            color: var(--c,var(--accent));
+            opacity: .8;
+        }
+
+        /* ===== ANNOTATION HINT ===== */
+        .chart-hint {
+            font-size: .65rem;
+            color: #94a3b8;
+            text-align: center;
+            font-style: italic;
+            padding: 2px 0;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 900px) {
+            .main-row  { grid-template-columns: 1fr; }
+            .kpi-grid  { grid-template-columns: repeat(2,1fr); }
+        }
+        @media (max-width: 520px) {
+            body      { padding: 10px; }
+            .card     { padding: 14px 12px; }
+            .kpi-grid { grid-template-columns: repeat(2,1fr); }
+        }
+    </style>
+</head>
+
+<body>
+<div class="dash">
+
+    <!-- ==========================================================
+         SECTION 1 — HEADER
+    ========================================================== -->
+    <div class="hdr">
+        <div class="eyebrow">📖 Case Study #4</div>
+        <h1>🎓 Efektivitas Program Magang terhadap Penempatan Kerja</h1>
+        <p>
+            Dari <strong>10.000 mahasiswa</strong> — apakah pengalaman magang
+            benar-benar meningkatkan peluang mendapatkan pekerjaan?
+            Data menjawab dengan mengejutkan.
+        </p>
+    </div>
+
+    <!-- ==========================================================
+         SECTION 1 — KPI CARDS
+         4 kartu: Total, Internship Rate, Placement Rate, Placement Advantage
+    ========================================================== -->
+    <div class="kpi-grid">
+        <div class="kpi" style="--c:#0f172a;">
+            <span class="kpi-ico">🎓</span>
+            <span class="kpi-val" id="kv-total">—</span>
+            <div class="kpi-lbl">Total Mahasiswa</div>
+            <div class="kpi-sub" id="ks-total">Memuat...</div>
+        </div>
+        <div class="kpi" style="--c:#0284c7;">
+            <span class="kpi-ico">🏢</span>
+            <span class="kpi-val" id="kv-intern">—</span>
+            <div class="kpi-lbl">Internship Rate</div>
+            <div class="kpi-sub" id="ks-intern">Pernah magang</div>
+        </div>
+        <div class="kpi" style="--c:#059669;">
+            <span class="kpi-ico">✅</span>
+            <span class="kpi-val" id="kv-placed">—</span>
+            <div class="kpi-lbl">Overall Placement Rate</div>
+            <div class="kpi-sub" id="ks-placed">Semua mahasiswa</div>
+        </div>
+        <!-- Placement Advantage: selisih percentage points + multiplier -->
+        <div class="kpi" style="--c:#7c3aed;" id="kpi-advantage">
+            <span class="kpi-ico">⚡</span>
+            <!-- Nilai utama: selisih dalam poin persentase -->
+            <span class="kpi-val-2" id="kv-adv">—</span>
+            <!-- Nilai sekunder: multiplier -->
+            <div class="kpi-mult" id="kv-mult"></div>
+            <div class="kpi-lbl" style="margin-top:4px;">Placement Advantage</div>
+            <div class="kpi-sub" id="ks-adv">Magang vs Non-Magang</div>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         HEADLINE INSIGHT BAR — menjawab research question langsung
+         Angka diisi JavaScript dari data nyata
+    ========================================================== -->
+    <div class="headline-bar" id="headline-bar">
+        <div class="hl-block">
+            <div class="hl-lbl">🏢 Internship Placement Rate</div>
+            <div class="hl-val" id="hl-intern-rate" style="color:#0284c7;">—</div>
+            <div class="hl-sub" id="hl-intern-n">Memuat...</div>
+        </div>
+        <div class="hl-block hl-diff">
+            <div class="hl-lbl">📊 Selisih (Poin Persentase)</div>
+            <div class="hl-val" id="hl-diff" style="color:#64748b;">—</div>
+            <div class="hl-sub" id="hl-diff-sub">Memuat...</div>
+        </div>
+        <div class="hl-block">
+            <div class="hl-lbl">📚 Non-Internship Placement Rate</div>
+            <div class="hl-val" id="hl-no-intern-rate" style="color:#d97706;">—</div>
+            <div class="hl-sub" id="hl-no-intern-n">Memuat...</div>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         LAYOUT UTAMA: Donut Chart (kiri) + Comparison & Insight Panel (kanan)
+    ========================================================== -->
+    <div class="main-row">
+
+        <!-- ===== KOLOM KIRI: DONUT CHART ===== -->
+        <div class="card">
+            <div class="card-hdr">
+                <!-- Breadcrumb navigasi drill-down -->
+                <div>
+                    <h2>🍩 Donut Chart <span class="badge" id="chart-badge">Overview</span></h2>
+                    <div class="breadcrumb" id="breadcrumb">
+                        <span class="crumb">Internship Experience</span>
+                    </div>
+                </div>
+                <!-- Tombol Back muncul saat drill-down -->
+                <button class="btn-back" id="btn-back" style="display:none;" onclick="drillBack()">
+                    ← Kembali ke Overview
+                </button>
+            </div>
+
+            <div class="vis-wrap">
+                <!-- Tooltip -->
+                <div id="tt" class="tooltip"></div>
+
+                <!-- SVG Donut Chart -->
+                <div class="chart-box" id="chart-box">
+                    <svg id="main-svg"></svg>
+                </div>
+
+                <!-- Legend dinamis -->
+                <div class="donut-legend" id="donut-legend">
+                    <!-- Diisi JavaScript -->
+                </div>
+                <!-- Annotation hint — klik untuk drill-down -->
+                <div class="chart-hint" id="chart-hint">
+                    💡 Klik salah satu segmen untuk melihat breakdown placement status.
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== KOLOM KANAN: SECTION 3 + 4 — Comparison & Insight Panel ===== -->
+        <div class="cmp-panel" id="cmp-panel">
+            <div class="cmp-ttl">
+                📊 Perbandingan & Insight
+                <span class="live"><span class="live-dot"></span> Live</span>
+            </div>
+            <!-- Stats panel — berubah mengikuti slice yang dipilih -->
+            <div id="cmp-stats">
+                <p style="font-size:.76rem;color:#94a3b8;text-align:center;padding:12px 0;">Memuat...</p>
+            </div>
+            <!-- Divider -->
+            <div style="border-top:1px solid var(--border);padding-top:4px;"></div>
+            <!-- Auto insight items -->
+            <div id="ins-items">
+                <p style="font-size:.76rem;color:#94a3b8;text-align:center;padding:12px 0;">Memuat...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================================
+         SECTION 4 — BOTTOM INSIGHT CARDS (Storytelling)
+    ========================================================== -->
+    <div class="ins-grid" id="ins-bottom">
+        <div class="ic findings"><span class="ico">🔍</span><div><strong>Memuat temuan...</strong></div></div>
+        <div class="ic story">   <span class="ico">📖</span><div><strong>Memuat cerita...</strong></div></div>
+        <div class="ic action">  <span class="ico">💡</span><div><strong>Memuat rekomendasi...</strong></div></div>
+    </div>
+
+</div><!-- /.dash -->
+
+<script>
+// ============================================================
+// CASE 4 — Donut Chart: Internship Experience → Placement
+//
+// ARSITEKTUR:
+//   Level 0 (Overview)    : Donut internship Yes / No
+//   Level 1 (Drill-down)  : Klik slice → Donut Placed / Not Placed
+//                           khusus kelompok yang diklik
+//
+// Semua angka dihitung REAL-TIME dari CSV.
+// Insight otomatis, tidak hardcoded.
+// ============================================================
+
+// ------------------------------------------------------------------
+// 1. CONFIG
+// ------------------------------------------------------------------
+const CFG = {
+    CSV:  '../data/college_student_placement_dataset.csv',
+    // Margin SVG — cukup untuk label center
+    W_CHART: 340,
+    H_CHART: 340,
+    // Donut dimensions
+    OUTER_R: 130,
+    INNER_R: 72,
+    // Warna
+    COLORS: {
+        intern:    '#0284c7',   // Biru — pernah magang
+        no_intern: '#f59e0b',   // Kuning — tidak magang
+        placed:    '#059669',   // Hijau — ditempatkan
+        not_placed:'#ef4444',   // Merah — tidak ditempatkan
+    },
+};
+
+// ------------------------------------------------------------------
+// 2. STATE GLOBAL
+// ------------------------------------------------------------------
+let fullData  = [];
+let currentLevel = 'overview';  // 'overview' | 'intern_yes' | 'intern_no'
+
+// Data per level (dihitung saat load)
+let stats = {
+    total: 0,
+    internYes: 0, internNo: 0,
+    internRate: 0,
+    overallPlacedRate: 0,
+    placedYes: 0, placedNo: 0,
+    iYesPlaced: 0, iYesNotPlaced: 0, iYesRate: 0,
+    iNoPlaced: 0,  iNoNotPlaced: 0,  iNoRate: 0,
+    advantage: 0,
+};
+
+// ------------------------------------------------------------------
+// 3. LOAD DATA
+// ------------------------------------------------------------------
+async function loadData() {
+    const box = document.getElementById('chart-box');
+    try {
+        const raw = await d3.csv(CFG.CSV);
+        if (!raw || raw.length === 0) throw new Error('Dataset kosong');
+
+        // Parse kolom yang diperlukan
+        fullData = raw.map(d => ({
+            internship: (d.Internship_Experience || '').trim().toLowerCase() === 'yes',
+            placed:     (d.Placement            || '').trim().toLowerCase() === 'yes',
+        }));
+
+        console.log(`✅ ${fullData.length} baris dimuat`);
+        computeStats();
+        refresh();
+
+    } catch(e) {
+        console.error('❌', e);
+        if (box) box.innerHTML = `
+            <div style="text-align:center;padding:60px;color:#b91c1c;">
+                <p style="font-size:2rem;">⚠️</p>
+                <p style="font-weight:800;margin:8px 0;">Gagal Memuat Data</p>
+                <p style="font-size:.8rem;color:#64748b;">
+                    Pastikan <code>data/college_student_placement_dataset.csv</code> tersedia.<br>${e.message}
+                </p>
+            </div>`;
+    }
+}
+
+// ------------------------------------------------------------------
+// 4. HITUNG STATISTIK dari data nyata
+//    Semua angka di bawah bersumber dari CSV, tidak ada yang hardcoded.
+// ------------------------------------------------------------------
+function computeStats() {
+    const total     = fullData.length;
+    const internYes = fullData.filter(d => d.internship).length;
+    const internNo  = total - internYes;
+
+    const iYP  = fullData.filter(d => d.internship && d.placed).length;
+    const iYNP = internYes - iYP;
+    const iNP  = fullData.filter(d => !d.internship && d.placed).length;
+    const iNNP = internNo - iNP;
+
+    const overallPlaced = iYP + iNP;
+
+    const iYRate = internYes > 0 ? iYP / internYes * 100 : 0;
+    const iNRate = internNo  > 0 ? iNP / internNo  * 100 : 0;
+
+    // Placement advantage: berapa kali lipat vs non-magang
+    // Jika iNRate nyaris sama dengan iYRate → advantage ~1.0x (tidak signifikan)
+    const adv = iNRate > 0 ? iYRate / iNRate : 0;
+
+    stats = {
+        total, internYes, internNo,
+        internRate:        internYes / total * 100,
+        overallPlacedRate: overallPlaced / total * 100,
+        placedYes: overallPlaced,
+        placedNo:  total - overallPlaced,
+        iYesPlaced:    iYP,  iYesNotPlaced: iYNP, iYesRate: iYRate,
+        iNoPlaced:     iNP,  iNoNotPlaced:  iNNP, iNoRate:  iNRate,
+        advantage: adv,
+    };
+
+    console.log('📊 Stats:', stats);
+}
+
+// ------------------------------------------------------------------
+// 5. UPDATE KPI CARDS
+// ------------------------------------------------------------------
+function updateKPI() {
+    const s   = stats;
+    const diff = s.iYesRate - s.iNoRate;   // Selisih dalam poin persentase (bisa negatif)
+    const absDiff = Math.abs(diff);
+
+    animVal('kv-total',  s.total,            0, 'int');
+    animVal('kv-intern', s.internRate,        1, 'pct');
+    animVal('kv-placed', s.overallPlacedRate, 1, 'pct');
+
+    // KPI Advantage: tampilkan selisih poin + multiplier di bawahnya
+    // Format: "+2.1 pts" atau "-0.5 pts" (warna hijau/merah sesuai arah)
+    const advEl  = document.getElementById('kv-adv');
+    const multEl = document.getElementById('kv-mult');
+    if (advEl) {
+        const sign  = diff >= 0 ? '+' : '';
+        advEl.textContent = `${sign}${diff.toFixed(1)} pts`;
+        advEl.dataset.v = diff;
+    }
+    if (multEl) {
+        // Multiplier: iYesRate / iNoRate — seberapa kali lipat magang vs non-magang
+        multEl.textContent = `(${s.advantage.toFixed(2)}× dibanding non-magang)`;
+    }
+
+    // Sub-label kontekstual
+    setText('ks-total',  `${s.internYes.toLocaleString()} magang · ${s.internNo.toLocaleString()} tidak`);
+    setText('ks-intern', `${s.internYes.toLocaleString()} dari ${s.total.toLocaleString()} mhs`);
+    setText('ks-placed', `${s.placedYes.toLocaleString()} mhs berhasil ditempatkan`);
+    setText('ks-adv',
+        absDiff < 1    ? `⚠️ Nyaris tidak ada perbedaan`
+        : absDiff < 3  ? `➡️ Perbedaan kecil (< 3 poin)`
+        : diff > 0     ? `✅ Magang unggul ${absDiff.toFixed(1)} poin`
+                       : `⚠️ Non-magang unggul ${absDiff.toFixed(1)} poin`
+    );
+
+    // Warna KPI Advantage dinamis: hijau jika magang > non, merah jika sebaliknya atau <1 poin
+    const kpiAdv = document.getElementById('kpi-advantage');
+    if (kpiAdv) {
+        const c = diff > 3 ? '#059669' : diff < -3 ? '#dc2626' : absDiff < 1 ? '#dc2626' : '#f59e0b';
+        kpiAdv.style.setProperty('--c', c);
+        // Juga set warna pada kv-adv dan kv-mult
+        const advEl2 = document.getElementById('kv-adv');
+        if (advEl2) advEl2.style.color = c;
+        const multEl2 = document.getElementById('kv-mult');
+        if (multEl2) multEl2.style.color = c;
+    }
+
+    // ===== HEADLINE BAR (angka besar di atas chart) =====
+    const iYRateStr = s.iYesRate.toFixed(2) + '%';
+    const iNRateStr = s.iNoRate.toFixed(2) + '%';
+    const diffStr   = (diff >= 0 ? '+' : '') + diff.toFixed(2) + ' pp';
+    const diffColor = Math.abs(diff) < 1 ? '#64748b' : diff > 0 ? '#059669' : '#dc2626';
+
+    // Set nilai headline bar
+    const hlI = document.getElementById('hl-intern-rate');
+    const hlN = document.getElementById('hl-no-intern-rate');
+    const hlD = document.getElementById('hl-diff');
+    const hlDS = document.getElementById('hl-diff-sub');
+    const hlIN = document.getElementById('hl-intern-n');
+    const hlNN = document.getElementById('hl-no-intern-n');
+
+    if (hlI) hlI.textContent = iYRateStr;
+    if (hlN) hlN.textContent = iNRateStr;
+    if (hlD) { hlD.textContent = diffStr; hlD.style.color = diffColor; }
+    if (hlDS) hlDS.textContent = Math.abs(diff) < 1
+        ? 'Tidak signifikan (< 1 poin)'
+        : diff > 0 ? 'Magang lebih unggul' : 'Non-magang lebih unggul';
+    if (hlIN) hlIN.textContent = `${s.internYes.toLocaleString()} mhs pernah magang`;
+    if (hlNN) hlNN.textContent = `${s.internNo.toLocaleString()} mhs tidak magang`;
+}
+
+// ------------------------------------------------------------------
+// 6. RENDER DONUT CHART
+//    Level 0: Overview  → slice Intern Yes / No
+//    Level 1: Drill-down → slice Placed / Not Placed per kelompok
+// ------------------------------------------------------------------
+function renderDonut(data, title) {
+    const svg = d3.select('#main-svg');
+    svg.selectAll('*').remove();
+
+    const W = CFG.W_CHART, H = CFG.H_CHART;
+    const cx = W / 2, cy = H / 2;
+
+    svg.attr('viewBox', `0 0 ${W} ${H}`)
+       .attr('preserveAspectRatio', 'xMidYMid meet')
+       .style('width', '100%')
+       .style('height', 'auto')
+       .style('max-height', H + 'px');
+
+    const g = svg.append('g').attr('transform', `translate(${cx},${cy})`);
+
+    // ===== ARC GENERATOR =====
+    const arc = d3.arc()
+        .innerRadius(CFG.INNER_R)
+        .outerRadius(CFG.OUTER_R)
+        .cornerRadius(6)
+        .padAngle(.025);
+
+    // Arc untuk hover (sedikit lebih besar)
+    const arcHover = d3.arc()
+        .innerRadius(CFG.INNER_R - 4)
+        .outerRadius(CFG.OUTER_R + 10)
+        .cornerRadius(6)
+        .padAngle(.025);
+
+    const pie = d3.pie()
+        .value(d => d.value)
+        .sort(null);
+
+    const pieData = pie(data);
+    const tooltip = d3.select('#tt');
+
+    // ===== SHADOW FILTER =====
+    const defs = svg.append('defs');
+    const filt = defs.append('filter').attr('id', 'slice-shadow');
+    filt.append('feDropShadow')
+        .attr('dx', 0).attr('dy', 3)
+        .attr('stdDeviation', 5)
+        .attr('flood-opacity', .22);
+
+    // ===== RENDER SLICES =====
+    const slices = g.selectAll('.slice')
+        .data(pieData)
+        .enter().append('g').attr('class', 'slice');
+
+    slices.append('path')
+        .attr('fill', d => d.data.color)
+        .attr('stroke', '#fff')
+        .attr('stroke-width', 2)
+        .attr('opacity', 0)
+        // Animasi masuk: expand dari 0
+        .transition()
+        .delay((d,i) => i * 120)
+        .duration(600)
+        .ease(d3.easeBackOut.overshoot(1.05))
+        .attrTween('d', function(d) {
+            const interp = d3.interpolate({ startAngle: d.startAngle, endAngle: d.startAngle }, d);
+            return t => arc(interp(t));
+        })
+        .attr('opacity', 1);
+
+    // ===== HOVER INTERACTION =====
+    slices.on('mouseenter', function(event, d) {
+        d3.select(this).select('path')
+            .transition().duration(150)
+            .attr('d', arcHover(d))
+            .attr('filter', 'url(#slice-shadow)');
+
+        // Dim slices lain
+        d3.selectAll('.slice').filter(s => s !== d)
+            .select('path').transition().duration(150).attr('opacity', .45);
+
+        // Update center text dengan detail slice
+        updateCenter(d.data.label, d.data.value, d.data.pct);
+
+        // Tooltip content
+        tooltip.classed('vis', true).html(`
+            <span class="tt-ttl">${d.data.icon} ${d.data.label}</span>
+            <div class="tt-row"><span class="l">Jumlah Mahasiswa</span><span class="v">${d.data.value.toLocaleString()}</span></div>
+            <div class="tt-row"><span class="l">Persentase</span><span class="v">${d.data.pct.toFixed(1)}%</span></div>
+            ${d.data.subLabel ? `<div class="tt-row"><span class="l">${d.data.subLabel}</span><span class="v">${d.data.subVal}</span></div>` : ''}
+            ${currentLevel === 'overview' ? '<div style="margin-top:6px;font-size:.65rem;color:#64748b;">Klik slice untuk melihat breakdown</div>' : ''}
+        `);
+    })
+    .on('mousemove', function(event) {
+        const tn = tooltip.node();
+        if (!tn) return;
+        const tw = tn.offsetWidth, th = tn.offsetHeight;
+        let L = event.clientX + 14, T = event.clientY - th - 10;
+        if (L + tw > window.innerWidth  - 10) L = event.clientX - tw - 14;
+        if (T < 10)                            T = event.clientY + 14;
+        if (L < 10)                            L = 10;
+        if (T + th > window.innerHeight - 10)  T = window.innerHeight - th - 10;
+        tooltip.style('left', L + 'px').style('top', T + 'px');
+    })
+    .on('mouseleave', function(event, d) {
+        d3.select(this).select('path')
+            .transition().duration(200)
+            .attr('d', arc(d))
+            .attr('filter', null);
+
+        d3.selectAll('.slice').select('path')
+            .transition().duration(200).attr('opacity', 1);
+
+        updateCenter(title, stats.total, null);
+        tooltip.classed('vis', false);
+    })
+    // Klik slice → drill-down (hanya di level overview)
+    .on('click', function(event, d) {
+        if (currentLevel !== 'overview') return;
+        if (d.data.key === 'intern_yes') drillDown('intern_yes');
+        else if (d.data.key === 'intern_no') drillDown('intern_no');
+    });
+
+    // ===== CENTER TEXT =====
+    // Teks di tengah donut — menampilkan total / detail saat hover
+    const centerG = g.append('g').attr('class', 'center-text');
+
+    centerG.append('text').attr('class', 'ct-main')
+        .attr('text-anchor', 'middle').attr('dy', '-0.3em')
+        .style('font-size', '1.6rem').style('font-weight', '900')
+        .style('fill', '#0f172a').style('letter-spacing', '-.03em');
+
+    centerG.append('text').attr('class', 'ct-sub')
+        .attr('text-anchor', 'middle').attr('dy', '1.1em')
+        .style('font-size', '.65rem').style('font-weight', '700')
+        .style('fill', '#475569').style('text-transform', 'uppercase')
+        .style('letter-spacing', '.07em');
+
+    centerG.append('text').attr('class', 'ct-pct')
+        .attr('text-anchor', 'middle').attr('dy', '2.5em')
+        .style('font-size', '.75rem').style('font-weight', '700')
+        .style('fill', '#94a3b8');
+
+    // Default center
+    updateCenter(title, null, null);
+
+    function updateCenter(label, val, pct) {
+        const main = val !== null ? (val > 1000 ? (val/1000).toFixed(1)+'K' : val.toLocaleString()) : '';
+        g.select('.ct-main').text(main || stats.total.toLocaleString());
+        g.select('.ct-sub').text(label);
+        g.select('.ct-pct').text(pct !== null ? pct.toFixed(1) + '%' : '');
+    }
+}
+
+// ------------------------------------------------------------------
+// 7. DRILL-DOWN: Klik slice → tampilkan breakdown Placed/Not Placed
+//    Saat masuk drill-down: sembunyikan annotation hint (tidak relevan)
+// ------------------------------------------------------------------
+function drillDown(key) {
+    currentLevel = key;
+
+    const isIntern = key === 'intern_yes';
+    const label    = isIntern ? 'Pernah Magang' : 'Tidak Magang';
+    const placed   = isIntern ? stats.iYesPlaced    : stats.iNoPlaced;
+    const notPlaced= isIntern ? stats.iYesNotPlaced : stats.iNoNotPlaced;
+    const pct      = isIntern ? stats.iYesRate      : stats.iNoRate;
+    const total    = placed + notPlaced;
+
+    // Data untuk donut drill-down
+    const data = [
+        {
+            key: 'placed', label: 'Ditempatkan',
+            value: placed, color: CFG.COLORS.placed, icon: '✅',
+            pct: total > 0 ? placed/total*100 : 0,
+            subLabel: 'Placement Rate', subVal: (total > 0 ? placed/total*100 : 0).toFixed(1) + '%',
+        },
+        {
+            key: 'not_placed', label: 'Tidak Ditempatkan',
+            value: notPlaced, color: CFG.COLORS.not_placed, icon: '❌',
+            pct: total > 0 ? notPlaced/total*100 : 0,
+            subLabel: 'Dari total', subVal: total.toLocaleString() + ' mhs',
+        },
+    ];
+
+    // Update badge & breadcrumb
+    setText('chart-badge', `Drill-down: ${label}`);
+    document.getElementById('breadcrumb').innerHTML = `
+        <span class="crumb link" onclick="drillBack()">Internship Experience</span>
+        <span class="sep">›</span>
+        <span class="crumb">${label}</span>
+    `;
+    document.getElementById('btn-back').style.display = 'inline-flex';
+
+    // Sembunyikan annotation hint saat drill-down (sudah tidak relevan)
+    const hint = document.getElementById('chart-hint');
+    if (hint) hint.style.display = 'none';
+
+    // Render donut baru
+    renderDonut(data, label);
+
+    // Update legend
+    renderLegend([
+        { label: `Ditempatkan (${(total > 0 ? placed/total*100 : 0).toFixed(1)}%)`, color: CFG.COLORS.placed },
+        { label: `Tidak Ditempatkan (${(total > 0 ? notPlaced/total*100 : 0).toFixed(1)}%)`, color: CFG.COLORS.not_placed },
+    ]);
+
+    // Update comparison panel untuk kelompok ini
+    updateCmpPanel(key, placed, notPlaced, pct, total, label);
+}
+
+// ------------------------------------------------------------------
+// 8. KEMBALI KE OVERVIEW
+// ------------------------------------------------------------------
+function drillBack() {
+    currentLevel = 'overview';
+    setText('chart-badge', 'Overview');
+    document.getElementById('breadcrumb').innerHTML = `
+        <span class="crumb">Internship Experience</span>
+    `;
+    document.getElementById('btn-back').style.display = 'none';
+
+    renderOverview();
+    updateCmpOverview();
+}
+
+// ------------------------------------------------------------------
+// 9. RENDER OVERVIEW (Level 0)
+// ------------------------------------------------------------------
+function renderOverview() {
+    const s = stats;
+    const data = [
+        {
+            key: 'intern_yes', label: 'Pernah Magang',
+            value: s.internYes, color: CFG.COLORS.intern, icon: '🏢',
+            pct: s.internRate,
+            // Tooltip menampilkan placement rate kelompok ini
+            subLabel: 'Placement Rate', subVal: s.iYesRate.toFixed(2) + '%',
+        },
+        {
+            key: 'intern_no', label: 'Tidak Magang',
+            value: s.internNo, color: CFG.COLORS.no_intern, icon: '📚',
+            pct: 100 - s.internRate,
+            subLabel: 'Placement Rate', subVal: s.iNoRate.toFixed(2) + '%',
+        },
+    ];
+
+    // Center label overview: "Internship Experience" + total students
+    // (bukan hanya angka total) agar konteks langsung terlihat
+    renderDonut(data, 'Internship Exp.');
+
+    // Annotation hint: muncul hanya di level overview
+    const hint = document.getElementById('chart-hint');
+    if (hint) hint.style.display = 'block';
+
+    renderLegend([
+        { label: `Pernah Magang — ${s.internYes.toLocaleString()} mhs (${s.internRate.toFixed(1)}%) → Placed: ${s.iYesRate.toFixed(1)}%`, color: CFG.COLORS.intern    },
+        { label: `Tidak Magang — ${s.internNo.toLocaleString()} mhs (${(100-s.internRate).toFixed(1)}%) → Placed: ${s.iNoRate.toFixed(1)}%`, color: CFG.COLORS.no_intern },
+    ]);
+}
+
+// ------------------------------------------------------------------
+// 10. RENDER LEGEND DINAMIS
+// ------------------------------------------------------------------
+function renderLegend(items) {
+    const el = document.getElementById('donut-legend');
+    if (!el) return;
+    el.innerHTML = items.map(item => `
+        <div class="leg-item">
+            <span class="leg-dot" style="background:${item.color};"></span>
+            ${item.label}
+        </div>
+    `).join('');
+}
+
+// ------------------------------------------------------------------
+// 11. COMPARISON & INSIGHT PANEL — Overview
+// ------------------------------------------------------------------
+function updateCmpOverview() {
+    const s = stats;
+    const el = document.getElementById('cmp-stats');
+    if (!el) return;
+
+    el.innerHTML = `
+        <div style="font-size:.7rem;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">
+            Perbandingan Placement Rate
+        </div>
+        <div class="cmp-row" style="background:#eff6ff;border-color:#bfdbfe;">
+            <span class="cr-lbl">🏢 Pernah Magang</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span class="cr-val" style="color:#0284c7;">${s.iYesRate.toFixed(2)}%</span>
+                <span class="pill" style="background:#dbeafe;color:#1d4ed8;">${s.iYesPlaced.toLocaleString()} mhs</span>
+            </div>
+        </div>
+        <div class="cmp-row" style="background:#fffbeb;border-color:#fde68a;">
+            <span class="cr-lbl">📚 Tidak Magang</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span class="cr-val" style="color:#d97706;">${s.iNoRate.toFixed(2)}%</span>
+                <span class="pill" style="background:#fef3c7;color:#92400e;">${s.iNoPlaced.toLocaleString()} mhs</span>
+            </div>
+        </div>
+        <div class="cmp-row" style="background:#f8fafc;">
+            <span class="cr-lbl">📊 Selisih</span>
+            <span class="cr-val" style="color:${Math.abs(s.iYesRate - s.iNoRate) < 1 ? '#dc2626' : '#059669'};">
+                ${(s.iYesRate - s.iNoRate).toFixed(2)} poin
+            </span>
+        </div>
+    `;
+
+    // Auto-insight items
+    updateInsightItems();
+}
+
+// ------------------------------------------------------------------
+// 12. COMPARISON PANEL — Drill-down view
+// ------------------------------------------------------------------
+function updateCmpPanel(key, placed, notPlaced, rate, total, label) {
+    const el = document.getElementById('cmp-stats');
+    if (!el) return;
+
+    const color = key === 'intern_yes' ? '#0284c7' : '#d97706';
+    const bg    = key === 'intern_yes' ? '#eff6ff' : '#fffbeb';
+    const bord  = key === 'intern_yes' ? '#bfdbfe' : '#fde68a';
+
+    el.innerHTML = `
+        <div style="font-size:.7rem;font-weight:800;color:var(--text-2);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;">
+            Detail: ${label}
+        </div>
+        <div class="cmp-row" style="background:${bg};border-color:${bord};">
+            <span class="cr-lbl">Total Mahasiswa</span>
+            <span class="cr-val" style="color:${color};">${total.toLocaleString()}</span>
+        </div>
+        <div class="cmp-row" style="background:#f0fdf4;border-color:#bbf7d0;">
+            <span class="cr-lbl">✅ Ditempatkan</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span class="cr-val" style="color:#059669;">${placed.toLocaleString()}</span>
+                <span class="pill" style="background:#d1fae5;color:#065f46;">${rate.toFixed(1)}%</span>
+            </div>
+        </div>
+        <div class="cmp-row" style="background:#fff5f5;border-color:#fecaca;">
+            <span class="cr-lbl">❌ Tidak Ditempatkan</span>
+            <div style="display:flex;align-items:center;gap:6px;">
+                <span class="cr-val" style="color:#dc2626;">${notPlaced.toLocaleString()}</span>
+                <span class="pill" style="background:#fee2e2;color:#7f1d1d;">${(100-rate).toFixed(1)}%</span>
+            </div>
+        </div>
+        <div class="cmp-row">
+            <span class="cr-lbl">🔄 Dibanding Non-Magang</span>
+            <span class="cr-val" style="color:${stats.advantage < 1.05 ? '#dc2626' : '#059669'};">
+                ${stats.advantage.toFixed(2)}×
+            </span>
+        </div>
+    `;
+
+    // Insight tetap relevan saat drill-down
+    updateInsightItems();
+}
+
+// ------------------------------------------------------------------
+// 13. AUTO INSIGHT ITEMS
+//     Semua insight hanya dari data internship vs placement.
+//     Tidak menyimpulkan faktor lain yang tidak dihitung di halaman ini.
+// ------------------------------------------------------------------
+function updateInsightItems() {
+    const el = document.getElementById('ins-items');
+    if (!el) return;
+
+    const s         = stats;
+    const rawDiff   = s.iYesRate - s.iNoRate;          // Signed: positif = magang lebih tinggi
+    const absDiff   = Math.abs(rawDiff);
+    const internWins = rawDiff > 0;
+    const isSignificant = absDiff >= 3;   // Threshold klinis: ≥3 poin = perbedaan berarti
+
+    // Insight 1: Apakah magang berpengaruh? — jawaban langsung
+    const verdict = absDiff < 1
+        ? 'Tidak Ada Perbedaan Berarti'
+        : isSignificant
+            ? (internWins ? 'Magang Berpengaruh Positif' : 'Non-Magang Justru Lebih Tinggi')
+            : 'Perbedaan Sangat Kecil';
+
+    const verdictClass = absDiff < 1 ? 'warn'
+        : isSignificant ? (internWins ? 'tip' : 'alert')
+        : 'warn';
+
+    el.innerHTML = `
+        <div class="ii ${verdictClass}">
+            <span class="ii-ico">${absDiff < 1 ? '➡️' : internWins ? '📈' : '📉'}</span>
+            <div>
+                <b>${verdict}</b><br>
+                Magang: <b>${s.iYesRate.toFixed(2)}%</b> ·
+                Non-Magang: <b>${s.iNoRate.toFixed(2)}%</b><br>
+                Selisih: <b>${rawDiff >= 0 ? '+' : ''}${rawDiff.toFixed(2)} poin persentase</b>
+            </div>
+        </div>
+        <div class="ii info">
+            <span class="ii-ico">⚡</span>
+            <div>
+                <b>Faktor Pengali</b><br>
+                Mahasiswa magang memiliki placement rate
+                <b>${s.advantage.toFixed(2)}×</b> dibanding mahasiswa non-magang.
+                ${s.advantage >= 1.5
+                    ? '✅ Perbedaan signifikan secara praktis.'
+                    : s.advantage < 1.05
+                        ? '⚠️ Perbedaan tidak berarti secara praktis.'
+                        : '➡️ Perbedaan ada namun kecil.'}
+            </div>
+        </div>
+        <div class="ii warn">
+            <span class="ii-ico">👥</span>
+            <div>
+                <b>Distribusi Populasi</b><br>
+                <b>${s.internRate.toFixed(1)}%</b> mahasiswa (${s.internYes.toLocaleString()} orang)
+                pernah magang. Sisanya <b>${(100-s.internRate).toFixed(1)}%</b>
+                (${s.internNo.toLocaleString()} orang) tidak pernah magang.
+            </div>
+        </div>
+        <div class="ii ${internWins ? 'tip' : 'alert'}">
+            <span class="ii-ico">📊</span>
+            <div>
+                <b>Dalam Angka Absolut</b><br>
+                Dari ${s.internYes.toLocaleString()} mhs magang:
+                <b>${s.iYesPlaced.toLocaleString()}</b> ditempatkan,
+                <b>${s.iYesNotPlaced.toLocaleString()}</b> tidak.<br>
+                Dari ${s.internNo.toLocaleString()} mhs non-magang:
+                <b>${s.iNoPlaced.toLocaleString()}</b> ditempatkan,
+                <b>${s.iNoNotPlaced.toLocaleString()}</b> tidak.
+            </div>
+        </div>
+    `;
+}
+
+// ------------------------------------------------------------------
+// 14. BOTTOM INSIGHT CARDS — Storytelling
+//     Hanya mengacu pada hubungan Internship Experience ↔ Placement.
+//     Tidak menyimpulkan variabel lain yang tidak dihitung di sini.
+// ------------------------------------------------------------------
+function updateBottomCards() {
+    const el = document.getElementById('ins-bottom');
+    if (!el) return;
+
+    const s       = stats;
+    const diff    = s.iYesRate - s.iNoRate;   // Signed difference
+    const absDiff = Math.abs(diff);
+    const internWins = diff > 0;
+
+    // Judul & narasi adaptif berdasarkan arah dan besarnya perbedaan
+    const findingTitle = absDiff < 1
+        ? 'Temuan: Magang Tidak Membedakan Placement Rate'
+        : internWins
+            ? `Temuan: Magang Meningkatkan Placement ${absDiff.toFixed(1)} Poin`
+            : `Temuan: Non-Magang Justru Lebih Tinggi ${absDiff.toFixed(1)} Poin`;
+
+    const storyTitle = s.advantage < 1.05
+        ? 'Data Menunjukkan: Status Magang Saja Tidak Cukup'
+        : s.advantage >= 1.5
+            ? 'Data Menunjukkan: Magang Berkorelasi dengan Placement Lebih Tinggi'
+            : 'Data Menunjukkan: Korelasi Magang–Placement Lemah';
+
+    el.innerHTML = `
+        <div class="ic findings">
+            <span class="ico">🔍</span>
+            <div>
+                <strong>${findingTitle}</strong>
+                <p style="margin-top:5px;font-size:.8rem;">
+                    Dari <strong>${s.internYes.toLocaleString()} mahasiswa magang</strong>,
+                    <span class="hl">${s.iYesPlaced.toLocaleString()}</span> berhasil ditempatkan
+                    (placement rate: <span class="hl">${s.iYesRate.toFixed(2)}%</span>).
+                    Sementara dari <strong>${s.internNo.toLocaleString()} mahasiswa non-magang</strong>,
+                    <span class="hl">${s.iNoPlaced.toLocaleString()}</span> ditempatkan
+                    (rate: <span class="hl">${s.iNoRate.toFixed(2)}%</span>).
+                    Selisih placement rate: <strong>${diff >= 0 ? '+' : ''}${diff.toFixed(2)} poin persentase</strong>.
+                </p>
+            </div>
+        </div>
+        <div class="ic story">
+            <span class="ico">📖</span>
+            <div>
+                <strong>${storyTitle}</strong>
+                <p style="margin-top:5px;font-size:.8rem;">
+                    Dengan faktor pengali <strong>${s.advantage.toFixed(2)}×</strong>,
+                    ${s.advantage < 1.05
+                        ? `pengalaman magang dalam dataset ini <strong>tidak memberikan perbedaan berarti</strong> pada tingkat placement. Kedua kelompok memiliki tingkat keberhasilan yang sangat mirip.`
+                        : s.advantage >= 1.5
+                            ? `mahasiswa yang pernah magang memiliki peluang kerja yang <strong>secara berarti lebih tinggi</strong> dibanding yang tidak magang.`
+                            : `perbedaan placement rate antara mahasiswa magang dan non-magang <strong>ada namun relatif kecil</strong> dalam dataset ini.`
+                    }
+                </p>
+            </div>
+        </div>
+        <div class="ic action">
+            <span class="ico">💡</span>
+            <div>
+                <strong>Interpretasi: Apa Arti Data Ini?</strong>
+                <p style="margin-top:5px;font-size:.8rem;">
+                    ${absDiff < 1
+                        ? `Data menunjukkan bahwa dalam populasi ini, memiliki atau tidak memiliki pengalaman magang <strong>tidak secara konsisten membedakan</strong> hasil placement. Overall placement rate dataset ini adalah <strong>${s.overallPlacedRate.toFixed(2)}%</strong>, berlaku hampir merata pada kedua kelompok.`
+                        : internWins
+                            ? `Terdapat indikasi bahwa pengalaman magang <strong>berkorelasi positif</strong> dengan placement (selisih ${absDiff.toFixed(2)} poin). Namun korelasi tidak berarti kausalitas — perlu analisis multivariat untuk simpulan lebih kuat.`
+                            : `Dalam dataset ini, mahasiswa tanpa magang justru memiliki placement rate sedikit lebih tinggi (selisih ${absDiff.toFixed(2)} poin). Ini menunjukkan bahwa faktor-faktor selain magang juga memainkan peran penting dalam keberhasilan placement.`
+                    }
+                </p>
+            </div>
+        </div>
+    `;
+}
+
+// ------------------------------------------------------------------
+// 15. HELPER: animasi counter, setText
+// ------------------------------------------------------------------
+function animVal(id, target, dec, type) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const from = parseFloat(el.dataset.v || 0), to = target || 0;
+    const dur = 600, t0 = performance.now();
+    function tick(now) {
+        const p = Math.min((now - t0) / dur, 1);
+        const e = 1 - Math.pow(1 - p, 3);
+        const v = from + (to - from) * e;
+        el.textContent = type === 'pct' ? v.toFixed(dec) + '%'
+                       : type === 'dec' ? v.toFixed(dec)
+                       : Math.round(v).toLocaleString();
+        if (p < 1) requestAnimationFrame(tick);
+        else el.dataset.v = to;
+    }
+    requestAnimationFrame(tick);
+}
+
+function setText(id, txt) {
+    const el = document.getElementById(id);
+    if (el) el.textContent = txt;
+}
+
+// ------------------------------------------------------------------
+// 16. REFRESH UTAMA — panggil semua update sekaligus
+// ------------------------------------------------------------------
+function refresh() {
+    updateKPI();
+    renderOverview();
+    updateCmpOverview();
+    updateBottomCards();
+}
+
+// ------------------------------------------------------------------
+// 17. INIT
+// ------------------------------------------------------------------
+document.addEventListener('DOMContentLoaded', () => {
+    loadData();
+
+    // Resize handler
+    let timer;
+    window.addEventListener('resize', () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            if (fullData.length > 0) {
+                if (currentLevel === 'overview') renderOverview();
+                else drillDown(currentLevel);
+            }
+        }, 300);
+    });
+});
+</script>
+
+</body>
+</html>
