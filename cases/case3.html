@@ -57,7 +57,7 @@
         .case-badge {
             display: inline-flex; align-items: center; gap: 6px;
             font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-            color: #a78bfa; background: rgba(167,139,250,.1);
+            color: #a78bfa; background: rgba(167,139,250,.12);
             border: 1px solid rgba(167,139,250,.2); padding: 4px 10px; border-radius: 100px;
             margin-bottom: 14px;
         }
@@ -70,7 +70,7 @@
         }
         h1.case-title em {
             font-style: normal;
-            background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
+            background: linear-gradient(135deg, #a78bfa 0%, #c084fc 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
         }
         .case-desc {
@@ -78,77 +78,112 @@
             max-width: 700px; line-height: 1.65; margin-bottom: 32px;
         }
 
-        /* Stats strip */
-        .stats-strip {
-            display: flex; gap: 0; flex-wrap: wrap;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
-            width: fit-content;
-        }
-        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
-            border-right: 1px solid var(--border); }
-        .sstat:last-child { border-right: none; }
-        .sstat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
-        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .08em;
-            text-transform: uppercase; color: var(--text-muted); }
-
-        /* Filter panel */
-        .filter-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 24px 28px;
-            margin-bottom: 20px;
-        }
-        .filter-card-title {
-            font-size: 11px; font-weight: 700; letter-spacing: .1em;
-            text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .filter-card-title::after {
-            content: ''; flex: 1; height: 1px; background: var(--border);
-        }
-
-        .filters-grid {
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr auto;
-            gap: 20px; align-items: end;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px; margin-bottom: 24px;
         }
-
-        .fgroup { display: flex; flex-direction: column; gap: 7px; }
-        .flabel {
-            font-size: 11px; font-weight: 600; letter-spacing: .07em;
-            text-transform: uppercase; color: var(--text-muted);
-        }
-
-        .f-select, .f-input {
-            width: 100%; padding: 9px 12px;
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text-primary);
-            font-family: var(--font); font-size: 13px; outline: none;
-            transition: border-color .2s; cursor: pointer;
-        }
-        .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
-        .f-select:focus, .f-input:focus { border-color: var(--accent); }
-
-        .btn-reset {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 12px; font-weight: 600; color: var(--text-secondary);
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            padding: 9px 16px; border-radius: var(--radius-sm);
-            cursor: pointer; transition: color .2s, border-color .2s;
-            font-family: var(--font); white-space: nowrap;
-        }
-        .btn-reset:hover { color: var(--text-primary); border-color: var(--border-hover); }
-
-        /* Chart card */
-        .chart-card {
+        .stat-card {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 24px;
+            border-radius: var(--radius-md); padding: 16px 18px;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+        }
+        .stat-card.sc-total::before  { background: var(--accent); }
+        .stat-card.sc-roi::before    { background: #34d399; }
+        .stat-card.sc-budget::before { background: #f59e0b; }
+        .stat-card.sc-gross::before  { background: #2dd4bf; }
+        .stat-card.sc-corr::before   { background: #a78bfa; }
+        .stat-lbl {
+            font-size: 10px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
+        }
+        .stat-val {
+            font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em;
+            color: var(--text-primary); line-height: 1; margin-bottom: 3px;
+        }
+        .stat-sub { font-size: 10px; color: var(--text-muted); }
+
+        /* Controls Row (seperti Case 6) */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-muted);
+        }
+        .filter-group select, .filter-group input {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: #a78bfa;
+        }
+        .range-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .range-slider-wrap input[type="range"] {
+            width: 120px;
+            accent-color: #a78bfa;
+        }
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            margin-left: auto;
+        }
+        .btn-reset:hover {
+            color: var(--text-primary);
+            border-color: #a78bfa;
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
             position: relative;
             overflow-x: auto;
+            margin-bottom: 24px;
         }
         .chart-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, var(--accent) 0%, #a78bfa 60%, transparent 100%);
+            background: linear-gradient(90deg, #a78bfa 0%, #c084fc 60%, transparent 100%);
             opacity: .5;
         }
 
@@ -157,52 +192,73 @@
         .axis .domain { display: none; }
         .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
 
-        .correlation-text {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: var(--bg-elevated);
-            border-radius: var(--radius-md);
-            border-left: 3px solid var(--accent);
+        /* Insight Panel (grid card seperti Case 6 & 7) */
+        .insight-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-bottom: 24px;
         }
-        .correlation-text h4 {
-            font-size: 12px;
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: rgba(167,139,250,.15);
+            border: 1px solid rgba(167,139,250,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #a78bfa;
+        }
+        .insight-title {
+            font-size: 13px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-primary);
+        }
+        .insight-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .insight-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            border-left: 3px solid #a78bfa;
+        }
+        .ic-num {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .ic-label {
+            font-size: 10px;
             font-weight: 700;
             letter-spacing: .08em;
             text-transform: uppercase;
             color: var(--text-muted);
-            margin-bottom: 8px;
+            margin-bottom: 6px;
         }
-        .correlation-text p {
-            font-size: 14px;
+        .ic-desc {
+            font-size: 11px;
             color: var(--text-secondary);
-            line-height: 1.6;
+            line-height: 1.5;
         }
-        .correlation-text strong {
-            color: var(--text-primary);
-        }
-
-        .tooltip-scatter {
-            position: fixed;
-            background: rgba(10,10,16,.97);
-            border: 1px solid var(--border-hover);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
-            pointer-events: none;
-            z-index: 200;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            color: var(--text-primary);
-            box-shadow: 0 12px 48px rgba(0,0,0,.7);
-            min-width: 220px;
-            opacity: 0;
-            transition: opacity .15s ease;
-        }
-        .tooltip-scatter.visible { opacity: 1; }
-        .tt-row { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px; }
-        .tt-label { color: var(--text-muted); }
-        .tt-val { font-weight: 700; color: var(--text-primary); }
-        .tt-gross { color: var(--teal); }
-        .tt-budget { color: var(--accent); }
 
         .legend-wrap {
             display: flex;
@@ -221,15 +277,32 @@
         }
         .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
+        .tooltip-scatter {
+            position: fixed;
+            background: rgba(10,10,16,.97);
+            border: 1px solid var(--border-hover);
+            border-radius: 12px;
+            padding: 12px 16px;
+            pointer-events: none;
+            z-index: 200;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            min-width: 260px;
+            opacity: 0;
+            transition: opacity .15s ease;
+            box-shadow: 0 12px 48px rgba(0,0,0,.7);
+        }
+        .tooltip-scatter.visible { opacity: 1; }
+        .tt-row { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 20px; }
+
         @media (max-width: 768px) {
             .page-wrap { padding: 20px 16px 60px; }
-            .filters-grid { grid-template-columns: 1fr 1fr; }
-            .stats-strip { width: 100%; }
-            .sstat { padding: 10px 16px; flex: 1; }
+            .controls-row { flex-direction: column; align-items: stretch; }
+            .btn-reset { margin-left: 0; width: 100%; }
+            .range-slider-wrap { flex-wrap: wrap; }
         }
-        @media (max-width: 550px) {
-            .filters-grid { grid-template-columns: 1fr; }
-        }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
@@ -241,16 +314,14 @@
             <span class="brand-text">VISDAT</span>
             <span class="brand-sub">KLP 10</span>
         </a>
-        <div class="topbar-case">
-            Case <span>03</span> · Budget vs Gross
-        </div>
+        <div class="topbar-case">Case <span>03</span> · Budget vs Gross</div>
     </div>
 </div>
 
 <div class="page-wrap">
 
     <a href="../index.html" class="back-btn">
-        <svg viewBox="0 0 20 20" fill="currentColor">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
             <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
         </svg>
         Kembali ke Dashboard
@@ -263,88 +334,96 @@
     <h1 class="case-title">Budget <em>vs</em> Gross</h1>
     <p class="case-desc">
         Apakah anggaran produksi yang lebih besar menjamin pendapatan yang lebih tinggi? 
-        Visualisasi ini menampilkan korelasi antara <strong style="color:var(--accent)">budget</strong> (sumbu X) dan 
-        <strong style="color:var(--teal)">gross revenue</strong> (sumbu Y) dari ribuan film. 
-        Setiap titik mewakili satu film, dengan warna berdasarkan genre. Hover untuk melihat detail film.
+        Visualisasi ini menampilkan korelasi antara <strong style="color:#f59e0b">budget</strong> (sumbu X) dan 
+        <strong style="color:#2dd4bf">gross revenue</strong> (sumbu Y) dari ribuan film. 
+        Ukuran bubble merepresentasikan jumlah votes. Hover untuk melihat detail film.
     </p>
 
-    <!-- Stats strip -->
-    <div class="stats-strip">
-        <div class="sstat">
-            <span class="sstat-val" id="stat-total">—</span>
-            <span class="sstat-lbl">Film</span>
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card sc-total">
+            <div class="stat-lbl">Total Film</div>
+            <div class="stat-val" id="stat-total">—</div>
+            <div class="stat-sub">dalam filter aktif</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-avg-roi">—</span>
-            <span class="sstat-lbl">Rata-rata ROI</span>
+        <div class="stat-card sc-roi">
+            <div class="stat-lbl">Rata-rata ROI</div>
+            <div class="stat-val" id="stat-avg-roi">—</div>
+            <div class="stat-sub">Return on Investment</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-top-budget">—</span>
-            <span class="sstat-lbl">Budget Tertinggi</span>
+        <div class="stat-card sc-budget">
+            <div class="stat-lbl">Budget Tertinggi</div>
+            <div class="stat-val" id="stat-top-budget">—</div>
+            <div class="stat-sub" id="stat-top-budget-name">—</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-top-gross">—</span>
-            <span class="sstat-lbl">Gross Tertinggi</span>
+        <div class="stat-card sc-gross">
+            <div class="stat-lbl">Gross Tertinggi</div>
+            <div class="stat-val" id="stat-top-gross">—</div>
+            <div class="stat-sub" id="stat-top-gross-name">—</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-correlation">—</span>
-            <span class="sstat-lbl">Korelasi (r)</span>
-        </div>
-    </div>
-
-    <!-- Filter panel -->
-    <div class="filter-card">
-        <div class="filter-card-title">Filter Data</div>
-        <div class="filters-grid">
-            <div class="fgroup">
-                <label class="flabel">Genre</label>
-                <select class="f-select" id="genre-select">
-                    <option value="">Semua Genre</option>
-                </select>
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Tahun (min)</label>
-                <input type="number" class="f-input" id="year-min" value="1986" min="1986" max="2016" step="1">
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Tahun (max)</label>
-                <input type="number" class="f-input" id="year-max" value="2016" min="1986" max="2016" step="1">
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Budget Min (USD)</label>
-                <select class="f-select" id="budget-filter">
-                    <option value="0">Semua Budget</option>
-                    <option value="1000000">≥ $1M</option>
-                    <option value="10000000">≥ $10M</option>
-                    <option value="50000000">≥ $50M</option>
-                    <option value="100000000">≥ $100M</option>
-                </select>
-            </div>
-            <div class="fgroup">
-                <button class="btn-reset" id="btn-reset">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-                        <path d="M3 8a5 5 0 105 5"/><path d="M3 5V8H6"/>
-                    </svg>
-                    Reset
-                </button>
-            </div>
+        <div class="stat-card sc-corr">
+            <div class="stat-lbl">Korelasi (r)</div>
+            <div class="stat-val" id="stat-correlation">—</div>
+            <div class="stat-sub">Budget vs Gross</div>
         </div>
     </div>
 
-    <!-- Chart card -->
+    <!-- Controls Row (seperti Case 6) -->
+    <div class="controls-row">
+        <div class="filter-group">
+            <label>🎭 Genre</label>
+            <select id="genre-select">
+                <option value="">Semua Genre</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>📅 Tahun</label>
+            <div class="range-slider-wrap">
+                <input type="range" id="year-min" min="1986" max="2016" value="1986">
+                <span style="color:var(--text-muted);font-weight:700;">-</span>
+                <input type="range" id="year-max" min="1986" max="2016" value="2016">
+                <span id="year-range-label" style="font-size:11px;color:#a78bfa;font-weight:700;">1986 - 2016</span>
+            </div>
+        </div>
+        <div class="filter-group">
+            <label>💰 Budget Min</label>
+            <select id="budget-filter" style="width:100px">
+                <option value="0">Semua</option>
+                <option value="1000000">≥ $1M</option>
+                <option value="10000000">≥ $10M</option>
+                <option value="50000000">≥ $50M</option>
+                <option value="100000000">≥ $100M</option>
+            </select>
+        </div>
+        <button class="btn-reset" id="btn-reset">↺ Reset Filter</button>
+    </div>
+
+    <!-- Chart Card -->
     <div class="chart-card">
         <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 500px; flex-direction: column; gap: 16px;">
-            <div class="loading-spinner" style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite;"></div>
+            <div style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: #a78bfa; border-radius: 50%; animation: spin .7s linear infinite;"></div>
             <span style="color: var(--text-muted);">Memuat data film...</span>
         </div>
         <svg id="scatter-chart" width="100%" height="540" style="display: none;"></svg>
         <div class="legend-wrap" id="legend"></div>
     </div>
 
-    <!-- Correlation insight -->
-    <div class="correlation-text" id="correlation-insight" style="display: none;">
-        <h4>📊 Analisis Korelasi</h4>
-        <p id="correlation-desc">Memuat analisis...</p>
+    <!-- Insight Panel (grid card seperti Case 6 & 7) -->
+    <div class="insight-panel">
+        <div class="insight-header">
+            <div class="insight-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="12" y1="16" x2="12" y2="12"/>
+                    <line x1="12" y1="8" x2="12.01" y2="8"/>
+                </svg>
+            </div>
+            <div>
+                <div class="insight-title">Analisis Korelasi Budget vs Gross</div>
+                <div class="insight-subtitle">Berdasarkan data 1986–2016</div>
+            </div>
+        </div>
+        <div class="insights-grid" id="insights-grid"></div>
     </div>
 
 </div>
@@ -357,37 +436,17 @@
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
 const GENRE_COLORS = {
-    'Comedy':    '#e05c3a',
-    'Action':    '#2dd4bf',
-    'Drama':     '#a78bfa',
-    'Crime':     '#f59e0b',
-    'Biography': '#60a5fa',
-    'Adventure': '#34d399',
-    'Animation': '#f97316',
-    'Horror':    '#fb7185',
-    'Thriller':  '#8b5cf6',
-    'Romance':   '#ec4899',
-    'Sci-Fi':    '#06b6d4',
-    'Fantasy':   '#d946ef',
-    'Family':    '#84cc16',
-    'Music':     '#f43f5e',
-    'Mystery':   '#6366f1',
-    'History':   '#14b8a6',
-    'War':       '#ef4444',
-    'Western':   '#b45309',
+    'Comedy': '#e05c3a', 'Action': '#2dd4bf', 'Drama': '#a78bfa',
+    'Crime': '#f59e0b', 'Biography': '#60a5fa', 'Adventure': '#34d399',
+    'Animation': '#f97316', 'Horror': '#fb7185', 'Thriller': '#8b5cf6',
+    'Romance': '#ec4899', 'Sci-Fi': '#06b6d4', 'Fantasy': '#d946ef'
 };
 
 let allData = [];
 let currentData = [];
-let svg, width, height;
-let xScale, yScale;
-let tooltip;
 
 const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
 
-// ═══════════════════════════════════════════════════════════════
-// FORMATTERS
-// ═══════════════════════════════════════════════════════════════
 function fmtMoney(v) {
     if (!v || isNaN(v) || v <= 0) return 'N/A';
     if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
@@ -397,8 +456,24 @@ function fmtMoney(v) {
 }
 
 function calcROI(budget, gross) {
-    if (!budget || budget <= 0) return null;
+    if (!budget || budget <= 0 || !gross || gross <= 0) return null;
     return (gross - budget) / budget;
+}
+
+function calculateCorrelation(xArr, yArr) {
+    const n = xArr.length;
+    if (n < 3) return 0;
+    const sumX = d3.sum(xArr), sumY = d3.sum(yArr);
+    const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
+    const sumX2 = d3.sum(xArr.map(x => x * x));
+    const sumY2 = d3.sum(yArr.map(y => y * y));
+    const numerator = n * sumXY - sumX * sumY;
+    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+    return denominator === 0 ? 0 : numerator / denominator;
+}
+
+function truncate(str, n) {
+    return str.length > n ? str.slice(0, n) + '…' : str;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -425,13 +500,27 @@ d3.csv('../data/movies.csv').then(raw => {
         sel.appendChild(opt);
     });
 
+    // Setup range slider labels
+    const yearMin = document.getElementById('year-min');
+    const yearMax = document.getElementById('year-max');
+    const rangeLabel = document.getElementById('year-range-label');
+    
+    yearMin.addEventListener('input', () => {
+        if (parseInt(yearMin.value) > parseInt(yearMax.value)) yearMax.value = yearMin.value;
+        rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
+        applyFilters();
+    });
+    yearMax.addEventListener('input', () => {
+        if (parseInt(yearMax.value) < parseInt(yearMin.value)) yearMin.value = yearMax.value;
+        rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
+        applyFilters();
+    });
+
     document.getElementById('loading').style.display = 'none';
     document.getElementById('scatter-chart').style.display = 'block';
-    document.getElementById('correlation-insight').style.display = 'block';
-    
     applyFilters();
 }).catch(err => {
-    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small></div>`;
+    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small><br>Pastikan file data/movies.csv ada</div>`;
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -451,6 +540,7 @@ function applyFilters() {
     });
 
     updateStats();
+    updateInsights();
     renderChart();
 }
 
@@ -466,58 +556,77 @@ function updateStats() {
         return;
     }
 
-    // Average ROI
     const roiValues = currentData.map(d => calcROI(d.budget, d.gross)).filter(v => v !== null);
     const avgROI = roiValues.length ? d3.mean(roiValues) : 0;
     document.getElementById('stat-avg-roi').textContent = avgROI.toFixed(2) + 'x';
 
-    // Top budget & gross
     const topBudget = d3.greatest(currentData, d => d.budget);
     const topGross = d3.greatest(currentData, d => d.gross);
     document.getElementById('stat-top-budget').textContent = topBudget ? fmtMoney(topBudget.budget) : '—';
+    document.getElementById('stat-top-budget-name').textContent = topBudget ? truncate(topBudget.name, 20) : '—';
     document.getElementById('stat-top-gross').textContent = topGross ? fmtMoney(topGross.gross) : '—';
+    document.getElementById('stat-top-gross-name').textContent = topGross ? truncate(topGross.name, 20) : '—';
 
-    // Correlation
-    const withBoth = currentData.filter(d => d.budget > 0 && d.gross > 0);
-    if (withBoth.length >= 3) {
-        const corr = calculateCorrelation(withBoth.map(d => d.budget), withBoth.map(d => d.gross));
-        document.getElementById('stat-correlation').textContent = corr.toFixed(3);
-        updateCorrelationInsight(corr, withBoth.length);
-    } else {
-        document.getElementById('stat-correlation').textContent = '—';
-        document.getElementById('correlation-desc').innerHTML = 'Data tidak cukup untuk menghitung korelasi.';
-    }
+    const corr = calculateCorrelation(currentData.map(d => Math.log(d.budget)), currentData.map(d => Math.log(d.gross)));
+    document.getElementById('stat-correlation').textContent = corr.toFixed(3);
 }
 
-function calculateCorrelation(xArr, yArr) {
-    const n = xArr.length;
-    const sumX = d3.sum(xArr);
-    const sumY = d3.sum(yArr);
-    const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
-    const sumX2 = d3.sum(xArr.map(x => x * x));
-    const sumY2 = d3.sum(yArr.map(y => y * y));
-    const numerator = n * sumXY - sumX * sumY;
-    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-    return denominator === 0 ? 0 : numerator / denominator;
-}
+function updateInsights() {
+    const total = currentData.length;
+    if (total === 0) return;
 
-function updateCorrelationInsight(corr, n) {
+    const corr = calculateCorrelation(currentData.map(d => Math.log(d.budget)), currentData.map(d => Math.log(d.gross)));
     const strength = Math.abs(corr);
     let interpretation = '';
-    if (strength > 0.7) interpretation = 'Hubungan positif yang KUAT';
-    else if (strength > 0.4) interpretation = 'Hubungan positif yang SEDANG';
-    else if (strength > 0.2) interpretation = 'Hubungan positif yang LEMAH';
-    else if (strength > -0.2) interpretation = 'Hubungan sangat LEMAH (hampir tidak berkorelasi)';
-    else if (strength > -0.5) interpretation = 'Hubungan negatif yang SEDANG';
-    else interpretation = 'Hubungan negatif yang KUAT';
+    if (strength > 0.5) interpretation = 'KUAT';
+    else if (strength > 0.3) interpretation = 'SEDANG';
+    else if (strength > 0.1) interpretation = 'LEMAH';
+    else interpretation = 'SANGAT LEMAH';
 
-    const direction = corr > 0 ? 'positif' : 'negatif';
-    document.getElementById('correlation-desc').innerHTML = `
-        Koefisien korelasi <strong style="color:${corr > 0 ? 'var(--teal)' : 'var(--accent)'}">r = ${corr.toFixed(3)}</strong> 
-        (${interpretation}) berdasarkan <strong>${n.toLocaleString('id-ID')}</strong> film dengan data budget dan gross lengkap.
-        ${corr > 0.3 ? ' Secara umum, film dengan budget lebih besar cenderung menghasilkan pendapatan yang lebih tinggi.' : 
-          corr < -0.3 ? ' Menariknya, ada kecenderungan negatif — film dengan budget lebih kecil justru lebih menguntungkan secara proporsional.' : 
-          ' Korelasi lemah menunjukkan bahwa budget bukanlah penentu utama kesuksesan finansial.'}
+    const avgROI = d3.mean(currentData.map(d => calcROI(d.budget, d.gross)).filter(v => v !== null)) || 0;
+    
+    // Genre dengan ROI tertinggi
+    const roiByGenre = {};
+    currentData.forEach(d => {
+        const roi = calcROI(d.budget, d.gross);
+        if (roi !== null) {
+            if (!roiByGenre[d.genre]) roiByGenre[d.genre] = [];
+            roiByGenre[d.genre].push(roi);
+        }
+    });
+    let bestGenre = { name: '—', roi: 0 };
+    for (const [genre, rois] of Object.entries(roiByGenre)) {
+        const medianRoi = d3.median(rois);
+        if (medianRoi > bestGenre.roi) {
+            bestGenre = { name: genre, roi: medianRoi };
+        }
+    }
+
+    // Hidden gems count
+    const hiddenGems = currentData.filter(d => d.score >= 8.0 && d.budget < 10000000).length;
+
+    const grid = document.getElementById('insights-grid');
+    grid.innerHTML = `
+        <div class="insight-card">
+            <div class="ic-num">${corr.toFixed(3)}</div>
+            <div class="ic-label">Koefisien Korelasi (r)</div>
+            <div class="ic-desc">Hubungan ${interpretation} dan ${corr > 0 ? 'positif' : 'negatif'} antara budget dan gross revenue.</div>
+        </div>
+        <div class="insight-card">
+            <div class="ic-num">${avgROI.toFixed(2)}x</div>
+            <div class="ic-label">Rata-rata ROI</div>
+            <div class="ic-desc">Return on Investment rata-rata dari ${total.toLocaleString('id-ID')} film dalam filter aktif.</div>
+        </div>
+        <div class="insight-card">
+            <div class="ic-num">${bestGenre.name}</div>
+            <div class="ic-label">Genre dengan ROI Tertinggi</div>
+            <div class="ic-desc">Median ROI ${bestGenre.roi.toFixed(2)}x — genre ini paling efisien secara finansial.</div>
+        </div>
+        <div class="insight-card">
+            <div class="ic-num">${hiddenGems}</div>
+            <div class="ic-label">Hidden Gems</div>
+            <div class="ic-desc">Film dengan skor ≥ 8.0 namun budget < $10M — kualitas tinggi dengan biaya rendah.</div>
+        </div>
     `;
 }
 
@@ -526,10 +635,8 @@ function updateCorrelationInsight(corr, n) {
 // ═══════════════════════════════════════════════════════════════
 function renderChart() {
     const container = document.getElementById('scatter-chart');
-    const containerRect = container.parentElement.getBoundingClientRect();
-    width = containerRect.width - 40;
-    height = 540;
-
+    const width = Math.max(700, container.parentElement.clientWidth - 40);
+    const height = 540;
     container.setAttribute('width', width);
     container.setAttribute('height', height);
     container.innerHTML = '';
@@ -541,45 +648,65 @@ function renderChart() {
 
     const innerW = width - MARGIN.left - MARGIN.right;
     const innerH = height - MARGIN.top - MARGIN.bottom;
-
-    svg = d3.select('#scatter-chart')
+    const svg = d3.select('#scatter-chart')
         .append('g')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Scales (log)
-    const minBudget = d3.min(currentData, d => d.budget) || 1;
-    const maxBudget = d3.max(currentData, d => d.budget) || 1;
-    const minGross = d3.min(currentData, d => d.gross) || 1;
-    const maxGross = d3.max(currentData, d => d.gross) || 1;
-
-    xScale = d3.scaleLog()
-        .domain([minBudget, maxBudget])
-        .range([0, innerW])
-        .nice();
-
-    yScale = d3.scaleLog()
-        .domain([minGross, maxGross])
-        .range([innerH, 0])
-        .nice();
+    // Scales
+    const budgetMin = d3.min(currentData, d => d.budget);
+    const budgetMax = d3.max(currentData, d => d.budget);
+    const grossMin = d3.min(currentData, d => d.gross);
+    const grossMax = d3.max(currentData, d => d.gross);
+    
+    const xScale = d3.scaleLog().domain([budgetMin, budgetMax]).range([0, innerW]).nice();
+    const yScale = d3.scaleLog().domain([grossMin, grossMax]).range([innerH, 0]).nice();
+    
+    const minVotes = d3.min(currentData, d => d.votes) || 1;
+    const maxVotes = d3.max(currentData, d => d.votes) || 1;
+    const rScale = d3.scaleSqrt().domain([minVotes, maxVotes]).range([3, 12]);
 
     // Grid
     svg.append('g')
         .attr('class', 'grid')
         .call(d3.axisLeft(yScale).ticks(6).tickSize(-innerW).tickFormat(''))
-        .select('.domain').remove();
-
+        .selectAll('.domain, .tick line')
+        .attr('stroke', 'rgba(255,255,255,.05)');
     svg.append('g')
         .attr('class', 'grid')
         .attr('transform', `translate(0,${innerH})`)
         .call(d3.axisBottom(xScale).ticks(6).tickSize(-innerH).tickFormat(''))
-        .select('.domain').remove();
+        .selectAll('.domain, .tick line')
+        .attr('stroke', 'rgba(255,255,255,.05)');
 
-    // Axis
+    // Diagonal line (budget = gross)
+    const diagStart = Math.max(budgetMin, grossMin);
+    const diagEnd = Math.min(budgetMax, grossMax);
+    if (diagEnd > diagStart) {
+        svg.append('line')
+            .attr('x1', xScale(diagStart))
+            .attr('y1', yScale(diagStart))
+            .attr('x2', xScale(diagEnd))
+            .attr('y2', yScale(diagEnd))
+            .attr('stroke', 'rgba(255,255,255,0.08)')
+            .attr('stroke-dasharray', '4,4')
+            .attr('stroke-width', 1.5);
+    }
+
+    // ROI 200% line
+    svg.append('line')
+        .attr('x1', 0)
+        .attr('y1', yScale(budgetMin * 2))
+        .attr('x2', innerW)
+        .attr('y2', yScale(budgetMax * 2))
+        .attr('stroke', 'rgba(52,211,153,0.2)')
+        .attr('stroke-dasharray', '4,4')
+        .attr('stroke-width', 1);
+
+    // Axes
     svg.append('g')
         .attr('class', 'axis')
         .attr('transform', `translate(0,${innerH})`)
         .call(d3.axisBottom(xScale).tickFormat(d3.format('~s')));
-
     svg.append('g')
         .attr('class', 'axis')
         .call(d3.axisLeft(yScale).tickFormat(d3.format('~s')));
@@ -592,9 +719,7 @@ function renderChart() {
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', 11)
         .attr('font-weight', 600)
-        .attr('letter-spacing', '.08em')
-        .text('BUDGET (USD) →');
-
+        .text('BUDGET (USD) → (log scale)');
     svg.append('text')
         .attr('transform', 'rotate(-90)')
         .attr('x', -innerH / 2)
@@ -603,94 +728,54 @@ function renderChart() {
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', 11)
         .attr('font-weight', 600)
-        .attr('letter-spacing', '.08em')
-        .text('GROSS REVENUE (USD) →');
-
-    // Diagonal line (budget = gross)
-    const diagStart = Math.max(minBudget, minGross);
-    const diagEnd = Math.min(maxBudget, maxGross);
-    if (diagEnd > diagStart) {
-        svg.append('line')
-            .attr('x1', xScale(diagStart))
-            .attr('y1', yScale(diagStart))
-            .attr('x2', xScale(diagEnd))
-            .attr('y2', yScale(diagEnd))
-            .attr('stroke', 'rgba(255,255,255,.12)')
-            .attr('stroke-dasharray', '5,5')
-            .attr('stroke-width', 1.5);
-    }
+        .text('GROSS REVENUE (USD) → (log scale)');
 
     // Points
-    const points = svg.selectAll('.dot')
+    const tooltip = d3.select('#tooltip');
+    svg.selectAll('.dot')
         .data(currentData)
         .enter()
         .append('circle')
-        .attr('class', 'dot')
         .attr('cx', d => xScale(d.budget))
         .attr('cy', d => yScale(d.gross))
-        .attr('r', 4)
+        .attr('r', d => rScale(d.votes))
         .attr('fill', d => GENRE_COLORS[d.genre] || '#888')
         .attr('fill-opacity', 0.55)
         .attr('stroke', 'none')
         .on('mouseenter', function(event, d) {
-            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 1.5).attr('fill-opacity', 0.9);
-            showTooltip(event, d);
+            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 2).attr('fill-opacity', 0.9);
+            const roi = calcROI(d.budget, d.gross);
+            tooltip.html(`
+                <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span style="font-weight: 700;">${d.name}</span>
+                    <span style="color: #a78bfa; font-weight: 700;">⭐ ${d.score.toFixed(1)}</span>
+                </div>
+                <div class="tt-row"><span style="color: var(--text-muted);">📅 Tahun / 🎭 Genre</span><span>${d.year} · ${d.genre}</span></div>
+                <div class="tt-row"><span style="color: var(--text-muted);">💰 Budget</span><span style="color: #f59e0b;">${fmtMoney(d.budget)}</span></div>
+                <div class="tt-row"><span style="color: var(--text-muted);">📈 Gross</span><span style="color: #2dd4bf;">${fmtMoney(d.gross)}</span></div>
+                <div class="tt-row"><span style="color: var(--text-muted);">📊 ROI</span><span style="color: #34d399; font-weight: 700;">${roi !== null ? roi.toFixed(2) + 'x' : '—'}</span></div>
+                <div class="tt-row"><span style="color: var(--text-muted);">🗳️ Votes</span><span>${d.votes.toLocaleString('id-ID')}</span></div>
+            `);
+            tooltip.classed('visible', true);
+            const left = event.clientX + 14;
+            const top = event.clientY - 10;
+            tooltip.style('left', Math.min(left, window.innerWidth - 280) + 'px')
+                   .style('top', Math.max(8, top) + 'px');
         })
         .on('mouseleave', function() {
             d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.55);
-            hideTooltip();
+            tooltip.classed('visible', false);
         });
 
-    // Reference line (ROI = 100%)
-    // Optional: add a line for 2x ROI
-    const roiLineX = d3.scaleLinear().domain([minBudget, maxBudget]).range([0, innerW]);
-    svg.append('line')
-        .attr('x1', 0)
-        .attr('y1', yScale(minBudget * 2))
-        .attr('x2', innerW)
-        .attr('y2', yScale(maxBudget * 2))
-        .attr('stroke', 'rgba(52,211,153,.25)')
-        .attr('stroke-dasharray', '3,4')
-        .attr('stroke-width', 1);
-
     // Legend
-    const genresInView = [...new Set(currentData.map(d => d.genre))];
+    const genresInView = [...new Set(currentData.map(d => d.genre))].slice(0, 8);
     const legendWrap = document.getElementById('legend');
     legendWrap.innerHTML = genresInView.map(g => `
         <div class="legend-item">
             <span class="legend-dot" style="background: ${GENRE_COLORS[g] || '#888'}"></span>
             <span>${g}</span>
         </div>
-    `).join('');
-}
-
-// ═══════════════════════════════════════════════════════════════
-// TOOLTIP
-// ═══════════════════════════════════════════════════════════════
-function showTooltip(event, d) {
-    const tooltip = document.getElementById('tooltip');
-    const roi = calcROI(d.budget, d.gross);
-    tooltip.innerHTML = `
-        <div class="tt-row"><span class="tt-label">🎬 Film</span><span class="tt-val">${d.name}</span></div>
-        <div class="tt-row"><span class="tt-label">📅 Tahun</span><span class="tt-val">${d.year}</span></div>
-        <div class="tt-row"><span class="tt-label">🎭 Genre</span><span class="tt-val">${d.genre}</span></div>
-        <div class="tt-row"><span class="tt-label">💰 Budget</span><span class="tt-val tt-budget">${fmtMoney(d.budget)}</span></div>
-        <div class="tt-row"><span class="tt-label">📈 Gross</span><span class="tt-val tt-gross">${fmtMoney(d.gross)}</span></div>
-        <div class="tt-row"><span class="tt-label">📊 ROI</span><span class="tt-val">${roi !== null ? roi.toFixed(2) + 'x' : '—'}</span></div>
-        <div class="tt-row"><span class="tt-label">⭐ IMDb</span><span class="tt-val">${d.score.toFixed(1)}</span></div>
-        <div class="tt-row"><span class="tt-label">🗳️ Votes</span><span class="tt-val">${d.votes.toLocaleString('id-ID')}</span></div>
-    `;
-
-    const left = event.clientX + 14;
-    const top = event.clientY - 10;
-    tooltip.style.left = Math.min(left, window.innerWidth - 260) + 'px';
-    tooltip.style.top = Math.max(8, top) + 'px';
-    tooltip.classList.add('visible');
-}
-
-function hideTooltip() {
-    const tooltip = document.getElementById('tooltip');
-    tooltip.classList.remove('visible');
+    `).join('') + `<div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3);"></span><span>Ukuran bubble = Jumlah Votes</span></div>`;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -701,33 +786,22 @@ function debounce(fn, ms) {
     return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
 }
 
-const debouncedRender = debounce(() => applyFilters(), 200);
-
 document.getElementById('genre-select').addEventListener('change', applyFilters);
-document.getElementById('year-min').addEventListener('input', debouncedRender);
-document.getElementById('year-max').addEventListener('input', debouncedRender);
 document.getElementById('budget-filter').addEventListener('change', applyFilters);
 document.getElementById('btn-reset').addEventListener('click', () => {
     document.getElementById('genre-select').value = '';
     document.getElementById('year-min').value = '1986';
     document.getElementById('year-max').value = '2016';
     document.getElementById('budget-filter').value = '0';
+    document.getElementById('year-range-label').textContent = '1986 - 2016';
     applyFilters();
 });
 
-// Responsive resize
 let resizeTimer;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        if (currentData.length) renderChart();
-    }, 200);
+    resizeTimer = setTimeout(() => { if (currentData.length) renderChart(); }, 200);
 });
-
-// Spin animation style
-const style = document.createElement('style');
-style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
-document.head.appendChild(style);
 </script>
 </body>
 </html>
