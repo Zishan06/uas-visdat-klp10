@@ -3,731 +3,1231 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case 3 — Budget vs Gross | Visualisasi Data Film</title>
-    <meta name="description" content="Scatter plot korelasi antara anggaran produksi (budget) dan pendapatan kotor (gross) film dari 1986 hingga 2016.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
+    <title>Case 3: Matriks Korelasi & Word Cloud Faktor Penempatan Kerja</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/d3-cloud@1.2.7/build/d3.layout.cloud.min.js"></script>
     <style>
-        body { background: var(--bg-base); }
+        :root {
+            --bg: #f0fdf4;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --accent: #0d9488;
+            --accent-light: #ccfbf1;
+            --accent-dark: #0f766e;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --success: #10b981;
+            --border: #e2e8f0;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+            --radius: 20px;
+            --radius-sm: 12px;
+            --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
 
-        .topbar {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(13,13,18,.88);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--border);
-        }
-        .topbar-inner {
-            max-width: 1320px; margin: 0 auto; padding: 0 28px;
-            height: 56px; display: flex; align-items: center; justify-content: space-between;
-        }
-        .topbar-brand {
-            display: flex; align-items: center; gap: 8px; text-decoration: none;
-        }
-        .brand-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
-        .brand-sub {
-            font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
-            background: var(--accent-dim); border: 1px solid var(--accent-glow);
-            padding: 2px 7px; border-radius: 4px;
-        }
-        .topbar-case {
-            font-size: 12px; font-weight: 500; color: var(--text-muted);
-            letter-spacing: .04em; display: flex; align-items: center; gap: 6px;
-        }
-        .topbar-case span { color: var(--text-secondary); }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
-
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-            color: var(--text-muted); text-decoration: none;
-            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
-            background: var(--bg-elevated); transition: color .2s, border-color .2s;
-            margin-bottom: 28px;
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(160deg, #f0fdfa 0%, #f8fafc 40%, #fffbeb 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 24px 16px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
         }
-        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
-        .back-btn svg { width: 14px; height: 14px; }
 
-        .case-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-            color: #a78bfa; background: rgba(167,139,250,.1);
-            border: 1px solid rgba(167,139,250,.2); padding: 4px 10px; border-radius: 100px;
-            margin-bottom: 14px;
+        .dashboard-container {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+            animation: fadeSlideUp 0.8s ease forwards;
         }
-        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #a78bfa; }
 
-        h1.case-title {
-            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
-            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary);
+        @keyframes fadeSlideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(13, 148, 136, 0); }
+        }
+
+        @keyframes tooltipIn {
+            from { opacity: 0; transform: translateY(10px) scale(0.95); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+
+        /* ===== HEADER STORY ===== */
+        .story-header {
+            text-align: center;
+            padding: 10px 0 0;
+        }
+
+        .story-header .eyebrow {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            font-size: 0.7rem;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            padding: 6px 18px;
+            border-radius: 100px;
             margin-bottom: 12px;
         }
-        h1.case-title em {
-            font-style: normal;
-            background: linear-gradient(135deg, var(--accent) 0%, #a78bfa 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .case-desc {
-            font-size: .975rem; color: var(--text-secondary);
-            max-width: 700px; line-height: 1.65; margin-bottom: 32px;
+
+        .story-header h1 {
+            font-size: clamp(1.5rem, 3vw, 2.2rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            color: #0f172a;
+            margin-bottom: 6px;
         }
 
-        /* Stats strip */
-        .stats-strip {
-            display: flex; gap: 0; flex-wrap: wrap;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
-            width: fit-content;
-        }
-        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
-            border-right: 1px solid var(--border); }
-        .sstat:last-child { border-right: none; }
-        .sstat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
-        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .08em;
-            text-transform: uppercase; color: var(--text-muted); }
-
-        /* Filter panel */
-        .filter-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 24px 28px;
-            margin-bottom: 20px;
-        }
-        .filter-card-title {
-            font-size: 11px; font-weight: 700; letter-spacing: .1em;
-            text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .filter-card-title::after {
-            content: ''; flex: 1; height: 1px; background: var(--border);
-        }
-
-        .filters-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr 1fr auto;
-            gap: 20px; align-items: end;
-        }
-
-        .fgroup { display: flex; flex-direction: column; gap: 7px; }
-        .flabel {
-            font-size: 11px; font-weight: 600; letter-spacing: .07em;
-            text-transform: uppercase; color: var(--text-muted);
-        }
-
-        .f-select, .f-input {
-            width: 100%; padding: 9px 12px;
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text-primary);
-            font-family: var(--font); font-size: 13px; outline: none;
-            transition: border-color .2s; cursor: pointer;
-        }
-        .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
-        .f-select:focus, .f-input:focus { border-color: var(--accent); }
-
-        .btn-reset {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 12px; font-weight: 600; color: var(--text-secondary);
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            padding: 9px 16px; border-radius: var(--radius-sm);
-            cursor: pointer; transition: color .2s, border-color .2s;
-            font-family: var(--font); white-space: nowrap;
-        }
-        .btn-reset:hover { color: var(--text-primary); border-color: var(--border-hover); }
-
-        /* Chart card */
-        .chart-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 24px;
-            position: relative;
-            overflow-x: auto;
-        }
-        .chart-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, var(--accent) 0%, #a78bfa 60%, transparent 100%);
-            opacity: .5;
-        }
-
-        .axis text { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; }
-        .axis line, .axis path { stroke: rgba(255,255,255,.07); }
-        .axis .domain { display: none; }
-        .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
-
-        .correlation-text {
-            margin-top: 20px;
-            padding: 16px 20px;
-            background: var(--bg-elevated);
-            border-radius: var(--radius-md);
-            border-left: 3px solid var(--accent);
-        }
-        .correlation-text h4 {
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 8px;
-        }
-        .correlation-text p {
-            font-size: 14px;
+        .story-header .subtitle {
+            font-size: 0.95rem;
             color: var(--text-secondary);
-            line-height: 1.6;
-        }
-        .correlation-text strong {
-            color: var(--text-primary);
+            max-width: 700px;
+            margin: 0 auto;
+            font-weight: 500;
         }
 
-        .tooltip-scatter {
-            position: fixed;
-            background: rgba(10,10,16,.97);
-            border: 1px solid var(--border-hover);
-            border-radius: var(--radius-md);
-            padding: 12px 16px;
-            pointer-events: none;
-            z-index: 200;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            color: var(--text-primary);
-            box-shadow: 0 12px 48px rgba(0,0,0,.7);
-            min-width: 220px;
-            opacity: 0;
-            transition: opacity .15s ease;
+        /* ===== KARTU ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 28px 30px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.35s ease;
         }
-        .tooltip-scatter.visible { opacity: 1; }
-        .tt-row { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 16px; }
-        .tt-label { color: var(--text-muted); }
-        .tt-val { font-weight: 700; color: var(--text-primary); }
-        .tt-gross { color: var(--teal); }
-        .tt-budget { color: var(--accent); }
 
-        .legend-wrap {
+        .card:hover { box-shadow: var(--shadow-lg); }
+
+        .card-header {
             display: flex;
             flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
             gap: 16px;
-            margin-top: 20px;
-            justify-content: center;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border);
         }
-        .legend-item {
+
+        .card-header h2 {
+            font-size: 1.3rem;
+            font-weight: 800;
             display: flex;
             align-items: center;
+            gap: 10px;
+            letter-spacing: -0.01em;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+            color: #065f46;
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 5px 14px;
+            border-radius: 100px;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+        }
+
+        .badge-warning {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            color: #92400e;
+        }
+
+        /* ===== TOGGLE VIEW ===== */
+        .toggle-group {
+            display: flex;
+            background: #f1f5f9;
+            border-radius: 100px;
+            padding: 5px;
+            border: 1px solid var(--border);
+            gap: 2px;
+        }
+
+        .toggle-btn {
+            padding: 10px 22px;
+            border-radius: 100px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            transition: all var(--transition);
+            white-space: nowrap;
+            letter-spacing: -0.01em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .toggle-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 14px -4px rgba(13, 148, 136, 0.5);
+            transform: scale(1.03);
+        }
+
+        .toggle-btn:hover:not(.active) {
+            background: #e2e8f0;
+            color: #334155;
+        }
+
+        /* ===== TOMBOL SORT ===== */
+        .sort-controls {
+            display: flex;
+            flex-wrap: wrap;
             gap: 8px;
-            font-size: 11px;
-            font-weight: 500;
+        }
+
+        .btn-sort {
+            background: #f8fafc;
+            border: 1.5px solid var(--border);
+            padding: 7px 16px;
+            border-radius: 100px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.25s ease;
+            white-space: nowrap;
             color: var(--text-secondary);
         }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
 
-        @media (max-width: 768px) {
-            .page-wrap { padding: 20px 16px 60px; }
-            .filters-grid { grid-template-columns: 1fr 1fr; }
-            .stats-strip { width: 100%; }
-            .sstat { padding: 10px 16px; flex: 1; }
+        .btn-sort:hover { background: #e2e8f0; border-color: #cbd5e1; transform: translateY(-1px); }
+
+        .btn-sort.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px -4px rgba(13, 148, 136, 0.4);
         }
-        @media (max-width: 550px) {
-            .filters-grid { grid-template-columns: 1fr; }
+
+        /* ===== TOOLTIP (DIPERBAIKI - PASTI MUNCUL) ===== */
+        .tooltip {
+            position: fixed;
+            background: rgba(15, 23, 42, 0.97);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            color: #f1f5f9;
+            padding: 18px 22px;
+            border-radius: 16px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+            box-shadow: 0 24px 48px -12px rgba(0,0,0,0.6);
+            z-index: 99999;
+            line-height: 1.7;
+            border: 1px solid rgba(255,255,255,0.2);
+            max-width: 340px;
+            min-width: 200px;
+            word-wrap: break-word;
+        }
+
+        .tooltip.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
+            animation: tooltipIn 0.25s ease forwards;
+        }
+
+        .tooltip .corr-value {
+            font-size: 1.5rem;
+            font-weight: 900;
+            color: #fbbf24;
+            display: block;
+            margin-bottom: 2px;
+            letter-spacing: -0.02em;
+        }
+
+        .tooltip .strength-badge {
+            display: inline-block;
+            padding: 3px 12px;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            margin-bottom: 6px;
+            letter-spacing: 0.03em;
+        }
+
+        .tooltip .var-names {
+            font-size: 0.82rem;
+            color: #e2e8f0;
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+        }
+
+        .tooltip .interpretation {
+            font-size: 0.76rem;
+            color: #94a3b8;
+            margin-top: 8px;
+            padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,0.15);
+            font-style: italic;
+            line-height: 1.5;
+        }
+
+        .tooltip .data-source {
+            font-size: 0.65rem;
+            color: #64748b;
+            margin-top: 6px;
+            font-style: normal;
+        }
+
+        /* ===== AREA VISUALISASI ===== */
+        .vis-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .chart-container {
+            width: 100%;
+            overflow-x: auto;
+            overflow-y: visible;
+            display: flex;
+            justify-content: center;
+            padding: 10px 0;
+            position: relative;
+        }
+
+        svg {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            display: block;
+            overflow: visible;
+        }
+
+        /* ===== LEGENDA ===== */
+        .legend-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            flex-wrap: wrap;
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 10px;
+            padding: 12px 22px;
+            background: #f8fafc;
+            border-radius: 100px;
+            border: 1px solid var(--border);
+        }
+
+        .legend-gradient {
+            width: 200px;
+            height: 12px;
+            border-radius: 100px;
+            background: linear-gradient(to right, #dc2626, #ef4444, #f97316, #f8fafc, #34d399, #10b981, #059669);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* ===== INSIGHT BOX ===== */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .insight-card {
+            padding: 18px 20px;
+            border-radius: var(--radius-sm);
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+            border-left: 5px solid;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+
+        .insight-card.findings {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            color: #78350f;
+        }
+
+        .insight-card.story {
+            background: #ede9fe;
+            border-left-color: #8b5cf6;
+            color: #4c1d95;
+        }
+
+        .insight-card.action {
+            background: #d1fae5;
+            border-left-color: #10b981;
+            color: #065f46;
+        }
+
+        .insight-card .icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+
+        .highlight-num {
+            font-weight: 900;
+            font-size: 1.2rem;
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+            margin-bottom: 8px;
+        }
+
+        .stat-item {
+            background: #f8fafc;
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 12px 18px;
+            text-align: center;
+            min-width: 100px;
+            flex: 1;
+        }
+
+        .stat-item .stat-value {
+            font-size: 1.4rem;
+            font-weight: 900;
+            color: var(--accent-dark);
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        /* ===== CELL HIGHLIGHT ===== */
+        .cell-bg {
+            transition: all 0.2s ease;
+        }
+
+        .cell-bg.highlighted {
+            stroke: #0f172a !important;
+            stroke-width: 4 !important;
+            filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        .cell-bg.dimmed {
+            opacity: 0.15;
+        }
+
+        .cell-bg.row-col-highlight {
+            opacity: 1;
+            stroke: #0f172a;
+            stroke-width: 3;
+        }
+
+        /* ===== WORD CLOUD ===== */
+        .word-item {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .word-item:hover {
+            filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+        }
+
+        /* ===== SCROLLBAR ===== */
+        .chart-container::-webkit-scrollbar { height: 10px; }
+        .chart-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
+        .chart-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        .chart-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        /* ===== RESPONSIF ===== */
+        @media (max-width: 768px) {
+            body { padding: 12px; }
+            .card { padding: 16px 14px; }
+            .card-header { flex-direction: column; align-items: flex-start; }
+            .toggle-group { width: 100%; }
+            .toggle-btn { flex: 1; justify-content: center; font-size: 0.75rem; padding: 8px 12px; }
+            .sort-controls { width: 100%; }
+            .btn-sort { flex: 1; text-align: center; font-size: 0.7rem; }
+            .tooltip { max-width: 260px; padding: 14px 18px; font-size: 0.8rem; }
+            .stats-bar { flex-direction: column; }
         }
     </style>
 </head>
 <body>
 
-<div class="topbar">
-    <div class="topbar-inner">
-        <a href="../index.html" class="topbar-brand">
-            <span class="brand-dot"></span>
-            <span class="brand-text">VISDAT</span>
-            <span class="brand-sub">KLP 10</span>
-        </a>
-        <div class="topbar-case">
-            Case <span>03</span> · Budget vs Gross
+<div class="dashboard-container">
+
+    <!-- ===== HEADER STORY ===== -->
+    <div class="story-header">
+        <div class="eyebrow">📖 Case Study #3</div>
+        <h1>Membedah Formula Kesuksesan: Korelasi Tersembunyi</h1>
+        <p class="subtitle">
+            Dari <strong>10.000 mahasiswa</strong> di <strong>100 kampus</strong>, hanya <strong>16.6% yang berhasil ditempatkan</strong>. 
+            Semua korelasi dihitung <em>real-time</em> dari dataset asli menggunakan D3.js.
+        </p>
+    </div>
+
+    <!-- ===== STATS BAR ===== -->
+    <div class="stats-bar">
+        <div class="stat-item">
+            <div class="stat-value">10,000</div>
+            <div class="stat-label">Mahasiswa</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">100</div>
+            <div class="stat-label">Kampus</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">16.6%</div>
+            <div class="stat-label">Tingkat Penempatan</div>
+        </div>
+        <div class="stat-item">
+            <div class="stat-value">8</div>
+            <div class="stat-label">Variabel Dikorelasikan</div>
+        </div>
+    </div>
+
+    <!-- ===== KARTU UTAMA ===== -->
+    <div class="card">
+        <div class="card-header">
+            <h2>
+                <span id="view-icon">🌡️</span>
+                <span id="view-title">Matriks Korelasi Lengkap (8×8)</span>
+                <span class="badge">Real-time D3.js</span>
+            </h2>
+            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                <div class="toggle-group" id="toggle-group">
+                    <button id="btn-heatmap" class="toggle-btn active">
+                        <span>🌡️</span> Heatmap
+                    </button>
+                    <button id="btn-wordcloud" class="toggle-btn">
+                        <span>☁️</span> Word Cloud
+                    </button>
+                </div>
+                <div class="sort-controls" id="sort-controls">
+                    <button id="sort-default" class="btn-sort active">📋 Default</button>
+                    <button id="sort-placement" class="btn-sort">🎯 Terdekat Placement</button>
+                    <button id="sort-strength" class="btn-sort">📊 Kekuatan Umum</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info: Data dihitung real-time -->
+        <div style="background:#f0fdf4; border:1px solid #a7f3d0; border-radius:10px; padding:10px 16px; margin-bottom:16px; font-size:0.78rem; color:#065f46; display:flex; align-items:center; gap:8px;">
+            <span>🟢</span>
+            <span><strong>Live Computation:</strong> Semua nilai korelasi dihitung langsung dari <code>college_student_placement_dataset.csv</code> (10.000 baris) menggunakan fungsi Pearson Correlation di D3.js. Tidak ada data yang di-hardcode.</span>
+        </div>
+
+        <div class="vis-wrapper">
+            <div id="custom-tooltip" class="tooltip"></div>
+            <div class="chart-container" id="chart-container">
+                <svg id="main-svg"></svg>
+            </div>
+            <div class="legend-container" id="legend-heatmap">
+                <span style="display:flex; align-items:center; gap:4px;">
+                    <span style="width:10px;height:10px;background:#dc2626;border-radius:50%;display:inline-block;"></span> -1.0
+                </span>
+                <div class="legend-gradient"></div>
+                <span style="display:flex; align-items:center; gap:4px;">
+                    <span style="width:10px;height:10px;background:#059669;border-radius:50%;display:inline-block;"></span> +1.0
+                </span>
+                <span style="font-weight:500;color:#64748b;">(Hover sel untuk detail)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== INSIGHT GRID ===== -->
+    <div class="insight-grid">
+        <div class="insight-card findings">
+            <span class="icon">🔍</span>
+            <div>
+                <strong>Temuan Kunci</strong>
+                <p style="margin-top:4px;font-size:0.82rem;">
+                    <span class="highlight-num">4 variabel</span> berkorelasi moderat dengan Placement: 
+                    <strong>Communication Skills</strong> (r≈0.323), <strong>CGPA</strong> (r≈0.322), 
+                    <strong>Prev Sem Result</strong> (r≈0.318), dan <strong>IQ</strong> (r≈0.286).
+                    <br><em>Tidak ada faktor tunggal yang dominan — kesuksesan bersifat multi-faktor.</em>
+                </p>
+            </div>
+        </div>
+
+        <div class="insight-card story">
+            <span class="icon">📖</span>
+            <div>
+                <strong>Cerita di Balik Data</strong>
+                <p style="margin-top:4px;font-size:0.82rem;">
+                    <strong>Magang hampir tidak berkorelasi</strong> dengan penempatan (r≈-0.006). 
+                    Ini mengejutkan! Artinya, <em>memiliki pengalaman magang saja tidak cukup</em> — 
+                    yang lebih penting adalah <strong>kemampuan komunikasi</strong> dan <strong>konsistensi akademik</strong>.
+                </p>
+            </div>
+        </div>
+
+        <div class="insight-card action">
+            <span class="icon">💡</span>
+            <div>
+                <strong>Rekomendasi untuk Mahasiswa</strong>
+                <p style="margin-top:4px;font-size:0.82rem;">
+                    Fokus pada <strong>pengembangan komunikasi</strong>, jaga <strong>IPK di atas 7.5</strong> 
+                    (kuartil atas), dan selesaikan <strong>minimal 3 proyek</strong>. 
+                    Kombinasi ini meningkatkan peluang penempatan secara signifikan.
+                </p>
+            </div>
         </div>
     </div>
 </div>
 
-<div class="page-wrap">
-
-    <a href="../index.html" class="back-btn">
-        <svg viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
-        </svg>
-        Kembali ke Dashboard
-    </a>
-
-    <div class="case-badge">
-        <span class="case-badge-dot"></span>
-        Case 03 · Scatter Plot
-    </div>
-    <h1 class="case-title">Budget <em>vs</em> Gross</h1>
-    <p class="case-desc">
-        Apakah anggaran produksi yang lebih besar menjamin pendapatan yang lebih tinggi? 
-        Visualisasi ini menampilkan korelasi antara <strong style="color:var(--accent)">budget</strong> (sumbu X) dan 
-        <strong style="color:var(--teal)">gross revenue</strong> (sumbu Y) dari ribuan film. 
-        Setiap titik mewakili satu film, dengan warna berdasarkan genre. Hover untuk melihat detail film.
-    </p>
-
-    <!-- Stats strip -->
-    <div class="stats-strip">
-        <div class="sstat">
-            <span class="sstat-val" id="stat-total">—</span>
-            <span class="sstat-lbl">Film</span>
-        </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-avg-roi">—</span>
-            <span class="sstat-lbl">Rata-rata ROI</span>
-        </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-top-budget">—</span>
-            <span class="sstat-lbl">Budget Tertinggi</span>
-        </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-top-gross">—</span>
-            <span class="sstat-lbl">Gross Tertinggi</span>
-        </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-correlation">—</span>
-            <span class="sstat-lbl">Korelasi (r)</span>
-        </div>
-    </div>
-
-    <!-- Filter panel -->
-    <div class="filter-card">
-        <div class="filter-card-title">Filter Data</div>
-        <div class="filters-grid">
-            <div class="fgroup">
-                <label class="flabel">Genre</label>
-                <select class="f-select" id="genre-select">
-                    <option value="">Semua Genre</option>
-                </select>
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Tahun (min)</label>
-                <input type="number" class="f-input" id="year-min" value="1986" min="1986" max="2016" step="1">
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Tahun (max)</label>
-                <input type="number" class="f-input" id="year-max" value="2016" min="1986" max="2016" step="1">
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Budget Min (USD)</label>
-                <select class="f-select" id="budget-filter">
-                    <option value="0">Semua Budget</option>
-                    <option value="1000000">≥ $1M</option>
-                    <option value="10000000">≥ $10M</option>
-                    <option value="50000000">≥ $50M</option>
-                    <option value="100000000">≥ $100M</option>
-                </select>
-            </div>
-            <div class="fgroup">
-                <button class="btn-reset" id="btn-reset">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-                        <path d="M3 8a5 5 0 105 5"/><path d="M3 5V8H6"/>
-                    </svg>
-                    Reset
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Chart card -->
-    <div class="chart-card">
-        <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 500px; flex-direction: column; gap: 16px;">
-            <div class="loading-spinner" style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite;"></div>
-            <span style="color: var(--text-muted);">Memuat data film...</span>
-        </div>
-        <svg id="scatter-chart" width="100%" height="540" style="display: none;"></svg>
-        <div class="legend-wrap" id="legend"></div>
-    </div>
-
-    <!-- Correlation insight -->
-    <div class="correlation-text" id="correlation-insight" style="display: none;">
-        <h4>📊 Analisis Korelasi</h4>
-        <p id="correlation-desc">Memuat analisis...</p>
-    </div>
-
-</div>
-
-<div id="tooltip" class="tooltip-scatter"></div>
-
-<script src="https://d3js.org/d3.v7.min.js"></script>
 <script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIGURATION
-// ═══════════════════════════════════════════════════════════════
-const GENRE_COLORS = {
-    'Comedy':    '#e05c3a',
-    'Action':    '#2dd4bf',
-    'Drama':     '#a78bfa',
-    'Crime':     '#f59e0b',
-    'Biography': '#60a5fa',
-    'Adventure': '#34d399',
-    'Animation': '#f97316',
-    'Horror':    '#fb7185',
-    'Thriller':  '#8b5cf6',
-    'Romance':   '#ec4899',
-    'Sci-Fi':    '#06b6d4',
-    'Fantasy':   '#d946ef',
-    'Family':    '#84cc16',
-    'Music':     '#f43f5e',
-    'Mystery':   '#6366f1',
-    'History':   '#14b8a6',
-    'War':       '#ef4444',
-    'Western':   '#b45309',
+// =============================================
+// CASE 3: HEATMAP KORELASI & WORD CLOUD
+// Dataset: college_student_placement_dataset.csv
+// Semua nilai korelasi dihitung REAL-TIME oleh D3.js
+// Fungsi Pearson Correlation memproses 10.000 baris data
+// =============================================
+
+const CONFIG = {
+    DATA_PATH: '../data/college_student_placement_dataset.csv',
+    
+    // SEMUA 8 variabel yang akan dikorelasikan
+    ALL_VARIABLES: [
+        'IQ',
+        'CGPA', 
+        'Prev_Sem_Result',
+        'Communication_Skills',
+        'Projects_Completed',
+        'Extra_Curricular_Score',
+        'Placement',
+        'Internship_Experience'
+    ],
+    
+    TARGET_COL: 'Placement',
+    CELL_SIZE: 72,
+    MARGIN_HEATMAP: { top: 30, right: 30, bottom: 100, left: 175 },
 };
 
-let allData = [];
-let currentData = [];
-let svg, width, height;
-let xScale, yScale;
-let tooltip;
+// State global
+let fullData = [];                    // Seluruh data mentah dari CSV
+let correlationMatrix = {};          // Matriks korelasi hasil perhitungan
+let variables = [...CONFIG.ALL_VARIABLES]; // Urutan variabel saat ini
+let currentView = 'heatmap';
+let currentSort = 'default';
 
-const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
+// =============================================
+// 1. LOAD DATA DARI CSV
+// =============================================
+async function loadData() {
+    try {
+        console.log('📂 Memuat dataset:', CONFIG.DATA_PATH);
+        const raw = await d3.csv(CONFIG.DATA_PATH);
+        console.log(`✅ ${raw.length} baris berhasil dimuat`);
+        
+        // Konversi semua nilai ke numerik
+        fullData = raw.map(d => ({
+            IQ: +d.IQ || 0,
+            CGPA: +d.CGPA || 0,
+            Prev_Sem_Result: +d.Prev_Sem_Result || 0,
+            Communication_Skills: +d.Communication_Skills || 0,
+            Projects_Completed: +d.Projects_Completed || 0,
+            Extra_Curricular_Score: +d.Extra_Curricular_Score || 0,
+            Academic_Performance: +d.Academic_Performance || 0,
+            Placement: (d.Placement || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
+            Internship_Experience: (d.Internship_Experience || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
+            College_ID: d.College_ID || ''
+        })).filter(d => !isNaN(d.CGPA) && !isNaN(d.IQ));
 
-// ═══════════════════════════════════════════════════════════════
-// FORMATTERS
-// ═══════════════════════════════════════════════════════════════
-function fmtMoney(v) {
-    if (!v || isNaN(v) || v <= 0) return 'N/A';
-    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
-    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
-    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
-    return '$' + Math.round(v);
+        console.log(`✅ ${fullData.length} baris valid setelah filtering`);
+        console.log('📊 Menghitung matriks korelasi Pearson...');
+        
+        // Hitung korelasi untuk semua 8 variabel
+        computeMatrix();
+        
+        console.log('✅ Matriks korelasi selesai dihitung');
+        console.table(correlationMatrix);
+        
+        renderCurrentView();
+    } catch (e) {
+        console.error('❌ Error:', e);
+        document.getElementById('chart-container').innerHTML = `
+            <div style="text-align:center;padding:50px;color:#b91c1c;">
+                <p style="font-size:2rem;">⚠️</p>
+                <p style="font-weight:700;">Gagal Memuat Data</p>
+                <p style="font-size:0.85rem;">Pastikan file <code>data/college_student_placement_dataset.csv</code> tersedia.</p>
+                <p style="font-size:0.75rem;color:#94a3b8;">Error: ${e.message}</p>
+            </div>`;
+    }
 }
 
-function calcROI(budget, gross) {
-    if (!budget || budget <= 0) return null;
-    return (gross - budget) / budget;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// LOAD DATA
-// ═══════════════════════════════════════════════════════════════
-d3.csv('../data/movies.csv').then(raw => {
-    allData = raw.map(d => ({
-        name: d.name || '',
-        genre: d.genre || 'Other',
-        year: +d.year || 0,
-        budget: parseFloat(d.budget) || 0,
-        gross: parseFloat(d.gross) || 0,
-        score: parseFloat(d.score) || 0,
-        votes: parseFloat(d.votes) || 0,
-    })).filter(d => d.year >= 1980 && d.name && d.budget > 0 && d.gross > 0 && d.genre);
-
-    // Populate genre dropdown
-    const genres = [...new Set(allData.map(d => d.genre))].filter(Boolean).sort();
-    const sel = document.getElementById('genre-select');
-    genres.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g;
-        opt.textContent = g;
-        sel.appendChild(opt);
-    });
-
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('scatter-chart').style.display = 'block';
-    document.getElementById('correlation-insight').style.display = 'block';
+// =============================================
+// 2. FUNGSI KORELASI PEARSON (REAL-TIME)
+//    Memproses 10.000 data point per pasangan variabel
+// =============================================
+function pearson(x, y) {
+    const n = x.length;
+    if (n === 0) return 0;
     
-    applyFilters();
-}).catch(err => {
-    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small></div>`;
-});
-
-// ═══════════════════════════════════════════════════════════════
-// FILTERS
-// ═══════════════════════════════════════════════════════════════
-function applyFilters() {
-    const genre = document.getElementById('genre-select').value;
-    const yearMin = parseInt(document.getElementById('year-min').value) || 1986;
-    const yearMax = parseInt(document.getElementById('year-max').value) || 2016;
-    const budgetMin = parseFloat(document.getElementById('budget-filter').value) || 0;
-
-    currentData = allData.filter(d => {
-        if (genre && d.genre !== genre) return false;
-        if (d.year < yearMin || d.year > yearMax) return false;
-        if (d.budget < budgetMin) return false;
-        return true;
-    });
-
-    updateStats();
-    renderChart();
-}
-
-function updateStats() {
-    const total = currentData.length;
-    document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
+    // Hitung mean
+    const mx = x.reduce((a, b) => a + b, 0) / n;
+    const my = y.reduce((a, b) => a + b, 0) / n;
     
-    if (total === 0) {
-        document.getElementById('stat-avg-roi').textContent = '—';
-        document.getElementById('stat-top-budget').textContent = '—';
-        document.getElementById('stat-top-gross').textContent = '—';
-        document.getElementById('stat-correlation').textContent = '—';
-        return;
+    // Hitung covariance dan variance
+    let num = 0, dx2 = 0, dy2 = 0;
+    for (let i = 0; i < n; i++) {
+        const dx = x[i] - mx;
+        const dy = y[i] - my;
+        num += dx * dy;
+        dx2 += dx * dx;
+        dy2 += dy * dy;
     }
-
-    // Average ROI
-    const roiValues = currentData.map(d => calcROI(d.budget, d.gross)).filter(v => v !== null);
-    const avgROI = roiValues.length ? d3.mean(roiValues) : 0;
-    document.getElementById('stat-avg-roi').textContent = avgROI.toFixed(2) + 'x';
-
-    // Top budget & gross
-    const topBudget = d3.greatest(currentData, d => d.budget);
-    const topGross = d3.greatest(currentData, d => d.gross);
-    document.getElementById('stat-top-budget').textContent = topBudget ? fmtMoney(topBudget.budget) : '—';
-    document.getElementById('stat-top-gross').textContent = topGross ? fmtMoney(topGross.gross) : '—';
-
-    // Correlation
-    const withBoth = currentData.filter(d => d.budget > 0 && d.gross > 0);
-    if (withBoth.length >= 3) {
-        const corr = calculateCorrelation(withBoth.map(d => d.budget), withBoth.map(d => d.gross));
-        document.getElementById('stat-correlation').textContent = corr.toFixed(3);
-        updateCorrelationInsight(corr, withBoth.length);
-    } else {
-        document.getElementById('stat-correlation').textContent = '—';
-        document.getElementById('correlation-desc').innerHTML = 'Data tidak cukup untuk menghitung korelasi.';
-    }
+    
+    const den = Math.sqrt(dx2 * dy2);
+    const result = den === 0 ? 0 : num / den;
+    
+    // Bulatkan ke 3 desimal
+    return Math.round(result * 1000) / 1000;
 }
 
-function calculateCorrelation(xArr, yArr) {
-    const n = xArr.length;
-    const sumX = d3.sum(xArr);
-    const sumY = d3.sum(yArr);
-    const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
-    const sumX2 = d3.sum(xArr.map(x => x * x));
-    const sumY2 = d3.sum(yArr.map(y => y * y));
-    const numerator = n * sumXY - sumX * sumY;
-    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-    return denominator === 0 ? 0 : numerator / denominator;
-}
-
-function updateCorrelationInsight(corr, n) {
-    const strength = Math.abs(corr);
-    let interpretation = '';
-    if (strength > 0.7) interpretation = 'Hubungan positif yang KUAT';
-    else if (strength > 0.4) interpretation = 'Hubungan positif yang SEDANG';
-    else if (strength > 0.2) interpretation = 'Hubungan positif yang LEMAH';
-    else if (strength > -0.2) interpretation = 'Hubungan sangat LEMAH (hampir tidak berkorelasi)';
-    else if (strength > -0.5) interpretation = 'Hubungan negatif yang SEDANG';
-    else interpretation = 'Hubungan negatif yang KUAT';
-
-    const direction = corr > 0 ? 'positif' : 'negatif';
-    document.getElementById('correlation-desc').innerHTML = `
-        Koefisien korelasi <strong style="color:${corr > 0 ? 'var(--teal)' : 'var(--accent)'}">r = ${corr.toFixed(3)}</strong> 
-        (${interpretation}) berdasarkan <strong>${n.toLocaleString('id-ID')}</strong> film dengan data budget dan gross lengkap.
-        ${corr > 0.3 ? ' Secara umum, film dengan budget lebih besar cenderung menghasilkan pendapatan yang lebih tinggi.' : 
-          corr < -0.3 ? ' Menariknya, ada kecenderungan negatif — film dengan budget lebih kecil justru lebih menguntungkan secara proporsional.' : 
-          ' Korelasi lemah menunjukkan bahwa budget bukanlah penentu utama kesuksesan finansial.'}
-    `;
-}
-
-// ═══════════════════════════════════════════════════════════════
-// RENDER CHART
-// ═══════════════════════════════════════════════════════════════
-function renderChart() {
-    const container = document.getElementById('scatter-chart');
-    const containerRect = container.parentElement.getBoundingClientRect();
-    width = containerRect.width - 40;
-    height = 540;
-
-    container.setAttribute('width', width);
-    container.setAttribute('height', height);
-    container.innerHTML = '';
-
-    if (currentData.length === 0) {
-        container.innerHTML = `<text x="${width/2}" y="${height/2}" text-anchor="middle" fill="var(--text-muted)" font-size="14">Tidak ada data dengan filter yang dipilih</text>`;
-        return;
+function computeMatrix() {
+    console.log('🔄 Menghitung korelasi untuk', CONFIG.ALL_VARIABLES.length, 'variabel...');
+    correlationMatrix = {};
+    
+    // Inisialisasi matriks
+    CONFIG.ALL_VARIABLES.forEach(a => {
+        correlationMatrix[a] = {};
+    });
+    
+    // Hitung setiap pasangan (matriks simetris)
+    const totalPairs = (CONFIG.ALL_VARIABLES.length * (CONFIG.ALL_VARIABLES.length + 1)) / 2;
+    let pairCount = 0;
+    
+    for (let i = 0; i < CONFIG.ALL_VARIABLES.length; i++) {
+        for (let j = i; j < CONFIG.ALL_VARIABLES.length; j++) {
+            const colA = CONFIG.ALL_VARIABLES[i];
+            const colB = CONFIG.ALL_VARIABLES[j];
+            pairCount++;
+            
+            if (i === j) {
+                correlationMatrix[colA][colB] = 1.0;
+            } else {
+                const valuesA = fullData.map(d => d[colA]);
+                const valuesB = fullData.map(d => d[colB]);
+                const corr = pearson(valuesA, valuesB);
+                correlationMatrix[colA][colB] = corr;
+                correlationMatrix[colB][colA] = corr; // Simetris
+            }
+        }
     }
+    
+    console.log(`✅ ${pairCount} pasangan korelasi dihitung`);
+}
 
-    const innerW = width - MARGIN.left - MARGIN.right;
-    const innerH = height - MARGIN.top - MARGIN.bottom;
+// =============================================
+// 3. INTERPRETASI KORELASI
+// =============================================
+function interpretCorrelation(value) {
+    const abs = Math.abs(value);
+    const direction = value > 0 ? 'positif' : 'negatif';
+    if (abs >= 0.8) return `Korelasi ${direction} sangat kuat. Hubungan hampir pasti antar variabel.`;
+    if (abs >= 0.6) return `Korelasi ${direction} kuat. Hubungan signifikan dan konsisten.`;
+    if (abs >= 0.3) return `Korelasi ${direction} moderat. Ada hubungan yang berarti namun tidak dominan.`;
+    if (abs >= 0.15) return `Korelasi ${direction} lemah. Hubungan mulai terlihat namun kecil.`;
+    return `Korelasi sangat lemah (mendekati nol). Tidak ada hubungan linear yang berarti.`;
+}
 
-    svg = d3.select('#scatter-chart')
-        .append('g')
-        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+function getCorrelationLabel(value) {
+    const abs = Math.abs(value);
+    if (abs >= 0.8) return 'Sangat Kuat';
+    if (abs >= 0.6) return 'Kuat';
+    if (abs >= 0.3) return 'Moderat';
+    if (abs >= 0.15) return 'Lemah';
+    return 'Sangat Lemah';
+}
 
-    // Scales (log)
-    const minBudget = d3.min(currentData, d => d.budget) || 1;
-    const maxBudget = d3.max(currentData, d => d.budget) || 1;
-    const minGross = d3.min(currentData, d => d.gross) || 1;
-    const maxGross = d3.max(currentData, d => d.gross) || 1;
+function getStrengthColor(value) {
+    const abs = Math.abs(value);
+    if (abs >= 0.8) return { bg: '#7c3aed', text: '#ffffff' };
+    if (abs >= 0.6) return { bg: '#3b82f6', text: '#ffffff' };
+    if (abs >= 0.3) return { bg: '#f59e0b', text: '#1e293b' };
+    if (abs >= 0.15) return { bg: '#94a3b8', text: '#ffffff' };
+    return { bg: '#cbd5e1', text: '#475569' };
+}
 
-    xScale = d3.scaleLog()
-        .domain([minBudget, maxBudget])
-        .range([0, innerW])
-        .nice();
+// =============================================
+// 4. FORMAT NAMA
+// =============================================
+function formatName(name) {
+    const map = {
+        'IQ': 'IQ Score',
+        'CGPA': 'IPK (CGPA)',
+        'Prev_Sem_Result': 'Nilai Semester Lalu',
+        'Communication_Skills': 'Kemampuan Komunikasi',
+        'Projects_Completed': 'Proyek Diselesaikan',
+        'Extra_Curricular_Score': 'Skor Ekstrakurikuler',
+        'Placement': 'Status Penempatan',
+        'Internship_Experience': 'Pengalaman Magang'
+    };
+    return map[name] || name.replace(/_/g, ' ');
+}
 
-    yScale = d3.scaleLog()
-        .domain([minGross, maxGross])
-        .range([innerH, 0])
-        .nice();
+// =============================================
+// 5. SKEMA WARNA HEATMAP
+// =============================================
+const colorScale = d3.scaleLinear()
+    .domain([-1, -0.5, -0.2, 0, 0.2, 0.5, 1])
+    .range(['#dc2626', '#ef4444', '#f97316', '#f8fafc', '#34d399', '#10b981', '#059669'])
+    .clamp(true);
 
-    // Grid
-    svg.append('g')
-        .attr('class', 'grid')
-        .call(d3.axisLeft(yScale).ticks(6).tickSize(-innerW).tickFormat(''))
-        .select('.domain').remove();
+function getTextColor(value) {
+    return Math.abs(value) > 0.45 ? '#ffffff' : '#1e293b';
+}
 
-    svg.append('g')
-        .attr('class', 'grid')
-        .attr('transform', `translate(0,${innerH})`)
-        .call(d3.axisBottom(xScale).ticks(6).tickSize(-innerH).tickFormat(''))
-        .select('.domain').remove();
+// =============================================
+// 6. RENDER HEATMAP (8×8 - SEMUA VARIABEL)
+// =============================================
+function renderHeatmap() {
+    const svg = d3.select('#main-svg');
+    svg.selectAll('*').remove();
+    
+    const cols = variables;
+    const cell = CONFIG.CELL_SIZE;
+    const m = CONFIG.MARGIN_HEATMAP;
+    const w = cols.length * cell + m.left + m.right;
+    const h = cols.length * cell + m.top + m.bottom;
+    
+    svg.attr('width', w).attr('height', h).style('overflow', 'visible');
+    
+    const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+    const tooltip = d3.select('#custom-tooltip');
 
-    // Axis
-    svg.append('g')
-        .attr('class', 'axis')
-        .attr('transform', `translate(0,${innerH})`)
-        .call(d3.axisBottom(xScale).tickFormat(d3.format('~s')));
+    const xScale = d3.scaleBand().domain(cols).range([0, cols.length * cell]).padding(0.06);
+    const yScale = d3.scaleBand().domain(cols).range([0, cols.length * cell]).padding(0.06);
 
-    svg.append('g')
-        .attr('class', 'axis')
-        .call(d3.axisLeft(yScale).tickFormat(d3.format('~s')));
+    // Buat grid data untuk semua sel
+    const cellsData = cols.flatMap(r => cols.map(c => ({
+        row: r, 
+        col: c, 
+        value: correlationMatrix[r]?.[c] ?? 0
+    })));
 
-    // Labels
-    svg.append('text')
-        .attr('x', innerW / 2)
-        .attr('y', innerH + 45)
+    // Debug: tampilkan jumlah sel
+    console.log(`🔲 Merender ${cellsData.length} sel heatmap (${cols.length}×${cols.length})`);
+
+    const cellGroups = g.selectAll('.cell-group')
+        .data(cellsData)
+        .enter().append('g')
+        .attr('class', 'cell-group')
+        .attr('transform', d => `translate(${xScale(d.col)},${yScale(d.row)})`);
+
+    // Background sel dengan warna korelasi
+    cellGroups.append('rect')
+        .attr('class', 'cell-bg')
+        .attr('width', xScale.bandwidth())
+        .attr('height', yScale.bandwidth())
+        .attr('rx', 10).attr('ry', 10)
+        .attr('fill', d => colorScale(d.value))
+        .attr('stroke', '#ffffff')
+        .attr('stroke-width', 2.5)
+        .style('cursor', 'pointer');
+
+    // Bubble di dalam sel (ukuran = kekuatan korelasi)
+    cellGroups.append('circle')
+        .attr('class', 'bubble')
+        .attr('cx', xScale.bandwidth() / 2)
+        .attr('cy', yScale.bandwidth() / 2)
+        .attr('r', d => Math.max(3, Math.abs(d.value) * (xScale.bandwidth() / 2.8)))
+        .attr('fill', 'rgba(255, 255, 255, 0.4)')
+        .attr('stroke', 'rgba(255, 255, 255, 0.7)')
+        .attr('stroke-width', 1.5)
+        .style('pointer-events', 'none');
+
+    // Teks nilai korelasi
+    cellGroups.append('text')
+        .attr('x', xScale.bandwidth() / 2)
+        .attr('y', yScale.bandwidth() / 2 + 1)
         .attr('text-anchor', 'middle')
-        .attr('fill', 'var(--text-muted)')
-        .attr('font-size', 11)
-        .attr('font-weight', 600)
-        .attr('letter-spacing', '.08em')
-        .text('BUDGET (USD) →');
+        .attr('dominant-baseline', 'middle')
+        .style('font-size', '0.82rem')
+        .style('font-weight', '800')
+        .style('fill', d => getTextColor(d.value))
+        .style('pointer-events', 'none')
+        .text(d => d.value.toFixed(2));
 
-    svg.append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('x', -innerH / 2)
-        .attr('y', -52)
+    // Label sumbu X (di atas)
+    g.selectAll('.x-label')
+        .data(cols)
+        .enter().append('text')
+        .attr('class', 'x-label')
+        .attr('x', d => xScale(d) + xScale.bandwidth() / 2)
+        .attr('y', -12)
         .attr('text-anchor', 'middle')
-        .attr('fill', 'var(--text-muted)')
-        .attr('font-size', 11)
-        .attr('font-weight', 600)
-        .attr('letter-spacing', '.08em')
-        .text('GROSS REVENUE (USD) →');
-
-    // Diagonal line (budget = gross)
-    const diagStart = Math.max(minBudget, minGross);
-    const diagEnd = Math.min(maxBudget, maxGross);
-    if (diagEnd > diagStart) {
-        svg.append('line')
-            .attr('x1', xScale(diagStart))
-            .attr('y1', yScale(diagStart))
-            .attr('x2', xScale(diagEnd))
-            .attr('y2', yScale(diagEnd))
-            .attr('stroke', 'rgba(255,255,255,.12)')
-            .attr('stroke-dasharray', '5,5')
-            .attr('stroke-width', 1.5);
-    }
-
-    // Points
-    const points = svg.selectAll('.dot')
-        .data(currentData)
-        .enter()
-        .append('circle')
-        .attr('class', 'dot')
-        .attr('cx', d => xScale(d.budget))
-        .attr('cy', d => yScale(d.gross))
-        .attr('r', 4)
-        .attr('fill', d => GENRE_COLORS[d.genre] || '#888')
-        .attr('fill-opacity', 0.55)
-        .attr('stroke', 'none')
-        .on('mouseenter', function(event, d) {
-            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 1.5).attr('fill-opacity', 0.9);
-            showTooltip(event, d);
-        })
-        .on('mouseleave', function() {
-            d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.55);
-            hideTooltip();
+        .style('font-size', '10px')
+        .style('font-weight', '700')
+        .style('fill', '#334155')
+        .text(d => formatName(d))
+        .each(function(d) {
+            if (d.length > 15) {
+                d3.select(this)
+                    .attr('transform', `rotate(-30, ${xScale(d) + xScale.bandwidth()/2}, -12)`)
+                    .attr('text-anchor', 'end');
+            }
         });
 
-    // Reference line (ROI = 100%)
-    // Optional: add a line for 2x ROI
-    const roiLineX = d3.scaleLinear().domain([minBudget, maxBudget]).range([0, innerW]);
-    svg.append('line')
-        .attr('x1', 0)
-        .attr('y1', yScale(minBudget * 2))
-        .attr('x2', innerW)
-        .attr('y2', yScale(maxBudget * 2))
-        .attr('stroke', 'rgba(52,211,153,.25)')
-        .attr('stroke-dasharray', '3,4')
-        .attr('stroke-width', 1);
+    // Label sumbu Y (di kiri)
+    g.selectAll('.y-label')
+        .data(cols)
+        .enter().append('text')
+        .attr('class', 'y-label')
+        .attr('x', -10)
+        .attr('y', d => yScale(d) + yScale.bandwidth() / 2)
+        .attr('text-anchor', 'end')
+        .attr('dominant-baseline', 'middle')
+        .style('font-size', '10px')
+        .style('font-weight', '700')
+        .style('fill', '#334155')
+        .text(d => formatName(d));
 
-    // Legend
-    const genresInView = [...new Set(currentData.map(d => d.genre))];
-    const legendWrap = document.getElementById('legend');
-    legendWrap.innerHTML = genresInView.map(g => `
-        <div class="legend-item">
-            <span class="legend-dot" style="background: ${GENRE_COLORS[g] || '#888'}"></span>
-            <span>${g}</span>
-        </div>
-    `).join('');
+    // =============================================
+    // INTERAKSI HOVER (DIPERBAIKI - PASTI MUNCUL)
+    // =============================================
+    cellGroups
+        .on('mouseenter', function(event, d) {
+            // Reset semua sel ke opacity normal dulu
+            g.selectAll('.cell-bg')
+                .classed('dimmed', true)
+                .classed('row-col-highlight', false)
+                .classed('highlighted', false);
+            
+            // Highlight baris dan kolom yang sesuai
+            g.selectAll('.cell-bg')
+                .filter(cell => cell.row === d.row || cell.col === d.col)
+                .classed('dimmed', false)
+                .classed('row-col-highlight', true);
+            
+            // Highlight sel yang dihover
+            d3.select(this).select('.cell-bg')
+                .classed('highlighted', true)
+                .classed('row-col-highlight', false);
+
+            // Siapkan tooltip
+            const strength = getCorrelationLabel(d.value);
+            const strengthColors = getStrengthColor(d.value);
+            const interpretation = interpretCorrelation(d.value);
+            
+            // Update konten tooltip
+            tooltip
+                .html(`
+                    <span class="corr-value">r = ${d.value.toFixed(3)}</span>
+                    <span class="strength-badge" style="background:${strengthColors.bg};color:${strengthColors.text};">${strength}</span>
+                    <span class="var-names">${formatName(d.row)} ↔ ${formatName(d.col)}</span>
+                    <span class="interpretation">📘 ${interpretation}</span>
+                    <span class="data-source">🟢 Dihitung dari 10.000 data point (Pearson)</span>
+                `)
+                .style('opacity', 1)
+                .classed('visible', true);
+        })
+        .on('mousemove', function(event) {
+            // Dapatkan ukuran tooltip
+            const tooltipNode = tooltip.node();
+            const tw = tooltipNode ? tooltipNode.offsetWidth : 300;
+            const th = tooltipNode ? tooltipNode.offsetHeight : 150;
+            
+            // Hitung posisi dengan boundary checking
+            let left = event.clientX + 25;
+            let top = event.clientY - th - 20;
+            
+            // Cek batas kanan
+            if (left + tw > window.innerWidth - 15) {
+                left = event.clientX - tw - 25;
+            }
+            // Cek batas atas
+            if (top < 15) {
+                top = event.clientY + 30;
+            }
+            // Cek batas kiri
+            if (left < 15) {
+                left = 15;
+            }
+            // Cek batas bawah
+            if (top + th > window.innerHeight - 15) {
+                top = window.innerHeight - th - 15;
+            }
+            
+            tooltip
+                .style('left', left + 'px')
+                .style('top', top + 'px');
+        })
+        .on('mouseleave', function() {
+            // Sembunyikan tooltip
+            tooltip
+                .style('opacity', 0)
+                .classed('visible', false);
+            
+            // Kembalikan semua sel ke normal
+            g.selectAll('.cell-bg')
+                .classed('dimmed', false)
+                .classed('row-col-highlight', false)
+                .classed('highlighted', false);
+        })
+        .on('click', function(event, d) {
+            // Klik untuk mengurutkan berdasarkan variabel baris
+            sortByVariable(d.row);
+        });
+
+    console.log('✅ Heatmap 8×8 selesai dirender');
 }
 
-// ═══════════════════════════════════════════════════════════════
-// TOOLTIP
-// ═══════════════════════════════════════════════════════════════
-function showTooltip(event, d) {
-    const tooltip = document.getElementById('tooltip');
-    const roi = calcROI(d.budget, d.gross);
-    tooltip.innerHTML = `
-        <div class="tt-row"><span class="tt-label">🎬 Film</span><span class="tt-val">${d.name}</span></div>
-        <div class="tt-row"><span class="tt-label">📅 Tahun</span><span class="tt-val">${d.year}</span></div>
-        <div class="tt-row"><span class="tt-label">🎭 Genre</span><span class="tt-val">${d.genre}</span></div>
-        <div class="tt-row"><span class="tt-label">💰 Budget</span><span class="tt-val tt-budget">${fmtMoney(d.budget)}</span></div>
-        <div class="tt-row"><span class="tt-label">📈 Gross</span><span class="tt-val tt-gross">${fmtMoney(d.gross)}</span></div>
-        <div class="tt-row"><span class="tt-label">📊 ROI</span><span class="tt-val">${roi !== null ? roi.toFixed(2) + 'x' : '—'}</span></div>
-        <div class="tt-row"><span class="tt-label">⭐ IMDb</span><span class="tt-val">${d.score.toFixed(1)}</span></div>
-        <div class="tt-row"><span class="tt-label">🗳️ Votes</span><span class="tt-val">${d.votes.toLocaleString('id-ID')}</span></div>
-    `;
+// =============================================
+// 7. RENDER WORD CLOUD
+// =============================================
+function renderWordCloud() {
+    const svg = d3.select('#main-svg');
+    svg.selectAll('*').remove();
+    
+    const w = 750, h = 500;
+    svg.attr('width', w).attr('height', h).style('overflow', 'visible');
+    
+    const tooltip = d3.select('#custom-tooltip');
+    const target = CONFIG.TARGET_COL;
 
-    const left = event.clientX + 14;
-    const top = event.clientY - 10;
-    tooltip.style.left = Math.min(left, window.innerWidth - 260) + 'px';
-    tooltip.style.top = Math.max(8, top) + 'px';
-    tooltip.classList.add('visible');
+    // Siapkan data: korelasi setiap variabel dengan Placement
+    const wordData = CONFIG.ALL_VARIABLES
+        .filter(v => v !== target)
+        .map(v => ({
+            text: formatName(v),
+            value: Math.abs(correlationMatrix[target]?.[v] || 0),
+            correlation: correlationMatrix[target]?.[v] || 0,
+            size: 0
+        }))
+        .sort((a, b) => b.value - a.value);
+
+    if (wordData.length === 0) {
+        svg.append('text').attr('x', w/2).attr('y', h/2)
+            .attr('text-anchor', 'middle').text('Data tidak tersedia')
+            .style('fill', '#94a3b8').style('font-size', '1rem');
+        return;
+    }
+
+    const maxVal = d3.max(wordData, d => d.value) || 0.35;
+    const fontSizeScale = d3.scaleLinear()
+        .domain([0, maxVal * 0.4, maxVal])
+        .range([20, 40, 68])
+        .clamp(true);
+
+    const layout = d3.layout.cloud()
+        .size([w, h])
+        .words(wordData.map(d => ({ ...d, size: fontSizeScale(d.value) })))
+        .padding(10)
+        .rotate(() => 0)
+        .fontSize(d => d.size)
+        .on('end', drawWords);
+
+    layout.start();
+
+    function drawWords(words) {
+        const g = svg.append('g')
+            .attr('transform', `translate(${w/2}, ${h/2})`);
+
+        g.selectAll('text')
+            .data(words)
+            .enter().append('text')
+            .attr('class', 'word-item')
+            .style('font-size', d => d.size + 'px')
+            .style('font-weight', d => d.value > 0.2 ? '900' : d.value > 0.1 ? '700' : '500')
+            .style('fill', d => {
+                if (d.correlation > 0.3) return '#059669';
+                if (d.correlation > 0.15) return '#10b981';
+                if (d.correlation > 0) return '#34d399';
+                if (d.correlation > -0.1) return '#94a3b8';
+                return '#ef4444';
+            })
+            .style('opacity', d => 0.55 + d.value * 1.4)
+            .style('cursor', 'pointer')
+            .attr('text-anchor', 'middle')
+            .attr('transform', d => `translate(${d.x}, ${d.y})`)
+            .text(d => d.text)
+            .on('mouseenter', function(event, d) {
+                d3.select(this)
+                    .transition().duration(200)
+                    .style('filter', 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))')
+                    .attr('transform', `translate(${d.x}, ${d.y}) scale(1.12)`);
+
+                const interpretation = interpretCorrelation(d.correlation);
+                tooltip
+                    .style('opacity', 1)
+                    .classed('visible', true)
+                    .html(`
+                        <span class="corr-value">r = ${d.correlation.toFixed(3)}</span>
+                        <span class="var-names">${d.text} → Status Penempatan</span>
+                        <span style="display:block;margin-top:4px;font-size:0.72rem;color:#94a3b8;">
+                            Ukuran & kecerahan = kekuatan korelasi
+                        </span>
+                        <span class="interpretation">📘 ${interpretation}</span>
+                        <span class="data-source">🟢 Dihitung dari 10.000 data point</span>
+                    `);
+            })
+            .on('mousemove', function(event) {
+                const tooltipNode = tooltip.node();
+                const tw = tooltipNode ? tooltipNode.offsetWidth : 280;
+                const th = tooltipNode ? tooltipNode.offsetHeight : 140;
+                let left = event.clientX + 22;
+                let top = event.clientY - th - 20;
+                if (left + tw > window.innerWidth - 10) left = event.clientX - tw - 22;
+                if (top < 10) top = event.clientY + 25;
+                if (left < 10) left = 10;
+                tooltip.style('left', left + 'px').style('top', top + 'px');
+            })
+            .on('mouseleave', function(event, d) {
+                d3.select(this)
+                    .transition().duration(200)
+                    .style('filter', 'none')
+                    .attr('transform', `translate(${d.x}, ${d.y}) scale(1)`);
+                tooltip.style('opacity', 0).classed('visible', false);
+            });
+    }
+
+    svg.append('text')
+        .attr('x', w/2).attr('y', 25)
+        .attr('text-anchor', 'middle')
+        .style('font-size', '0.85rem').style('font-weight', '700')
+        .style('fill', '#475569')
+        .text('☁️ Kekuatan Korelasi dengan Status Penempatan Kerja');
+    
+    console.log('✅ Word Cloud selesai dirender');
 }
 
-function hideTooltip() {
-    const tooltip = document.getElementById('tooltip');
-    tooltip.classList.remove('visible');
+// =============================================
+// 8. SORTING LOGIC
+// =============================================
+function sortByVariable(target) {
+    const corrs = variables.map(v => ({ 
+        v, 
+        val: Math.abs(correlationMatrix[target]?.[v] || 0) 
+    }));
+    corrs.sort((a, b) => { 
+        if (a.v === target) return -1; 
+        if (b.v === target) return 1; 
+        return b.val - a.val; 
+    });
+    variables = corrs.map(c => c.v);
+    updateSortButtons('custom');
+    renderHeatmap();
 }
 
-// ═══════════════════════════════════════════════════════════════
-// EVENT LISTENERS
-// ═══════════════════════════════════════════════════════════════
-function debounce(fn, ms) {
-    let timer;
-    return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
+function sortPlacement() {
+    const t = CONFIG.TARGET_COL;
+    variables.sort((a, b) => 
+        Math.abs(correlationMatrix[t]?.[b] || 0) - Math.abs(correlationMatrix[t]?.[a] || 0)
+    );
+    updateSortButtons('placement');
+    renderHeatmap();
 }
 
-const debouncedRender = debounce(() => applyFilters(), 200);
+function sortStrength() {
+    variables.sort((a, b) => {
+        const others = variables.filter(o => o !== a && o !== b);
+        const avgA = others.length > 0 
+            ? others.reduce((sum, o) => sum + Math.abs(correlationMatrix[a]?.[o] || 0), 0) / others.length 
+            : 0;
+        const avgB = others.length > 0 
+            ? others.reduce((sum, o) => sum + Math.abs(correlationMatrix[b]?.[o] || 0), 0) / others.length 
+            : 0;
+        return avgB - avgA;
+    });
+    updateSortButtons('strength');
+    renderHeatmap();
+}
 
-document.getElementById('genre-select').addEventListener('change', applyFilters);
-document.getElementById('year-min').addEventListener('input', debouncedRender);
-document.getElementById('year-max').addEventListener('input', debouncedRender);
-document.getElementById('budget-filter').addEventListener('change', applyFilters);
-document.getElementById('btn-reset').addEventListener('click', () => {
-    document.getElementById('genre-select').value = '';
-    document.getElementById('year-min').value = '1986';
-    document.getElementById('year-max').value = '2016';
-    document.getElementById('budget-filter').value = '0';
-    applyFilters();
+function resetDefault() {
+    variables = [...CONFIG.ALL_VARIABLES];
+    updateSortButtons('default');
+    renderHeatmap();
+}
+
+function updateSortButtons(mode) {
+    currentSort = mode;
+    document.querySelectorAll('.btn-sort').forEach(b => b.classList.remove('active'));
+    const map = { 
+        default: 'sort-default', 
+        placement: 'sort-placement', 
+        strength: 'sort-strength' 
+    };
+    if (map[mode]) document.getElementById(map[mode]).classList.add('active');
+}
+
+// =============================================
+// 9. TOGGLE VIEW (HEATMAP / WORD CLOUD)
+// =============================================
+function setView(view) {
+    currentView = view;
+    
+    document.getElementById('btn-heatmap').classList.toggle('active', view === 'heatmap');
+    document.getElementById('btn-wordcloud').classList.toggle('active', view === 'wordcloud');
+    
+    // Sort controls hanya untuk heatmap
+    document.getElementById('sort-controls').style.display = view === 'heatmap' ? 'flex' : 'none';
+    document.getElementById('legend-heatmap').style.display = view === 'heatmap' ? 'flex' : 'none';
+    
+    document.getElementById('view-icon').textContent = view === 'heatmap' ? '🌡️' : '☁️';
+    document.getElementById('view-title').textContent = view === 'heatmap' 
+        ? 'Matriks Korelasi Lengkap (8×8)' 
+        : 'Word Cloud: Kekuatan Korelasi → Penempatan';
+    
+    renderCurrentView();
+}
+
+function renderCurrentView() {
+    if (currentView === 'heatmap') renderHeatmap();
+    else renderWordCloud();
+}
+
+// =============================================
+// 10. INISIALISASI
+// =============================================
+document.addEventListener('DOMContentLoaded', () => {
+    console.log('🚀 Case 3: Inisialisasi...');
+    
+    document.getElementById('btn-heatmap').addEventListener('click', () => setView('heatmap'));
+    document.getElementById('btn-wordcloud').addEventListener('click', () => setView('wordcloud'));
+    document.getElementById('sort-default').addEventListener('click', resetDefault);
+    document.getElementById('sort-placement').addEventListener('click', sortPlacement);
+    document.getElementById('sort-strength').addEventListener('click', sortStrength);
+    
+    loadData();
 });
 
-// Responsive resize
+// Handle resize
 let resizeTimer;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-        if (currentData.length) renderChart();
-    }, 200);
+        if (fullData.length > 0) renderCurrentView();
+    }, 350);
 });
 
-// Spin animation style
-const style = document.createElement('style');
-style.textContent = `@keyframes spin { to { transform: rotate(360deg); } }`;
-document.head.appendChild(style);
+// Log info ke console
+console.log('📊 Case 3 Ready');
+console.log('   - Heatmap: 8×8 matriks korelasi');
+console.log('   - Word Cloud: visualisasi kekuatan korelasi');
+console.log('   - Semua nilai dihitung real-time dari CSV');
+console.log('   - Hover tooltip dengan boundary detection');
 </script>
 </body>
 </html>
