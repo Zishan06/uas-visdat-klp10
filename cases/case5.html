@@ -52,7 +52,6 @@
             margin-bottom: 28px;
         }
         .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
-        .back-btn svg { width: 14px; height: 14px; }
 
         .case-badge {
             display: inline-flex; align-items: center; gap: 6px;
@@ -78,70 +77,99 @@
             max-width: 700px; line-height: 1.65; margin-bottom: 32px;
         }
 
-        .stats-strip {
-            display: flex; gap: 0; flex-wrap: wrap;
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); overflow: hidden; margin-bottom: 28px;
-            width: fit-content;
-        }
-        .sstat { padding: 14px 24px; display: flex; flex-direction: column; gap: 3px;
-            border-right: 1px solid var(--border); }
-        .sstat:last-child { border-right: none; }
-        .sstat-val { font-size: 1.3rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); }
-        .sstat-lbl { font-size: 10px; font-weight: 600; letter-spacing: .08em;
-            text-transform: uppercase; color: var(--text-muted); }
-
-        .filter-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 24px 28px;
-            margin-bottom: 20px;
-        }
-        .filter-card-title {
-            font-size: 11px; font-weight: 700; letter-spacing: .1em;
-            text-transform: uppercase; color: var(--text-muted); margin-bottom: 20px;
-            display: flex; align-items: center; gap: 8px;
-        }
-        .filter-card-title::after {
-            content: ''; flex: 1; height: 1px; background: var(--border);
-        }
-
-        .filters-grid {
+        /* Stats Grid */
+        .stats-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr 1fr auto;
-            gap: 20px; align-items: end;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px; margin-bottom: 24px;
         }
-
-        .fgroup { display: flex; flex-direction: column; gap: 7px; }
-        .flabel {
-            font-size: 11px; font-weight: 600; letter-spacing: .07em;
-            text-transform: uppercase; color: var(--text-muted);
-        }
-
-        .f-select, .f-input {
-            width: 100%; padding: 9px 12px;
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            border-radius: var(--radius-sm); color: var(--text-primary);
-            font-family: var(--font); font-size: 13px; outline: none;
-            transition: border-color .2s; cursor: pointer;
-        }
-        .f-select { background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2355556a' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; padding-right: 30px; }
-        .f-select:focus, .f-input:focus { border-color: var(--accent); }
-
-        .btn-reset {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 12px; font-weight: 600; color: var(--text-secondary);
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            padding: 9px 16px; border-radius: var(--radius-sm);
-            cursor: pointer; transition: color .2s, border-color .2s;
-            font-family: var(--font); white-space: nowrap;
-        }
-        .btn-reset:hover { color: var(--text-primary); border-color: var(--border-hover); }
-
-        .chart-card {
+        .stat-card {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-lg); padding: 24px;
+            border-radius: var(--radius-md); padding: 16px 18px;
+            position: relative; overflow: hidden;
+        }
+        .stat-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px; }
+        .stat-card.sc-total::before { background: var(--accent); }
+        .stat-card.sc-gems::before { background: var(--gold); }
+        .stat-card.sc-roi::before { background: #34d399; }
+        .stat-card.sc-top::before { background: #a78bfa; }
+        .stat-lbl { font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px; }
+        .stat-val { font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em; color: var(--text-primary); line-height: 1; margin-bottom: 3px; }
+        .stat-sub { font-size: 10px; color: var(--text-muted); }
+
+        /* Controls Row */
+        .controls-row {
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            background: var(--bg-card);
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+        }
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .filter-group label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .08em;
+            color: var(--text-muted);
+        }
+        .filter-group select, .filter-group input {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            padding: 6px 12px;
+            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            outline: none;
+            cursor: pointer;
+        }
+        .filter-group select:focus, .filter-group input:focus {
+            border-color: var(--gold);
+        }
+        .range-slider-wrap {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .range-slider-wrap input[type="range"] {
+            width: 120px;
+            accent-color: var(--gold);
+        }
+        .btn-reset {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 16px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            margin-left: auto;
+        }
+        .btn-reset:hover {
+            color: var(--text-primary);
+            border-color: var(--gold);
+        }
+
+        /* Chart Card */
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            padding: 24px;
             position: relative;
             overflow-x: auto;
+            margin-bottom: 24px;
         }
         .chart-card::before {
             content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
@@ -154,81 +182,110 @@
         .axis .domain { display: none; }
         .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
 
-        .gem-point {
-            stroke: #fff;
-            stroke-width: 1.5;
-            filter: drop-shadow(0 0 6px rgba(245,166,35,0.5));
-        }
-
-        .highlight-zone {
-            fill: rgba(245,166,35,0.03);
-            stroke: rgba(245,166,35,0.2);
-            stroke-dasharray: 4,4;
-            stroke-width: 1;
-        }
-
-        .gems-panel {
-            margin-top: 24px;
-            background: linear-gradient(135deg, rgba(245,166,35,0.05) 0%, rgba(52,211,153,0.03) 100%);
-            border: 1px solid rgba(245,166,35,0.15);
+        /* Insight Panel (seperti Case 6) */
+        .insight-panel {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
             border-radius: var(--radius-lg);
-            padding: 20px 24px;
+            padding: 24px;
+            margin-bottom: 24px;
         }
-        .gems-panel h3 {
+        .insight-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        .insight-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-sm);
+            background: rgba(245,166,35,.15);
+            border: 1px solid rgba(245,166,35,.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--gold);
+        }
+        .insight-title {
             font-size: 13px;
             font-weight: 700;
             letter-spacing: .08em;
             text-transform: uppercase;
-            color: var(--gold);
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            color: var(--text-primary);
+        }
+        .insight-subtitle {
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .insights-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 14px;
+        }
+        .insight-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 14px;
+            border-left: 3px solid var(--gold);
+        }
+        .ic-num {
+            font-size: 1.2rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .ic-label {
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .08em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+        .ic-desc {
+            font-size: 11px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
+        /* Gems Panel */
+        .gems-panel {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            margin-top: 24px;
+        }
+        .gems-panel h3 {
+            font-size: 11px; font-weight: 700; letter-spacing: .1em;
+            text-transform: uppercase; color: var(--text-muted);
+            padding: 12px 20px;
+            background: rgba(245,166,35,0.05);
+            border-bottom: 1px solid var(--border);
+            display: flex; align-items: center; gap: 8px;
         }
         .gems-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-            gap: 12px;
+            gap: 8px;
+            padding: 16px;
+            max-height: 360px;
+            overflow-y: auto;
         }
         .gem-card {
-            background: var(--bg-elevated);
+            background: var(--bg-card);
             border: 1px solid var(--border);
             border-radius: var(--radius-md);
-            padding: 14px 16px;
-            transition: transform .2s, border-color .2s;
+            padding: 12px 16px;
+            transition: all .2s;
             cursor: pointer;
         }
-        .gem-card:hover {
-            transform: translateX(4px);
-            border-color: var(--gold);
-            background: rgba(245,166,35,0.05);
-        }
-        .gem-title {
-            font-weight: 700;
-            font-size: 14px;
-            color: var(--text-primary);
-            margin-bottom: 8px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .gem-score {
-            display: inline-flex;
-            align-items: center;
-            gap: 3px;
-            background: rgba(245,166,35,0.15);
-            padding: 2px 6px;
-            border-radius: 5px;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--gold);
-        }
-        .gem-details {
-            display: flex;
-            gap: 16px;
-            font-size: 11px;
-            color: var(--text-muted);
-        }
+        .gem-card:hover { transform: translateX(4px); border-color: var(--gold); background: rgba(245,166,35,0.05); }
+        .gem-title { font-weight: 700; font-size: 13px; color: var(--text-primary); margin-bottom: 6px; display: flex; justify-content: space-between; align-items: center; }
+        .gem-score { display: inline-flex; align-items: center; gap: 3px; background: rgba(245,166,35,0.15); padding: 2px 6px; border-radius: 5px; font-size: 10px; font-weight: 700; color: var(--gold); }
+        .gem-details { display: flex; gap: 16px; font-size: 10px; color: var(--text-muted); }
         .gem-budget { color: var(--accent); }
         .gem-gross { color: var(--teal); }
         .gem-roi { color: var(--gold); }
@@ -236,7 +293,7 @@
         .legend-wrap {
             display: flex;
             flex-wrap: wrap;
-            gap: 20px;
+            gap: 16px;
             margin-top: 20px;
             justify-content: center;
         }
@@ -253,13 +310,9 @@
 
         @media (max-width: 768px) {
             .page-wrap { padding: 20px 16px 60px; }
-            .filters-grid { grid-template-columns: 1fr 1fr; }
-            .stats-strip { width: 100%; }
-            .sstat { padding: 10px 16px; flex: 1; }
+            .controls-row { flex-direction: column; align-items: stretch; }
+            .btn-reset { margin-left: 0; width: 100%; }
             .gems-grid { grid-template-columns: 1fr; }
-        }
-        @media (max-width: 550px) {
-            .filters-grid { grid-template-columns: 1fr; }
         }
 
         @keyframes spin { to { transform: rotate(360deg); } }
@@ -273,11 +326,10 @@
             z-index: 200;
             font-family: 'Inter', sans-serif;
             font-size: 12px;
-            color: var(--text-primary);
-            box-shadow: 0 12px 48px rgba(0,0,0,.7);
-            min-width: 220px;
+            min-width: 260px;
             opacity: 0;
             transition: opacity .15s ease;
+            box-shadow: 0 12px 48px rgba(0,0,0,.7);
         }
         .tooltip-scatter.visible { opacity: 1; }
     </style>
@@ -291,16 +343,14 @@
             <span class="brand-text">VISDAT</span>
             <span class="brand-sub">KLP 10</span>
         </a>
-        <div class="topbar-case">
-            Case <span>05</span> · Hidden Gems
-        </div>
+        <div class="topbar-case">Case <span>05</span> · Hidden Gems</div>
     </div>
 </div>
 
 <div class="page-wrap">
 
     <a href="../index.html" class="back-btn">
-        <svg viewBox="0 0 20 20" fill="currentColor">
+        <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
             <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
         </svg>
         Kembali ke Dashboard
@@ -314,76 +364,90 @@
     <p class="case-desc">
         Film-film yang menjadi <strong style="color:var(--gold)">anomali positif</strong> dalam industri: 
         <strong style="color:var(--gold)">kualitas tinggi (IMDb ≥ 8.0)</strong> namun dibuat dengan 
-        <strong style="color:var(--accent)">budget rendah (&lt; $10 juta)</strong>. 
-        Titik-titik <span style="color:var(--gold)">⭐ emas</span> di scatter plot ini adalah "hidden gems" — 
-        bukti bahwa kreativitas dan cerita yang kuat tidak selalu membutuhkan anggaran besar.
+        <strong style="color:var(--accent)">budget rendah (< $10 juta)</strong>. 
+        Titik-titik <span style="color:var(--gold)">⭐ emas</span> di scatter plot ini adalah "hidden gems".
     </p>
 
-    <div class="stats-strip">
-        <div class="sstat">
-            <span class="sstat-val" id="stat-total">—</span>
-            <span class="sstat-lbl">Total Film</span>
+    <!-- Stats Grid -->
+    <div class="stats-grid">
+        <div class="stat-card sc-total">
+            <div class="stat-lbl">Total Film</div>
+            <div class="stat-val" id="stat-total">—</div>
+            <div class="stat-sub">dalam filter aktif</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-gems">—</span>
-            <span class="sstat-lbl">Hidden Gems</span>
+        <div class="stat-card sc-gems">
+            <div class="stat-lbl">Hidden Gems</div>
+            <div class="stat-val" id="stat-gems">—</div>
+            <div class="stat-sub">⭐ Kualitas Tinggi + Budget Rendah</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-avg-gem-roi">—</span>
-            <span class="sstat-lbl">Rata-rata ROI Gems</span>
+        <div class="stat-card sc-roi">
+            <div class="stat-lbl">Rata-rata ROI Gems</div>
+            <div class="stat-val" id="stat-avg-roi">—</div>
+            <div class="stat-sub">vs ROI semua film</div>
         </div>
-        <div class="sstat">
-            <span class="sstat-val" id="stat-top-gem">—</span>
-            <span class="sstat-lbl">Skor Tertinggi Gems</span>
-        </div>
-    </div>
-
-    <div class="filter-card">
-        <div class="filter-card-title">Filter Eksplorasi</div>
-        <div class="filters-grid">
-            <div class="fgroup">
-                <label class="flabel">Genre</label>
-                <select class="f-select" id="genre-select">
-                    <option value="">Semua Genre</option>
-                </select>
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Tahun (min)</label>
-                <input type="number" class="f-input" id="year-min" value="1986" min="1986" max="2016" step="1">
-            </div>
-            <div class="fgroup">
-                <label class="flabel">Tahun (max)</label>
-                <input type="number" class="f-input" id="year-max" value="2016" min="1986" max="2016" step="1">
-            </div>
-            <div class="fgroup">
-                <button class="btn-reset" id="btn-reset">
-                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" width="14" height="14">
-                        <path d="M3 8a5 5 0 105 5"/><path d="M3 5V8H6"/>
-                    </svg>
-                    Reset
-                </button>
-            </div>
+        <div class="stat-card sc-top">
+            <div class="stat-lbl">Skor Tertinggi Gems</div>
+            <div class="stat-val" id="stat-top-score">—</div>
+            <div class="stat-sub" id="stat-top-score-name">—</div>
         </div>
     </div>
 
+    <!-- Controls Row -->
+    <div class="controls-row">
+        <div class="filter-group">
+            <label>🎭 Genre</label>
+            <select id="genre-select">
+                <option value="">Semua Genre</option>
+            </select>
+        </div>
+        <div class="filter-group">
+            <label>📅 Tahun</label>
+            <div class="range-slider-wrap">
+                <input type="range" id="year-min" min="1986" max="2016" value="1986">
+                <span style="color:var(--text-muted);font-weight:700;">-</span>
+                <input type="range" id="year-max" min="1986" max="2016" value="2016">
+                <span id="year-range-label" style="font-size:11px;color:var(--gold);font-weight:700;">1986 - 2016</span>
+            </div>
+        </div>
+        <button class="btn-reset" id="btn-reset">↺ Reset Filter</button>
+    </div>
+
+    <!-- Chart Card -->
     <div class="chart-card">
         <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 500px; flex-direction: column; gap: 16px;">
-            <div style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin .7s linear infinite;"></div>
+            <div style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: var(--gold); border-radius: 50%; animation: spin .7s linear infinite;"></div>
             <span style="color: var(--text-muted);">Memuat data film...</span>
         </div>
         <svg id="scatter-chart" width="100%" height="540" style="display: none;"></svg>
         <div class="legend-wrap">
             <div class="legend-item"><span class="legend-dot" style="background: rgba(148,148,168,0.5);"></span><span>Film Biasa</span></div>
-            <div class="legend-item"><span class="legend-dot gem" style="background: var(--gold); box-shadow: 0 0 6px var(--gold);"></span><span>⭐ Hidden Gems (Score ≥ 8.0, Budget &lt; $10M)</span></div>
+            <div class="legend-item"><span class="legend-dot gem" style="background: var(--gold);"></span><span>⭐ Hidden Gems (Score ≥ 8.0, Budget < $10M)</span></div>
         </div>
     </div>
 
+    <!-- Insight Panel -->
+    <div class="insight-panel">
+        <div class="insight-header">
+            <div class="insight-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                </svg>
+            </div>
+            <div>
+                <div class="insight-title">Hidden Gems Analysis</div>
+                <div class="insight-subtitle">Film berkualitas dengan budget rendah</div>
+            </div>
+        </div>
+        <div class="insights-grid" id="insights-grid"></div>
+    </div>
+
+    <!-- Gems Panel -->
     <div class="gems-panel" id="gems-panel" style="display: none;">
         <h3>
-            <svg viewBox="0 0 20 20" fill="currentColor" width="16" height="16" style="color: var(--gold);">
+            <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor" style="color: var(--gold);">
                 <polygon points="10 2 12.5 7.5 18 8.5 14 12.5 15 18 10 15 5 18 6 12.5 2 8.5 7.5 7.5 10 2"/>
             </svg>
-            Daftar Hidden Gems
+            Daftar Hidden Gems (Klik untuk sorot di chart)
         </h3>
         <div class="gems-grid" id="gems-grid"></div>
     </div>
@@ -398,50 +462,35 @@
 // CONFIGURATION
 // ═══════════════════════════════════════════════════════════════
 const GENRE_COLORS = {
-    'Comedy':    '#e05c3a',
-    'Action':    '#2dd4bf',
-    'Drama':     '#a78bfa',
-    'Crime':     '#f59e0b',
-    'Biography': '#60a5fa',
-    'Adventure': '#34d399',
-    'Animation': '#f97316',
-    'Horror':    '#fb7185',
-    'Thriller':  '#8b5cf6',
-    'Romance':   '#ec4899',
-    'Sci-Fi':    '#06b6d4',
-    'Fantasy':   '#d946ef',
-    'Family':    '#84cc16',
-    'Music':     '#f43f5e',
-    'Mystery':   '#6366f1',
-    'History':   '#14b8a6',
-    'War':       '#ef4444',
-    'Western':   '#b45309',
+    'Comedy': '#e05c3a', 'Action': '#2dd4bf', 'Drama': '#a78bfa',
+    'Crime': '#f59e0b', 'Biography': '#60a5fa', 'Adventure': '#34d399',
+    'Animation': '#f97316', 'Horror': '#fb7185', 'Thriller': '#8b5cf6'
 };
+
+const GEM_SCORE = 8.0;
+const GEM_BUDGET = 10000000;
 
 let allData = [];
 let currentData = [];
 let currentGems = [];
-let width, height;
-
-const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
-const GEM_SCORE_THRESHOLD = 8.0;
-const GEM_BUDGET_THRESHOLD = 10000000; // $10M
 
 function fmtMoney(v) {
-    if (!v || isNaN(v) || v <= 0) return 'N/A';
+    if (!v || v <= 0) return 'N/A';
     if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
     if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
-    if (v >= 1e3) return '$' + (v / 1e3).toFixed(0) + 'K';
     return '$' + Math.round(v);
 }
 
-function calcROI(budget, gross) {
-    if (!budget || budget <= 0 || !gross || gross <= 0) return null;
-    return (gross - budget) / budget;
+function calcROI(b, g) {
+    return (b && g && b > 0) ? (g - b) / b : null;
 }
 
-function isHiddenGem(d) {
-    return d.score >= GEM_SCORE_THRESHOLD && d.budget > 0 && d.budget < GEM_BUDGET_THRESHOLD;
+function isGem(d) {
+    return d.score >= GEM_SCORE && d.budget > 0 && d.budget < GEM_BUDGET;
+}
+
+function truncate(str, n) {
+    return str.length > n ? str.slice(0, n) + '…' : str;
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -453,11 +502,12 @@ d3.csv('../data/movies.csv').then(raw => {
         genre: d.genre || 'Other',
         year: +d.year || 0,
         score: parseFloat(d.score) || 0,
-        gross: parseFloat(d.gross) || 0,
         budget: parseFloat(d.budget) || 0,
+        gross: parseFloat(d.gross) || 0,
         votes: parseFloat(d.votes) || 0,
     })).filter(d => d.year >= 1980 && d.name && d.score > 0 && d.budget > 0 && d.genre);
 
+    // Populate genre dropdown
     const genres = [...new Set(allData.map(d => d.genre))].filter(Boolean).sort();
     const sel = document.getElementById('genre-select');
     genres.forEach(g => {
@@ -467,13 +517,28 @@ d3.csv('../data/movies.csv').then(raw => {
         sel.appendChild(opt);
     });
 
+    // Setup range slider labels
+    const yearMin = document.getElementById('year-min');
+    const yearMax = document.getElementById('year-max');
+    const rangeLabel = document.getElementById('year-range-label');
+    
+    yearMin.addEventListener('input', () => {
+        if (parseInt(yearMin.value) > parseInt(yearMax.value)) yearMax.value = yearMin.value;
+        rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
+        applyFilters();
+    });
+    yearMax.addEventListener('input', () => {
+        if (parseInt(yearMax.value) < parseInt(yearMin.value)) yearMin.value = yearMax.value;
+        rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
+        applyFilters();
+    });
+
     document.getElementById('loading').style.display = 'none';
     document.getElementById('scatter-chart').style.display = 'block';
     document.getElementById('gems-panel').style.display = 'block';
-    
     applyFilters();
 }).catch(err => {
-    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small></div>`;
+    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small><br>Pastikan file data/movies.csv ada</div>`;
 });
 
 // ═══════════════════════════════════════════════════════════════
@@ -490,11 +555,12 @@ function applyFilters() {
         return true;
     });
 
-    currentGems = currentData.filter(d => isHiddenGem(d)).sort((a, b) => b.score - a.score);
+    currentGems = currentData.filter(isGem).sort((a, b) => b.score - a.score);
     
     updateStats();
+    updateInsights();
     renderChart();
-    renderGemsList();
+    renderGems();
 }
 
 function updateStats() {
@@ -506,16 +572,59 @@ function updateStats() {
     
     if (gemsCount > 0) {
         const avgROI = d3.mean(currentGems.map(g => calcROI(g.budget, g.gross)).filter(v => v !== null));
-        document.getElementById('stat-avg-gem-roi').textContent = (avgROI || 0).toFixed(2) + 'x';
+        document.getElementById('stat-avg-roi').textContent = (avgROI || 0).toFixed(2) + 'x';
         const topGem = currentGems[0];
-        document.getElementById('stat-top-gem').textContent = topGem ? topGem.score.toFixed(1) : '—';
+        document.getElementById('stat-top-score').textContent = topGem ? topGem.score.toFixed(1) : '—';
+        document.getElementById('stat-top-score-name').textContent = topGem ? truncate(topGem.name, 25) : '—';
     } else {
-        document.getElementById('stat-avg-gem-roi').textContent = '—';
-        document.getElementById('stat-top-gem').textContent = '—';
+        document.getElementById('stat-avg-roi').textContent = '—';
+        document.getElementById('stat-top-score').textContent = '—';
+        document.getElementById('stat-top-score-name').textContent = '—';
     }
 }
 
-function renderGemsList() {
+function updateInsights() {
+    const gemsCount = currentGems.length;
+    const allRoi = d3.mean(currentData.map(d => calcROI(d.budget, d.gross)).filter(v => v !== null)) || 0;
+    const gemsRoi = d3.mean(currentGems.map(g => calcROI(g.budget, g.gross)).filter(v => v !== null)) || 0;
+    const roiRatio = gemsRoi > 0 ? (gemsRoi / allRoi).toFixed(1) : '—';
+    
+    // Genre distribution in gems
+    const genreCount = {};
+    currentGems.forEach(g => { genreCount[g.genre] = (genreCount[g.genre] || 0) + 1; });
+    const topGenre = Object.entries(genreCount).sort((a, b) => b[1] - a[1])[0];
+    
+    // Year distribution
+    const yearCount = {};
+    currentGems.forEach(g => { yearCount[g.year] = (yearCount[g.year] || 0) + 1; });
+    const topYear = Object.entries(yearCount).sort((a, b) => b[1] - a[1])[0];
+
+    const grid = document.getElementById('insights-grid');
+    grid.innerHTML = `
+        <div class="insight-card">
+            <div class="ic-num">${gemsCount}</div>
+            <div class="ic-label">Total Hidden Gems</div>
+            <div class="ic-desc">Film dengan skor ≥ ${GEM_SCORE} dan budget < $${GEM_BUDGET/1000000}M</div>
+        </div>
+        <div class="insight-card">
+            <div class="ic-num">${gemsRoi > 0 ? gemsRoi.toFixed(2) + 'x' : '—'}</div>
+            <div class="ic-label">Rata-rata ROI Gems</div>
+            <div class="ic-desc">${roiRatio !== '—' ? `${roiRatio}x lebih tinggi` : 'vs'} dari rata-rata ROI semua film (${allRoi > 0 ? allRoi.toFixed(2) + 'x' : '—'})</div>
+        </div>
+        <div class="insight-card">
+            <div class="ic-num">${topGenre ? topGenre[0] : '—'}</div>
+            <div class="ic-label">Genre Paling Sering</div>
+            <div class="ic-desc">Dengan ${topGenre ? topGenre[1] : 0} film hidden gems</div>
+        </div>
+        <div class="insight-card">
+            <div class="ic-num">${topYear ? topYear[0] : '—'}</div>
+            <div class="ic-label">Tahun Keemasan</div>
+            <div class="ic-desc">Jumlah hidden gems terbanyak (${topYear ? topYear[1] : 0} film)</div>
+        </div>
+    `;
+}
+
+function renderGems() {
     const grid = document.getElementById('gems-grid');
     
     if (currentGems.length === 0) {
@@ -528,7 +637,7 @@ function renderGemsList() {
     grid.innerHTML = currentGems.map(gem => {
         const roi = calcROI(gem.budget, gem.gross);
         return `
-            <div class="gem-card" data-movie='${JSON.stringify(gem)}'>
+            <div class="gem-card" data-name="${gem.name.replace(/"/g, '&quot;')}">
                 <div class="gem-title">
                     ${gem.name}
                     <span class="gem-score">⭐ ${gem.score.toFixed(1)}</span>
@@ -548,25 +657,26 @@ function renderGemsList() {
     
     document.querySelectorAll('.gem-card').forEach(card => {
         card.addEventListener('click', () => {
-            const movie = JSON.parse(card.dataset.movie);
-            highlightPoint(movie);
+            const movie = currentGems.find(g => g.name === card.dataset.name);
+            if (movie) highlightPoint(movie);
         });
     });
 }
 
 function highlightPoint(movie) {
     const points = d3.selectAll('.dot');
-    points.classed('highlight-gem', false);
-    d3.selectAll('.dot').filter(function(d) { return d.name === movie.name; })
-        .classed('highlight-gem', true)
+    points.attr('stroke', 'none').attr('stroke-width', 0).attr('fill-opacity', 0.3);
+    points.filter(d => d.name === movie.name)
         .attr('stroke', '#fff')
-        .attr('stroke-width', 2.5);
+        .attr('stroke-width', 2.5)
+        .attr('fill-opacity', 1);
     
     setTimeout(() => {
-        d3.selectAll('.dot.highlight-gem')
-            .classed('highlight-gem', false)
-            .attr('stroke', 'none');
-    }, 2000);
+        points.filter(d => d.name === movie.name)
+            .attr('stroke', 'none')
+            .attr('fill-opacity', 0.9);
+        points.attr('fill-opacity', d => isGem(d) ? 0.9 : 0.5);
+    }, 2500);
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -574,10 +684,8 @@ function highlightPoint(movie) {
 // ═══════════════════════════════════════════════════════════════
 function renderChart() {
     const container = document.getElementById('scatter-chart');
-    const containerRect = container.parentElement.getBoundingClientRect();
-    width = containerRect.width - 40;
-    height = 540;
-
+    const width = Math.max(700, container.parentElement.clientWidth - 40);
+    const height = 540;
     container.setAttribute('width', width);
     container.setAttribute('height', height);
     container.innerHTML = '';
@@ -587,18 +695,17 @@ function renderChart() {
         return;
     }
 
+    const MARGIN = { top: 24, right: 32, bottom: 60, left: 70 };
     const innerW = width - MARGIN.left - MARGIN.right;
     const innerH = height - MARGIN.top - MARGIN.bottom;
-
     const svg = d3.select('#scatter-chart')
         .append('g')
         .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
 
     const xScale = d3.scaleLog()
-        .domain([d3.min(currentData, d => d.budget) || 1, d3.max(currentData, d => d.budget) || 1])
+        .domain([d3.min(currentData, d => d.budget), d3.max(currentData, d => d.budget)])
         .range([0, innerW])
         .nice();
-
     const yScale = d3.scaleLinear()
         .domain([0, 10])
         .range([innerH, 0])
@@ -608,20 +715,20 @@ function renderChart() {
     svg.append('g')
         .attr('class', 'grid')
         .call(d3.axisLeft(yScale).ticks(8).tickSize(-innerW).tickFormat(''))
-        .select('.domain').remove();
-
+        .selectAll('.domain, .tick line')
+        .attr('stroke', 'rgba(255,255,255,.05)');
     svg.append('g')
         .attr('class', 'grid')
         .attr('transform', `translate(0,${innerH})`)
         .call(d3.axisBottom(xScale).ticks(6).tickSize(-innerH).tickFormat(''))
-        .select('.domain').remove();
+        .selectAll('.domain, .tick line')
+        .attr('stroke', 'rgba(255,255,255,.05)');
 
     // Axes
     svg.append('g')
         .attr('class', 'axis')
         .attr('transform', `translate(0,${innerH})`)
         .call(d3.axisBottom(xScale).tickFormat(d3.format('~s')));
-
     svg.append('g')
         .attr('class', 'axis')
         .call(d3.axisLeft(yScale).tickFormat(d => d.toFixed(1)));
@@ -634,9 +741,7 @@ function renderChart() {
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', 11)
         .attr('font-weight', 600)
-        .attr('letter-spacing', '.08em')
         .text('BUDGET (USD) → (log scale)');
-
     svg.append('text')
         .attr('transform', 'rotate(-90)')
         .attr('x', -innerH / 2)
@@ -645,17 +750,16 @@ function renderChart() {
         .attr('fill', 'var(--text-muted)')
         .attr('font-size', 11)
         .attr('font-weight', 600)
-        .attr('letter-spacing', '.08em')
         .text('IMDb SCORE →');
 
-    // Highlight zone for hidden gems (budget < $10M, score ≥ 8.0)
+    // Highlight zone for hidden gems
     const zoneX = xScale(1);
-    const zoneWidth = xScale(GEM_BUDGET_THRESHOLD) - zoneX;
+    const zoneWidth = xScale(GEM_BUDGET) - zoneX;
     svg.append('rect')
         .attr('x', zoneX)
-        .attr('y', yScale(GEM_SCORE_THRESHOLD))
+        .attr('y', yScale(GEM_SCORE))
         .attr('width', zoneWidth)
-        .attr('height', innerH - yScale(GEM_SCORE_THRESHOLD))
+        .attr('height', innerH - yScale(GEM_SCORE))
         .attr('fill', 'rgba(245,166,35,0.03)')
         .attr('stroke', 'rgba(245,166,35,0.2)')
         .attr('stroke-dasharray', '4,4')
@@ -663,13 +767,12 @@ function renderChart() {
 
     svg.append('line')
         .attr('x1', zoneX)
-        .attr('y1', yScale(GEM_SCORE_THRESHOLD))
-        .attr('x2', xScale(GEM_BUDGET_THRESHOLD))
-        .attr('y2', yScale(GEM_SCORE_THRESHOLD))
+        .attr('y1', yScale(GEM_SCORE))
+        .attr('x2', xScale(GEM_BUDGET))
+        .attr('y2', yScale(GEM_SCORE))
         .attr('stroke', 'rgba(245,166,35,0.3)')
         .attr('stroke-dasharray', '4,4');
 
-    // Annotation text
     svg.append('text')
         .attr('x', xScale(5000000))
         .attr('y', yScale(8.3))
@@ -678,7 +781,7 @@ function renderChart() {
         .attr('font-weight', 600)
         .text('⭐ HIDDEN GEMS ZONE');
 
-    // Reference line: score 7.0
+    // Reference line score 7.0
     svg.append('line')
         .attr('x1', 0)
         .attr('y1', yScale(7.0))
@@ -688,82 +791,66 @@ function renderChart() {
         .attr('stroke-dasharray', '3,4');
 
     // Points
+    const tooltip = d3.select('#tooltip');
     svg.selectAll('.dot')
         .data(currentData)
         .enter()
         .append('circle')
-        .attr('class', d => isHiddenGem(d) ? 'dot gem-point' : 'dot')
+        .attr('class', d => isGem(d) ? 'dot gem-point' : 'dot')
         .attr('cx', d => xScale(d.budget))
         .attr('cy', d => yScale(d.score))
-        .attr('r', d => isHiddenGem(d) ? 6 : 3)
-        .attr('fill', d => isHiddenGem(d) ? 'var(--gold)' : (GENRE_COLORS[d.genre] || '#888'))
-        .attr('fill-opacity', d => isHiddenGem(d) ? 0.9 : 0.5)
-        .attr('stroke', d => isHiddenGem(d) ? '#fff' : 'none')
-        .attr('stroke-width', d => isHiddenGem(d) ? 1.2 : 0)
+        .attr('r', d => isGem(d) ? 6 : 3.5)
+        .attr('fill', d => isGem(d) ? 'var(--gold)' : (GENRE_COLORS[d.genre] || '#888'))
+        .attr('fill-opacity', d => isGem(d) ? 0.9 : 0.5)
+        .attr('stroke', d => isGem(d) ? '#fff' : 'none')
+        .attr('stroke-width', d => isGem(d) ? 1.2 : 0)
         .on('mouseenter', function(event, d) {
-            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 2);
-            showTooltip(event, d);
+            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 2.5);
+            const roi = calcROI(d.budget, d.gross);
+            tooltip.html(`
+                <div style="margin-bottom: 8px;">
+                    <span style="font-weight: 700;">${d.name}</span> ${isGem(d) ? '<span style="color:var(--gold);">⭐</span>' : ''}
+                </div>
+                <div class="tt-row"><span style="color:var(--text-muted);">📅 ${d.year} · 🎭 ${d.genre}</span></div>
+                <div class="tt-row"><span style="color:var(--text-muted);">⭐ IMDb Score</span><span style="color:#f59e0b;font-weight:700;">${d.score.toFixed(1)}</span></div>
+                <div class="tt-row"><span style="color:var(--text-muted);">💰 Budget</span><span style="color:#e05c3a;">${fmtMoney(d.budget)}</span></div>
+                <div class="tt-row"><span style="color:var(--text-muted);">📈 Gross</span><span style="color:#2dd4bf;">${fmtMoney(d.gross)}</span></div>
+                <div class="tt-row"><span style="color:var(--text-muted);">📊 ROI</span><span style="color:#34d399;font-weight:700;">${roi !== null ? roi.toFixed(2) + 'x' : '—'}</span></div>
+                ${isGem(d) ? '<div style="margin-top:8px; padding-top:6px; border-top:1px solid rgba(245,166,35,.2); color:var(--gold); font-size:10px;">✨ Hidden Gem — Kualitas tinggi dengan budget rendah</div>' : ''}
+            `);
+            tooltip.classed('visible', true);
+            const left = event.clientX + 14;
+            const top = event.clientY - 10;
+            tooltip.style('left', Math.min(left, window.innerWidth - 280) + 'px')
+                   .style('top', Math.max(8, top) + 'px');
         })
         .on('mouseleave', function(event, d) {
-            d3.select(this).attr('stroke', isHiddenGem(d) ? '#fff' : 'none').attr('stroke-width', isHiddenGem(d) ? 1.2 : 0);
-            hideTooltip();
+            d3.select(this).attr('stroke', isGem(d) ? '#fff' : 'none').attr('stroke-width', isGem(d) ? 1.2 : 0);
+            tooltip.classed('visible', false);
         });
-
-    function showTooltip(event, d) {
-        const tooltip = document.getElementById('tooltip');
-        const roi = calcROI(d.budget, d.gross);
-        const isGem = isHiddenGem(d);
-        tooltip.innerHTML = `
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
-                <span style="color: var(--text-muted);">🎬 Film</span>
-                <span style="font-weight: 700; ${isGem ? 'color: var(--gold);' : ''}">${d.name} ${isGem ? '⭐' : ''}</span>
-            </div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">📅 Tahun</span><span style="font-weight: 700;">${d.year}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">🎭 Genre</span><span style="font-weight: 700;">${d.genre}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">⭐ IMDb</span><span style="font-weight: 700; color: #f59e0b;">${d.score.toFixed(1)}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">💰 Budget</span><span style="font-weight: 700; color: var(--accent);">${fmtMoney(d.budget)}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">📈 Gross</span><span style="font-weight: 700; color: var(--teal);">${fmtMoney(d.gross)}</span></div>
-            <div style="display: flex; justify-content: space-between; margin-bottom: 6px;"><span style="color: var(--text-muted);">📊 ROI</span><span style="font-weight: 700;">${roi !== null ? roi.toFixed(2) + 'x' : '—'}</span></div>
-            <div style="display: flex; justify-content: space-between;"><span style="color: var(--text-muted);">🗳️ Votes</span><span style="font-weight: 700;">${d.votes.toLocaleString('id-ID')}</span></div>
-            ${isGem ? '<div style="margin-top:8px; padding-top:6px; border-top:1px solid rgba(245,166,35,.2); color:var(--gold); font-size:10px;">✨ Hidden Gem — Kualitas tinggi dengan budget rendah</div>' : ''}
-        `;
-
-        const left = event.clientX + 14;
-        const top = event.clientY - 10;
-        tooltip.style.left = Math.min(left, window.innerWidth - 260) + 'px';
-        tooltip.style.top = Math.max(8, top) + 'px';
-        tooltip.classList.add('visible');
-    }
-
-    function hideTooltip() {
-        const tooltip = document.getElementById('tooltip');
-        tooltip.classList.remove('visible');
-    }
 }
 
+// ═══════════════════════════════════════════════════════════════
+// EVENT LISTENERS
+// ═══════════════════════════════════════════════════════════════
 function debounce(fn, ms) {
     let timer;
     return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
 }
 
-const debouncedRender = debounce(() => applyFilters(), 200);
-
 document.getElementById('genre-select').addEventListener('change', applyFilters);
-document.getElementById('year-min').addEventListener('input', debouncedRender);
-document.getElementById('year-max').addEventListener('input', debouncedRender);
 document.getElementById('btn-reset').addEventListener('click', () => {
     document.getElementById('genre-select').value = '';
     document.getElementById('year-min').value = '1986';
     document.getElementById('year-max').value = '2016';
+    document.getElementById('year-range-label').textContent = '1986 - 2016';
     applyFilters();
 });
 
 let resizeTimer;
 window.addEventListener('resize', () => {
     clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        if (currentData.length) renderChart();
-    }, 200);
+    resizeTimer = setTimeout(() => { if (currentData.length) renderChart(); }, 200);
 });
 </script>
 </body>
