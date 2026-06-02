@@ -1,0 +1,942 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case 6: Treemap Eksplorasi Karakteristik Mahasiswa</title>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <style>
+        :root {
+            --bg: #faf5ff;
+            --card-bg: #ffffff;
+            --text: #0f172a;
+            --text-secondary: #475569;
+            --accent: #7c3aed;
+            --accent-light: #ede9fe;
+            --accent-dark: #5b21b6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --border: #e2e8f0;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+            --radius: 20px;
+            --radius-sm: 12px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: linear-gradient(160deg, #faf5ff 0%, #f8fafc 40%, #f0fdf4 100%);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px 12px;
+            line-height: 1.7;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .dashboard-container {
+            width: 100%;
+            max-width: 1100px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            animation: fadeSlideUp 0.8s ease forwards;
+        }
+
+        @keyframes fadeSlideUp {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ===== HEADER ===== */
+        .story-header {
+            text-align: center;
+            padding: 8px 0 0;
+        }
+
+        .story-header .eyebrow {
+            display: inline-block;
+            background: var(--accent-light);
+            color: var(--accent-dark);
+            font-size: 0.68rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            padding: 5px 16px;
+            border-radius: 100px;
+            margin-bottom: 10px;
+        }
+
+        .story-header h1 {
+            font-size: clamp(1.2rem, 2.2vw, 1.8rem);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            margin-bottom: 4px;
+        }
+
+        .story-header .subtitle {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            max-width: 650px;
+            margin: 0 auto;
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .stat-item {
+            background: #ffffff;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 8px 14px;
+            text-align: center;
+            min-width: 75px;
+            flex: 1;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        .stat-item .stat-value {
+            font-size: 1.2rem;
+            font-weight: 900;
+            color: var(--accent-dark);
+        }
+
+        .stat-item .stat-label {
+            font-size: 0.6rem;
+            color: var(--text-secondary);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        /* ===== KARTU ===== */
+        .card {
+            background: var(--card-bg);
+            border-radius: var(--radius);
+            padding: 18px 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        .card-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .card-header h2 {
+            font-size: 1.1rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge {
+            background: linear-gradient(135deg, #ede9fe, #ddd6fe);
+            color: #5b21b6;
+            font-size: 0.58rem;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 100px;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        /* ===== KONTROL DIMENSI ===== */
+        .dimension-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 12px;
+        }
+
+        .dim-tab {
+            padding: 7px 14px;
+            border-radius: 8px;
+            border: 1.5px solid var(--border);
+            font-size: 0.73rem;
+            font-weight: 600;
+            cursor: pointer;
+            background: #ffffff;
+            color: var(--text-secondary);
+            transition: all 0.2s;
+            font-family: inherit;
+            white-space: nowrap;
+        }
+
+        .dim-tab:hover {
+            background: var(--accent-light);
+            border-color: var(--accent);
+            color: var(--accent-dark);
+        }
+
+        .dim-tab.active {
+            background: var(--accent);
+            color: #ffffff;
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px -4px rgba(124, 58, 237, 0.4);
+        }
+
+        /* ===== TOOLTIP ===== */
+        .tooltip {
+            position: fixed;
+            background: rgba(15, 23, 42, 0.96);
+            backdrop-filter: blur(14px);
+            -webkit-backdrop-filter: blur(14px);
+            color: #f1f5f9;
+            padding: 12px 16px;
+            border-radius: 12px;
+            font-size: 0.78rem;
+            font-weight: 500;
+            pointer-events: none;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.15s ease, visibility 0.15s ease;
+            box-shadow: 0 16px 32px -8px rgba(0, 0, 0, 0.5);
+            z-index: 99999;
+            line-height: 1.6;
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            max-width: 260px;
+            min-width: 180px;
+        }
+
+        .tooltip.visible {
+            opacity: 1 !important;
+            visibility: visible !important;
+        }
+
+        .tooltip .tt-title {
+            font-weight: 800;
+            font-size: 0.85rem;
+            color: #ffffff;
+            display: block;
+            margin-bottom: 4px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .tooltip .tt-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            font-size: 0.73rem;
+            padding: 2px 0;
+        }
+
+        .tooltip .tt-row .lbl {
+            color: #94a3b8;
+        }
+
+        .tooltip .tt-row .val {
+            color: #fbbf24;
+            font-weight: 700;
+        }
+
+        .tooltip .tt-total {
+            font-size: 0.68rem;
+            color: #64748b;
+            margin-top: 4px;
+            padding-top: 4px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* ===== CHART ===== */
+        .vis-wrapper {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .chart-container {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .chart-container svg {
+            width: 100%;
+            height: auto;
+            max-height: 500px;
+            display: block;
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+        }
+
+        /* ===== TILE ===== */
+        .tile-bg {
+            transition: filter 0.15s ease, stroke 0.15s ease;
+        }
+
+        .tile:hover .tile-bg {
+            filter: brightness(1.1);
+            stroke: #0f172a !important;
+            stroke-width: 2.5 !important;
+        }
+
+        .tile-text {
+            pointer-events: none;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+
+        /* ===== LEGENDA ===== */
+        .legend-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+            flex-shrink: 0;
+        }
+
+        /* ===== INSIGHT ===== */
+        .insight-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 12px;
+        }
+
+        .insight-card {
+            padding: 14px 16px;
+            border-radius: var(--radius-sm);
+            font-size: 0.78rem;
+            font-weight: 500;
+            display: flex;
+            gap: 8px;
+            align-items: flex-start;
+            border-left: 4px solid;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .insight-card.findings {
+            background: #fef3c7;
+            border-left-color: #f59e0b;
+            color: #78350f;
+        }
+
+        .insight-card.story {
+            background: #ede9fe;
+            border-left-color: #8b5cf6;
+            color: #4c1d95;
+        }
+
+        .insight-card.action {
+            background: #d1fae5;
+            border-left-color: #10b981;
+            color: #065f46;
+        }
+
+        .insight-card .icon {
+            font-size: 1.3rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
+
+        .highlight-num {
+            font-weight: 900;
+            font-size: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+
+            .card {
+                padding: 12px 10px;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .dimension-tabs {
+                gap: 4px;
+            }
+
+            .dim-tab {
+                padding: 6px 10px;
+                font-size: 0.68rem;
+            }
+
+            .chart-container svg {
+                max-height: 380px;
+            }
+
+            .tooltip {
+                max-width: 220px;
+                padding: 10px 12px;
+                font-size: 0.72rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="dashboard-container">
+
+        <!-- HEADER -->
+        <div class="story-header">
+            <div class="eyebrow">📖 Case Study #6</div>
+            <h1>🧩 Treemap: Eksplorasi Multi-Dimensi Karakteristik Mahasiswa</h1>
+            <p class="subtitle">
+                Pilih dimensi untuk melihat distribusi mahasiswa.
+                <strong>Ukuran kotak = jumlah mahasiswa</strong>,
+                <strong>warna = persentase yang berhasil ditempatkan</strong>.
+            </p>
+        </div>
+
+        <!-- STATS -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">10,000</div>
+                <div class="stat-label">Total Mahasiswa</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100</div>
+                <div class="stat-label">Kampus</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">16.6%</div>
+                <div class="stat-label">Rata-rata Ditempatkan</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="tile-count">-</div>
+                <div class="stat-label">Kategori Aktif</div>
+            </div>
+        </div>
+
+        <!-- KARTU UTAMA -->
+        <div class="card">
+            <div class="card-header">
+                <h2><span>🧩</span> Treemap Multi-Dimensi <span class="badge">5 Dimensi</span></h2>
+            </div>
+
+            <!-- Tab Dimensi -->
+            <div class="dimension-tabs" id="dimension-tabs">
+                <button class="dim-tab active" data-dim="College_ID">🏫 Kampus</button>
+                <button class="dim-tab" data-dim="Academic_Performance">📊 Performa Akademik</button>
+                <button class="dim-tab" data-dim="Extra_Curricular_Score">🎭 Ekstrakurikuler</button>
+                <button class="dim-tab" data-dim="Communication_Skills">💬 Komunikasi</button>
+                <button class="dim-tab" data-dim="Projects_Completed">📁 Proyek</button>
+            </div>
+
+            <!-- Chart -->
+            <div class="vis-wrapper">
+                <div id="custom-tooltip" class="tooltip"></div>
+                <div class="chart-container" id="chart-container">
+                    <svg id="main-svg"></svg>
+                </div>
+                <div class="legend-bar">
+                    <span><span class="legend-dot" style="background:#10b981;"></span> Ditempatkan ≥ 20%</span>
+                    <span><span class="legend-dot" style="background:#f59e0b;"></span> 15-20%</span>
+                    <span><span class="legend-dot" style="background:#ef4444;"></span> &lt; 15%</span>
+                    <span style="margin-left:4px;font-size:0.65rem;color:#94a3b8;">Hover untuk detail</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- INSIGHT -->
+        <div class="insight-grid" id="insight-grid">
+            <div class="insight-card findings">
+                <span class="icon">🔍</span>
+                <div>
+                    <strong>Distribusi Tidak Merata</strong>
+                    <p style="margin-top:2px;font-size:0.75rem;">
+                        Tingkat penempatan bervariasi antar kategori.
+                        Kampus dengan performa akademik tinggi cenderung memiliki
+                        tingkat penempatan lebih baik.
+                    </p>
+                </div>
+            </div>
+            <div class="insight-card story">
+                <span class="icon">📖</span>
+                <div>
+                    <strong>Pola Menarik</strong>
+                    <p style="margin-top:2px;font-size:0.75rem;">
+                        Mahasiswa dengan <strong>Communication Skills 8-10</strong> dan
+                        <strong>Projects ≥ 3</strong> memiliki tingkat penempatan
+                        yang lebih tinggi dibanding kategori lainnya.
+                    </p>
+                </div>
+            </div>
+            <div class="insight-card action">
+                <span class="icon">💡</span>
+                <div>
+                    <strong>Cara Eksplorasi</strong>
+                    <p style="margin-top:2px;font-size:0.75rem;">
+                        <strong>Klik tab dimensi</strong> di atas untuk melihat
+                        distribusi dari sudut pandang berbeda.
+                        Hover tile untuk melihat statistik detail.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // =============================================
+        // CASE 6: TREEMAP MULTI-DIMENSI (SIMPLIFIED)
+        // - 5 dimensi analisis via tab
+        // - Tidak ada drill-down
+        // - Tooltip dekat kursor, tidak keluar frame
+        // - Warna = % penempatan, Ukuran = jumlah mahasiswa
+        // =============================================
+
+        const CONFIG = {
+            DATA_PATH: '../data/college_student_placement_dataset.csv',
+            MARGIN: { top: 5, right: 5, bottom: 25, left: 5 },
+
+            // Definisi 5 dimensi
+            DIMENSIONS: [
+                { key: 'College_ID', label: 'Kampus', icon: '🏫' },
+                { key: 'Academic_Performance', label: 'Performa Akademik', icon: '📊' },
+                { key: 'Extra_Curricular_Score', label: 'Skor Ekstrakurikuler', icon: '🎭' },
+                { key: 'Communication_Skills', label: 'Kemampuan Komunikasi', icon: '💬' },
+                { key: 'Projects_Completed', label: 'Proyek Diselesaikan', icon: '📁' },
+            ],
+        };
+
+        let fullData = [];
+        let currentDimension = 'College_ID';
+
+        // =============================================
+        // 1. SAFE DOM HELPERS
+        // =============================================
+        function safeText(id, text) {
+            const el = document.getElementById(id);
+            if (el) el.textContent = text;
+        }
+
+        // =============================================
+        // 2. LOAD DATA
+        // =============================================
+        async function loadData() {
+            const container = document.getElementById('chart-container');
+            if (!container) return;
+
+            try {
+                console.log('📂 Memuat:', CONFIG.DATA_PATH);
+                const raw = await d3.csv(CONFIG.DATA_PATH);
+
+                if (!raw || raw.length === 0) throw new Error('Dataset kosong');
+
+                fullData = raw.map(d => ({
+                    College_ID: d.College_ID || 'Unknown',
+                    Academic_Performance: +d.Academic_Performance || 0,
+                    Extra_Curricular_Score: +d.Extra_Curricular_Score || 0,
+                    Communication_Skills: +d.Communication_Skills || 0,
+                    Projects_Completed: +d.Projects_Completed || 0,
+                    Internship_Experience: (d.Internship_Experience || '').toString().trim(),
+                    Placement: (d.Placement || '').toString().trim(),
+                    Placement_Yes: (d.Placement || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
+                    CGPA: +d.CGPA || 0,
+                })).filter(d => !isNaN(d.CGPA));
+
+                console.log(`✅ ${fullData.length} mahasiswa valid`);
+
+                // Render dimensi default
+                renderTreemap('College_ID');
+
+            } catch (e) {
+                console.error('❌ Error:', e);
+                container.innerHTML = `
+            <div style="text-align:center;padding:40px;color:#b91c1c;">
+                <p style="font-size:2rem;">⚠️</p>
+                <p style="font-weight:700;">Gagal Memuat Data</p>
+                <p style="font-size:0.85rem;color:#64748b;">${e.message}</p>
+            </div>`;
+            }
+        }
+
+        // =============================================
+        // 3. FORMAT NAMA KATEGORI
+        // =============================================
+        function formatCategoryName(value, dimension) {
+            if (dimension === 'College_ID') return String(value);
+            if (dimension === 'Academic_Performance') return `Nilai ${value}`;
+            if (dimension === 'Extra_Curricular_Score') return `Skor ${value}`;
+            if (dimension === 'Communication_Skills') return `Kom ${value}`;
+            if (dimension === 'Projects_Completed') return `${value} Proyek`;
+            return String(value);
+        }
+
+        // =============================================
+        // 4. WARNA BERDASARKAN % PLACEMENT
+        // =============================================
+        function getColor(pct) {
+            if (pct >= 20) return '#10b981';  // Hijau
+            if (pct >= 15) return '#f59e0b';  // Kuning
+            return '#ef4444';                  // Merah
+        }
+
+        // =============================================
+        // 5. RENDER TREEMAP
+        // =============================================
+        function renderTreemap(dimension) {
+            const container = document.getElementById('chart-container');
+            if (!container) return;
+
+            const w = Math.min(container.clientWidth - 10, 1000);
+            const h = Math.min(w * 0.55, 500);
+            const m = CONFIG.MARGIN;
+
+            const svg = d3.select('#main-svg');
+            svg.selectAll('*').remove();
+            svg.attr('viewBox', `0 0 ${w} ${h}`)
+                .attr('preserveAspectRatio', 'xMidYMid meet')
+                .style('width', '100%').style('height', 'auto').style('max-height', h + 'px');
+
+            // Agregasi data berdasarkan dimensi yang dipilih
+            const grouped = d3.rollups(
+                fullData,
+                group => ({
+                    count: group.length,
+                    placed: d3.sum(group, d => d.Placement_Yes),
+                    pct: group.length > 0 ? (d3.sum(group, d => d.Placement_Yes) / group.length * 100) : 0,
+                    avgCGPA: d3.mean(group, d => d.CGPA) || 0,
+                    avgComm: d3.mean(group, d => d.Communication_Skills) || 0,
+                    avgProjects: d3.mean(group, d => d.Projects_Completed) || 0,
+                }),
+                d => String(d[dimension])
+            );
+
+            const data = grouped
+                .map(([name, val]) => ({
+                    name,
+                    displayName: formatCategoryName(name, dimension),
+                    ...val
+                }))
+                .sort((a, b) => b.count - a.count);
+
+            console.log(`📊 Dimensi "${dimension}": ${data.length} kategori`);
+
+            // Update tile count
+            safeText('tile-count', data.length);
+
+            if (data.length === 0) {
+                svg.append('text').attr('x', w / 2).attr('y', h / 2)
+                    .attr('text-anchor', 'middle').style('fill', '#94a3b8').style('font-size', '1rem')
+                    .text('Tidak ada data untuk dimensi ini');
+                return;
+            }
+
+            // Treemap layout
+            const root = d3.treemap()
+                .size([w - m.left - m.right, h - m.top - m.bottom])
+                .padding(dimension === 'College_ID' ? 2 : 4)
+                .round(true)
+                (d3.hierarchy({ children: data }).sum(d => d.count).sort((a, b) => b.value - a.value));
+
+            const leaves = root.leaves();
+            const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+            const tooltip = d3.select('#custom-tooltip');
+
+            // === RENDER TILES ===
+            const tiles = g.selectAll('.tile')
+                .data(leaves)
+                .enter().append('g')
+                .attr('class', 'tile')
+                .attr('transform', d => `translate(${d.x0},${d.y0})`)
+                .style('cursor', 'default');
+
+            // Background rect
+            tiles.append('rect')
+                .attr('class', 'tile-bg')
+                .attr('width', d => Math.max(1, d.x1 - d.x0))
+                .attr('height', d => Math.max(1, d.y1 - d.y0))
+                .attr('rx', 5).attr('ry', 5)
+                .attr('fill', d => getColor(d.data.pct))
+                .attr('stroke', '#ffffff')
+                .attr('stroke-width', 1.5)
+                .attr('opacity', 0.9);
+
+            // Nama kategori
+            tiles.append('text')
+                .attr('class', 'tile-text')
+                .attr('x', d => Math.max(6, (d.x1 - d.x0) / 2))
+                .attr('y', d => Math.max(14, (d.y1 - d.y0) / 2 - 8))
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .style('font-size', d => {
+                    const maxSize = Math.min((d.x1 - d.x0) / 7, (d.y1 - d.y0) / 3.5, 13);
+                    return Math.max(8, maxSize) + 'px';
+                })
+                .style('font-weight', '800')
+                .style('fill', '#ffffff')
+                .text(d => {
+                    const tw = d.x1 - d.x0;
+                    if (tw < 35) return '';
+                    const name = d.data.displayName;
+                    const maxChars = Math.floor(tw / 8);
+                    return name.length > maxChars ? name.substring(0, maxChars - 1) + '…' : name;
+                });
+
+            // Persentase placement
+            tiles.append('text')
+                .attr('class', 'tile-text')
+                .attr('x', d => Math.max(6, (d.x1 - d.x0) / 2))
+                .attr('y', d => Math.max(28, (d.y1 - d.y0) / 2 + 6))
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .style('font-size', d => {
+                    const maxSize = Math.min((d.x1 - d.x0) / 9, (d.y1 - d.y0) / 4.5, 11);
+                    return Math.max(7, maxSize) + 'px';
+                })
+                .style('font-weight', '700')
+                .style('fill', '#ffffff')
+                .style('opacity', 0.95)
+                .text(d => {
+                    const tw = d.x1 - d.x0;
+                    const th = d.y1 - d.y0;
+                    if (tw < 45 || th < 35) return '';
+                    return `${d.data.pct.toFixed(1)}%`;
+                });
+
+            // Jumlah mahasiswa
+            tiles.append('text')
+                .attr('class', 'tile-text')
+                .attr('x', d => Math.max(6, (d.x1 - d.x0) / 2))
+                .attr('y', d => Math.max(42, (d.y1 - d.y0) / 2 + 20))
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .style('font-size', d => {
+                    const maxSize = Math.min((d.x1 - d.x0) / 11, (d.y1 - d.y0) / 5.5, 9);
+                    return Math.max(6, maxSize) + 'px';
+                })
+                .style('font-weight', '600')
+                .style('fill', '#ffffff')
+                .style('opacity', 0.8)
+                .text(d => {
+                    const tw = d.x1 - d.x0;
+                    const th = d.y1 - d.y0;
+                    if (tw < 55 || th < 48) return '';
+                    return `${d.data.count} mhs`;
+                });
+
+            // === HOVER INTERACTION ===
+            tiles
+                .on('mouseenter', function (event, d) {
+                    d3.select(this).select('.tile-bg')
+                        .transition().duration(150)
+                        .attr('stroke', '#0f172a')
+                        .attr('stroke-width', 3)
+                        .attr('opacity', 1);
+
+                    const pctOfTotal = (d.data.count / fullData.length * 100).toFixed(1);
+
+                    tooltip
+                        .style('opacity', 1)
+                        .classed('visible', true)
+                        .html(`
+                    <span class="tt-title">${d.data.displayName}</span>
+                    <div class="tt-row"><span class="lbl">Mahasiswa:</span><span class="val">${d.data.count.toLocaleString()}</span></div>
+                    <div class="tt-row"><span class="lbl">Ditempatkan:</span><span class="val">${d.data.placed} (${d.data.pct.toFixed(1)}%)</span></div>
+                    <div class="tt-row"><span class="lbl">Rata-rata CGPA:</span><span class="val">${d.data.avgCGPA.toFixed(2)}</span></div>
+                    <div class="tt-row"><span class="lbl">Rata-rata Komunikasi:</span><span class="val">${d.data.avgComm.toFixed(1)}</span></div>
+                    <div class="tt-total">${pctOfTotal}% dari total mahasiswa</div>
+                `);
+                })
+                .on('mousemove', function (event) {
+                    const tn = tooltip.node();
+                    if (!tn) return;
+                    const tw = tn.offsetWidth;
+                    const th = tn.offsetHeight;
+
+                    // Posisikan dekat kursor dengan boundary check
+                    let L = event.clientX + 10;
+                    let T = event.clientY - th - 8;
+
+                    if (L + tw > window.innerWidth - 10) L = event.clientX - tw - 10;
+                    if (T < 10) T = event.clientY + 15;
+                    if (L < 10) L = 10;
+                    if (T + th > window.innerHeight - 10) T = window.innerHeight - th - 10;
+
+                    tooltip.style('left', L + 'px').style('top', T + 'px');
+                })
+                .on('mouseleave', function () {
+                    d3.select(this).select('.tile-bg')
+                        .transition().duration(200)
+                        .attr('stroke', '#ffffff')
+                        .attr('stroke-width', 1.5)
+                        .attr('opacity', 0.9);
+                    tooltip.style('opacity', 0).classed('visible', false);
+                });
+
+            // Label bawah
+            const dimInfo = CONFIG.DIMENSIONS.find(d => d.key === dimension);
+            svg.append('text')
+                .attr('x', w / 2).attr('y', h - 5)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '0.65rem')
+                .style('fill', '#94a3b8')
+                .style('font-weight', '600')
+                .text(`Dimensi: ${dimInfo?.label || dimension} | Ukuran = Jumlah Mahasiswa | Warna = % Ditempatkan`);
+
+            // Update insight based on dimension
+            updateInsight(dimension, data);
+        }
+
+        // =============================================
+        // 6. UPDATE INSIGHT BERDASARKAN DIMENSI
+        // =============================================
+        function updateInsight(dimension, data) {
+            const insightGrid = document.getElementById('insight-grid');
+            if (!insightGrid) return;
+
+            const topCategory = data[0];
+            const bottomCategory = data[data.length - 1];
+
+            // Cari kategori dengan placement tertinggi dan terendah
+            const sortedByPct = [...data].sort((a, b) => b.pct - a.pct);
+            const bestPlacement = sortedByPct[0];
+            const worstPlacement = sortedByPct[sortedByPct.length - 1];
+
+            const dimLabel = CONFIG.DIMENSIONS.find(d => d.key === dimension)?.label || dimension;
+
+            insightGrid.innerHTML = `
+        <div class="insight-card findings">
+            <span class="icon">🔍</span>
+            <div>
+                <strong>Distribusi ${dimLabel}</strong>
+                <p style="margin-top:2px;font-size:0.75rem;">
+                    Terdapat <span class="highlight-num">${data.length} kategori</span> dalam dimensi ini.
+                    Kategori terbesar: <strong>${topCategory.displayName}</strong> 
+                    (${topCategory.count} mhs, ${topCategory.pct.toFixed(1)}% ditempatkan).
+                </p>
+            </div>
+        </div>
+        <div class="insight-card story">
+            <span class="icon">📖</span>
+            <div>
+                <strong>Kesenjangan Penempatan</strong>
+                <p style="margin-top:2px;font-size:0.75rem;">
+                    <strong>${bestPlacement.displayName}</strong> memiliki tingkat penempatan tertinggi 
+                    (${bestPlacement.pct.toFixed(1)}%), sementara 
+                    <strong>${worstPlacement.displayName}</strong> terendah 
+                    (${worstPlacement.pct.toFixed(1)}%).
+                    Selisih: <span class="highlight-num">${(bestPlacement.pct - worstPlacement.pct).toFixed(1)}%</span>.
+                </p>
+            </div>
+        </div>
+        <div class="insight-card action">
+            <span class="icon">💡</span>
+            <div>
+                <strong>Rekomendasi Analisis</strong>
+                <p style="margin-top:2px;font-size:0.75rem;">
+                    ${dimension === 'Communication_Skills'
+                    ? 'Mahasiswa dengan skor komunikasi tinggi (8-10) memiliki rata-rata penempatan di atas 20%. Fokus pada pengembangan soft skill!'
+                    : dimension === 'Projects_Completed'
+                        ? 'Mahasiswa dengan 3+ proyek memiliki tingkat penempatan lebih tinggi. Dorong mahasiswa untuk menyelesaikan lebih banyak proyek.'
+                        : dimension === 'Academic_Performance'
+                            ? 'Performa akademik berkorelasi positif dengan penempatan. Nilai 8-10 memiliki peluang terbaik.'
+                            : 'Gunakan tab dimensi lain untuk melihat pola dari sudut pandang berbeda.'
+                }
+                </p>
+            </div>
+        </div>
+    `;
+        }
+
+        // =============================================
+        // 7. SWITCH DIMENSION
+        // =============================================
+        function switchDimension(dimension) {
+            currentDimension = dimension;
+
+            // Update tab active state
+            document.querySelectorAll('.dim-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.dim === dimension);
+            });
+
+            // Render treemap untuk dimensi baru
+            renderTreemap(dimension);
+        }
+
+        // =============================================
+        // 8. INIT
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Case 6: Multi-Dimension Treemap');
+
+            // Setup dimension tab click handlers
+            document.querySelectorAll('.dim-tab').forEach(tab => {
+                tab.addEventListener('click', function () {
+                    const dim = this.dataset.dim;
+                    if (dim) switchDimension(dim);
+                });
+            });
+
+            // Load data
+            loadData();
+        });
+
+        // Resize handler
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (fullData.length > 0) renderTreemap(currentDimension);
+            }, 300);
+        });
+
+        console.log('📊 Case 6 Ready - 5 dimensi analisis');
+    </script>
+</body>
+
+</html>
