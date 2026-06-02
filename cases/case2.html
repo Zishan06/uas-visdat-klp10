@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Case 2 — Filter Film per Tahun | Visualisasi Data Film</title>
-    <meta name="description" content="Filter interaktif film berdasarkan rentang tahun, genre, dan skor IMDb — 6.820 film dari 1986 hingga 2016.">
+    <title>Case 2 — Film Explorer | Visualisasi Data Film</title>
+    <meta name="description" content="Bar chart interaktif menampilkan jumlah atau rata-rata skor film per tahun berdasarkan filter genre, rentang tahun, dan skor IMDb.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
@@ -228,106 +228,65 @@
         .btn-reset svg { width: 13px; height: 13px; }
 
         /* ══════════════════════════════════════════
-           TABLE
+           CHART CARD
         ══════════════════════════════════════════ */
-        .table-card {
+        .chart-card {
             background: var(--bg-card); border: 1px solid var(--border);
             border-radius: var(--radius-lg); overflow: hidden;
             position: relative;
         }
+        .chart-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: linear-gradient(90deg, var(--accent) 0%, #f5a623 60%, transparent 100%);
+            opacity: .5; z-index: 1;
+        }
 
-        /* Table toolbar */
-        .table-toolbar {
+        /* Chart toolbar */
+        .chart-toolbar {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 16px 20px; border-bottom: 1px solid var(--border);
+            padding: 16px 24px; border-bottom: 1px solid var(--border);
             flex-wrap: wrap; gap: 10px;
         }
-        .table-count {
+        .chart-info { display: flex; flex-direction: column; gap: 3px; }
+        .chart-count {
             font-size: 13px; font-weight: 600; color: var(--text-primary);
         }
-        .table-count span { color: var(--accent); }
-        .table-hint { font-size: 11px; color: var(--text-muted); }
+        .chart-count span { color: var(--accent); }
+        .chart-hint { font-size: 11px; color: var(--text-muted); }
 
-        /* Pagination controls */
-        .pagination {
-            display: flex; align-items: center; gap: 6px;
+        /* Toggle buttons */
+        .toggle-group {
+            display: flex; gap: 6px; background: var(--bg-elevated);
+            border: 1px solid var(--border); border-radius: 8px; padding: 4px;
         }
-        .page-btn {
-            display: flex; align-items: center; justify-content: center;
-            width: 30px; height: 30px; border-radius: 6px;
-            background: var(--bg-elevated); border: 1px solid var(--border);
-            color: var(--text-secondary); cursor: pointer;
-            font-family: var(--font); font-size: 12px; font-weight: 600;
-            transition: color .2s, border-color .2s, background .2s;
+        .toggle-btn {
+            display: inline-flex; align-items: center; gap: 6px;
+            font-size: 12px; font-weight: 600; letter-spacing: .03em;
+            color: var(--text-muted); background: transparent;
+            border: 1px solid transparent; padding: 6px 14px; border-radius: 6px;
+            cursor: pointer; transition: color .2s, border-color .2s, background .2s;
+            font-family: var(--font); white-space: nowrap;
         }
-        .page-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
-        .page-btn.active { background: var(--accent-dim); border-color: var(--accent); color: var(--accent); }
-        .page-btn:disabled { opacity: .3; cursor: not-allowed; }
-        .page-info { font-size: 12px; color: var(--text-muted); padding: 0 6px; }
+        .toggle-btn:hover { color: var(--text-primary); }
+        .toggle-btn.active {
+            color: var(--accent); background: var(--accent-dim);
+            border-color: rgba(224,92,58,.3);
+        }
+        .toggle-btn svg { width: 13px; height: 13px; }
 
-        /* Table itself */
-        .table-scroll { overflow-x: auto; }
-        table {
-            width: 100%; border-collapse: collapse; min-width: 760px;
-        }
-        thead { position: sticky; top: 0; z-index: 2; }
-        th {
-            padding: 12px 16px; text-align: left;
-            font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-            color: var(--text-muted); background: var(--bg-elevated);
-            border-bottom: 1px solid var(--border);
-            cursor: pointer; user-select: none; white-space: nowrap;
-            transition: color .2s;
-        }
-        th:hover { color: var(--text-primary); }
-        th.sorted-asc::after  { content: ' ↑'; color: var(--accent); }
-        th.sorted-desc::after { content: ' ↓'; color: var(--accent); }
-        th.sorted-asc, th.sorted-desc { color: var(--text-primary); }
+        /* Chart body */
+        .chart-body { padding: 24px 24px 20px; }
+        #bar-chart { width: 100%; display: block; }
 
-        td {
-            padding: 13px 16px; font-size: 13px; color: var(--text-secondary);
-            border-bottom: 1px solid var(--border); vertical-align: middle;
+        /* Axis styles */
+        .axis text {
+            fill: var(--text-muted); font-family: 'Inter', sans-serif;
+            font-size: 11px; font-weight: 500;
         }
-        tr:last-child td { border-bottom: none; }
-
-        tbody tr {
-            transition: background .15s;
-            cursor: default;
-        }
-        tbody tr:hover td { background: rgba(255,255,255,.03); color: var(--text-primary); }
-
-        /* Cell specifics */
-        .cell-title { font-weight: 600; color: var(--text-primary); max-width: 260px; }
-        .cell-title-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-        .cell-year { font-weight: 600; color: var(--text-secondary); }
-        .cell-genre .genre-pill {
-            font-size: 10px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase;
-            padding: 3px 8px; border-radius: 4px; white-space: nowrap;
-        }
-        .cell-votes { color: var(--text-muted); font-size: 12px; }
-
-        /* Score badge */
-        .score-badge {
-            display: inline-flex; align-items: center; gap: 4px;
-            font-size: 13px; font-weight: 700; padding: 3px 10px;
-            border-radius: 6px; white-space: nowrap;
-        }
-        .score-high { background: rgba(52,211,153,.12); color: #34d399; border: 1px solid rgba(52,211,153,.2); }
-        .score-mid  { background: rgba(245,158,11,.12); color: #f59e0b; border: 1px solid rgba(245,158,11,.2); }
-        .score-low  { background: rgba(251,113,133,.12); color: #fb7185; border: 1px solid rgba(251,113,133,.2); }
-
-        /* Gross cell */
-        .cell-gross { font-weight: 600; }
-        .gross-value { color: #34d399; }
-        .gross-na { color: var(--text-muted); font-size: 12px; }
-
-        /* Empty state */
-        .empty-state {
-            padding: 60px 20px; text-align: center;
-        }
-        .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
-        .empty-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
-        .empty-sub { font-size: 13px; color: var(--text-muted); }
+        .axis line, .axis path { stroke: rgba(255,255,255,.07); }
+        .axis .domain { display: none; }
+        .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
+        .grid .domain { display: none; }
 
         /* Loading */
         .loading-overlay {
@@ -343,18 +302,51 @@
         }
         @keyframes spin { to { transform: rotate(360deg); } }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .filters-grid { grid-template-columns: 1fr 1fr; }
+        /* Empty state */
+        .empty-state-chart {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; padding: 60px 20px; text-align: center;
         }
-        @media (max-width: 600px) {
-            .page-wrap { padding: 20px 16px 60px; }
-            .filters-grid { grid-template-columns: 1fr; }
-            .filter-card { padding: 18px 16px; }
-            .table-toolbar { flex-direction: column; align-items: flex-start; }
-        }
+        .empty-icon { font-size: 2.5rem; margin-bottom: 12px; }
+        .empty-title { font-size: 1rem; font-weight: 700; color: var(--text-primary); margin-bottom: 6px; }
+        .empty-sub { font-size: 13px; color: var(--text-muted); }
 
-        /* Genre pill colors (matches case1 palette) */
+        /* Tooltip */
+        #bar-tooltip {
+            position: fixed; pointer-events: none; z-index: 999;
+            background: rgba(10,10,16,.97); border: 1px solid var(--accent);
+            border-radius: var(--radius-md); padding: 14px 16px;
+            box-shadow: 0 12px 48px rgba(0,0,0,.7), 0 0 0 1px rgba(224,92,58,.15);
+            font-family: 'Inter', sans-serif; min-width: 210px;
+            opacity: 0; transform: translateY(8px);
+            transition: opacity .15s ease, transform .15s ease;
+        }
+        #bar-tooltip.visible { opacity: 1; transform: translateY(0); }
+        .btt-year {
+            font-size: 16px; font-weight: 800; color: var(--accent);
+            letter-spacing: -.01em; margin-bottom: 10px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .btt-year-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: var(--accent); flex-shrink: 0;
+        }
+        .btt-row {
+            display: flex; justify-content: space-between; align-items: center; gap: 24px;
+            font-size: 12px; margin-bottom: 5px;
+        }
+        .btt-label { color: var(--text-muted); font-weight: 500; }
+        .btt-val { color: var(--text-primary); font-weight: 700; }
+        .btt-genre-chip {
+            display: inline-flex; align-items: center; gap: 5px;
+            font-size: 11px; font-weight: 700; padding: 3px 8px;
+            border-radius: 4px; margin-top: 8px; padding-top: 8px;
+            border-top: 1px solid rgba(255,255,255,.06);
+            width: 100%;
+        }
+        .btt-genre-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+        /* Genre pill colors */
         .g-Comedy    { background: rgba(224,92,58,.12);   color: #e05c3a;  border: 1px solid rgba(224,92,58,.2); }
         .g-Action    { background: rgba(45,212,191,.12);  color: #2dd4bf;  border: 1px solid rgba(45,212,191,.2); }
         .g-Drama     { background: rgba(167,139,250,.12); color: #a78bfa;  border: 1px solid rgba(167,139,250,.2); }
@@ -363,7 +355,17 @@
         .g-Adventure { background: rgba(52,211,153,.12);  color: #34d399;  border: 1px solid rgba(52,211,153,.2); }
         .g-Animation { background: rgba(249,115,22,.12);  color: #f97316;  border: 1px solid rgba(249,115,22,.2); }
         .g-Horror    { background: rgba(251,113,133,.12); color: #fb7185;  border: 1px solid rgba(251,113,133,.2); }
-        .g-default   { background: rgba(148,148,168,.1);  color: #9494a8;  border: 1px solid rgba(148,148,168,.15); }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .filters-grid { grid-template-columns: 1fr 1fr; }
+        }
+        @media (max-width: 600px) {
+            .page-wrap { padding: 20px 16px 60px; }
+            .filters-grid { grid-template-columns: 1fr; }
+            .filter-card { padding: 18px 16px; }
+            .chart-toolbar { flex-direction: column; align-items: flex-start; }
+        }
     </style>
 </head>
 <body>
@@ -377,7 +379,7 @@
             <span class="brand-sub">KLP 10</span>
         </a>
         <div class="topbar-case">
-            Case <span>02</span> · Filter Film per Tahun
+            Case <span>02</span> · Film Explorer
         </div>
     </div>
 </div>
@@ -395,13 +397,12 @@
     <!-- Case header -->
     <div class="case-badge">
         <span class="case-badge-dot"></span>
-        Case 02 · Filter &amp; Table
+        Case 02 · Bar Chart
     </div>
     <h1 class="case-title">Film <em>Explorer</em></h1>
     <p class="case-desc">
-        Filter dan telusuri <strong style="color:var(--text-primary)">6.820 film</strong> berdasarkan rentang tahun, genre, dan skor IMDb.
-        Temukan film apa saja yang dirilis pada periode tertentu, seberapa tinggi skornya,
-        dan seberapa besar pendapatan (gross) yang dihasilkan. Klik header kolom untuk mengurutkan data.
+        Visualisasi <strong style="color:var(--text-primary)">6.820 film</strong> dalam bar chart interaktif — filter berdasarkan rentang tahun, genre, dan skor IMDb.
+        Lihat distribusi film per tahun atau perbandingan rata-rata skor. Hover pada bar untuk detail lengkap.
     </p>
 
     <!-- Stats cards -->
@@ -491,37 +492,65 @@
         </div>
     </div>
 
-    <!-- Table card -->
-    <div class="table-card" id="table-card">
+    <!-- Chart card -->
+    <div class="chart-card" id="chart-card">
         <div class="loading-overlay" id="loading-overlay">
             <div class="loading-spinner"></div>
         </div>
 
-        <div class="table-toolbar">
-            <div>
-                <div class="table-count">Menampilkan <span id="showing-count">—</span> film</div>
-                <div class="table-hint">Klik header kolom untuk mengurutkan · Klik baris untuk detail</div>
+        <div class="chart-toolbar">
+            <div class="chart-info">
+                <div class="chart-count">Menampilkan <span id="showing-count">—</span> tahun</div>
+                <div class="chart-hint">💡 Hover pada bar untuk melihat detail · Toggle untuk ganti metrik</div>
             </div>
-            <div class="pagination" id="pagination"></div>
+            <div class="toggle-group" role="group" aria-label="Pilih metrik chart">
+                <button class="toggle-btn active" id="btn-count" title="Film per Tahun">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <rect x="1" y="8" width="3" height="7" rx="1"/>
+                        <rect x="6" y="4" width="3" height="11" rx="1"/>
+                        <rect x="11" y="1" width="3" height="14" rx="1"/>
+                    </svg>
+                    Film per Tahun
+                </button>
+                <button class="toggle-btn" id="btn-score" title="Rata-rata Skor per Tahun">
+                    <svg viewBox="0 0 16 16" fill="currentColor">
+                        <path d="M8 1l1.8 3.6L14 5.4l-3 2.9.7 4.1L8 10.4l-3.7 2 .7-4.1-3-2.9 4.2-.8z"/>
+                    </svg>
+                    Rata-rata Skor per Tahun
+                </button>
+            </div>
         </div>
 
-        <div class="table-scroll">
-            <table id="films-table">
-                <thead>
-                    <tr>
-                        <th data-col="name"   class="sorted-asc" style="min-width:220px">Judul Film</th>
-                        <th data-col="genre"  style="min-width:100px">Genre</th>
-                        <th data-col="year"   style="min-width:80px">Tahun</th>
-                        <th data-col="score"  style="min-width:100px">Skor IMDb</th>
-                        <th data-col="gross"  style="min-width:130px">Gross Revenue</th>
-                        <th data-col="votes"  style="min-width:110px">Votes</th>
-                    </tr>
-                </thead>
-                <tbody id="table-body"></tbody>
-            </table>
+        <div class="chart-body">
+            <div id="chart-empty" class="empty-state-chart" style="display:none">
+                <div class="empty-icon">🎬</div>
+                <div class="empty-title">Tidak ada film yang cocok</div>
+                <div class="empty-sub">Coba ubah filter atau perlebar rentang tahun</div>
+            </div>
+            <svg id="bar-chart"></svg>
         </div>
     </div>
 
+</div>
+
+<!-- Bar Tooltip -->
+<div id="bar-tooltip">
+    <div class="btt-year">
+        <span class="btt-year-dot" id="btt-dot"></span>
+        <span id="btt-year-val">—</span>
+    </div>
+    <div class="btt-row">
+        <span class="btt-label">Jumlah Film</span>
+        <span class="btt-val" id="btt-count">—</span>
+    </div>
+    <div class="btt-row">
+        <span class="btt-label">Rata-rata Skor</span>
+        <span class="btt-val" id="btt-score">—</span>
+    </div>
+    <div class="btt-genre-chip" id="btt-genre-chip">
+        <span class="btt-genre-dot" id="btt-genre-dot"></span>
+        <span id="btt-genre-name">—</span>
+    </div>
 </div>
 
 <script src="../js/d3.v7.min.js"></script>
@@ -529,23 +558,28 @@
 // ═══════════════════════════════════════════════════════════
 // CONFIG
 // ═══════════════════════════════════════════════════════════
-const PAGE_SIZE = 25;
-
-// Genre → CSS class map
-const GENRE_CLASS = {
-    Comedy: 'g-Comedy', Action: 'g-Action', Drama: 'g-Drama',
-    Crime: 'g-Crime', Biography: 'g-Biography', Adventure: 'g-Adventure',
-    Animation: 'g-Animation', Horror: 'g-Horror',
+const GENRE_COLORS = {
+    'Comedy':    '#e05c3a',
+    'Action':    '#2dd4bf',
+    'Drama':     '#a78bfa',
+    'Crime':     '#f59e0b',
+    'Biography': '#60a5fa',
+    'Adventure': '#34d399',
+    'Animation': '#f97316',
+    'Horror':    '#fb7185',
 };
+const ACCENT       = '#e05c3a';
+const ACCENT_DIM   = 'rgba(224,92,58,.25)';
+const BAR_DIM      = 'rgba(255,255,255,.06)';
+
+const MARGIN = { top: 20, right: 24, bottom: 52, left: 56 };
 
 // ═══════════════════════════════════════════════════════════
 // STATE
 // ═══════════════════════════════════════════════════════════
-let allData = [];       // raw cleaned rows
-let filtered = [];      // after filters
-let sortCol  = 'name';
-let sortDir  = 'asc';   // 'asc' | 'desc'
-let currentPage = 1;
+let allData = [];
+let filtered = [];
+let chartMode = 'count'; // 'count' | 'score'
 
 let filterState = {
     yearMin: 1986,
@@ -566,17 +600,8 @@ function fmtGross(v) {
     return '$' + Math.round(v);
 }
 
-function fmtVotes(v) {
-    if (!v || isNaN(v)) return '—';
-    if (v >= 1e6) return (v / 1e6).toFixed(1) + 'M';
-    if (v >= 1e3) return (v / 1e3).toFixed(0) + 'K';
-    return v.toString();
-}
-
-function scoreClass(s) {
-    if (s >= 7.5) return 'score-high';
-    if (s >= 5.5) return 'score-mid';
-    return 'score-low';
+function truncate(str, n) {
+    return str.length > n ? str.slice(0, n) + '…' : str;
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -589,7 +614,6 @@ d3.csv('../data/movies.csv').then(raw => {
         year:  +d.year || 0,
         score: parseFloat(d.score) || 0,
         gross: parseFloat(d.gross) || 0,
-        budget:parseFloat(d.budget)|| 0,
         votes: parseFloat(d.votes) || 0,
     })).filter(d => d.year >= 1980 && d.name);
 
@@ -603,6 +627,7 @@ d3.csv('../data/movies.csv').then(raw => {
     });
 
     document.getElementById('loading-overlay').style.display = 'none';
+    buildChart();
     applyFilters();
 }).catch(err => {
     document.getElementById('loading-overlay').innerHTML =
@@ -651,25 +676,22 @@ updateTrack();
 // ═══════════════════════════════════════════════════════════
 // OTHER FILTERS
 // ═══════════════════════════════════════════════════════════
-const searchInput = document.getElementById('search-input');
-const genreSelect = document.getElementById('genre-select');
+const searchInput  = document.getElementById('search-input');
+const genreSelect  = document.getElementById('genre-select');
 const minScoreInput = document.getElementById('min-score');
 
 searchInput.addEventListener('input', () => {
     filterState.search = searchInput.value.trim().toLowerCase();
-    currentPage = 1;
     debounce(applyFilters, 180)();
 });
 
 genreSelect.addEventListener('change', () => {
     filterState.genre = genreSelect.value;
-    currentPage = 1;
     applyFilters();
 });
 
 minScoreInput.addEventListener('input', () => {
     filterState.minScore = parseFloat(minScoreInput.value) || 0;
-    currentPage = 1;
     debounce(applyFilters, 180)();
 });
 
@@ -677,40 +699,28 @@ document.getElementById('btn-reset').addEventListener('click', () => {
     filterState = { yearMin: 1986, yearMax: 2016, genre: '', minScore: 0, search: '' };
     rangeMin.value = 1986; rangeMax.value = 2016; updateTrack();
     searchInput.value = ''; genreSelect.value = ''; minScoreInput.value = '';
-    sortCol = 'name'; sortDir = 'asc';
-    currentPage = 1;
     applyFilters();
 });
 
 // ═══════════════════════════════════════════════════════════
-// SORT (header click)
+// TOGGLE BUTTONS
 // ═══════════════════════════════════════════════════════════
-document.querySelectorAll('th[data-col]').forEach(th => {
-    th.addEventListener('click', () => {
-        const col = th.dataset.col;
-        if (sortCol === col) {
-            sortDir = sortDir === 'asc' ? 'desc' : 'asc';
-        } else {
-            sortCol = col;
-            sortDir = col === 'name' || col === 'genre' ? 'asc' : 'desc';
-        }
-        currentPage = 1;
-        renderTable();
-        updateSortHeaders();
-    });
+document.getElementById('btn-count').addEventListener('click', () => {
+    chartMode = 'count';
+    document.getElementById('btn-count').classList.add('active');
+    document.getElementById('btn-score').classList.remove('active');
+    updateChart();
 });
 
-function updateSortHeaders() {
-    document.querySelectorAll('th[data-col]').forEach(th => {
-        th.classList.remove('sorted-asc', 'sorted-desc');
-        if (th.dataset.col === sortCol) {
-            th.classList.add(sortDir === 'asc' ? 'sorted-asc' : 'sorted-desc');
-        }
-    });
-}
+document.getElementById('btn-score').addEventListener('click', () => {
+    chartMode = 'score';
+    document.getElementById('btn-score').classList.add('active');
+    document.getElementById('btn-count').classList.remove('active');
+    updateChart();
+});
 
 // ═══════════════════════════════════════════════════════════
-// FILTER + RENDER
+// FILTER + STATS
 // ═══════════════════════════════════════════════════════════
 function applyFilters() {
     const { yearMin, yearMax, genre, minScore, search } = filterState;
@@ -723,9 +733,8 @@ function applyFilters() {
         return true;
     });
 
-    currentPage = 1;
     updateStats();
-    renderTable();
+    updateChart();
 }
 
 function updateStats() {
@@ -759,7 +768,7 @@ function updateStats() {
         document.getElementById('stat-max-gross-name').textContent = 'tidak ada data';
     }
 
-    const topScore = d3.greatest(withScore, d => d.score);
+    const topScore = withScore.length ? d3.greatest(withScore, d => d.score) : null;
     if (topScore) {
         document.getElementById('stat-max-score').textContent = topScore.score.toFixed(1);
         document.getElementById('stat-max-score-name').textContent = truncate(topScore.name, 24);
@@ -769,98 +778,294 @@ function updateStats() {
     }
 }
 
-function renderTable() {
-    // Sort
-    const sorted = [...filtered].sort((a, b) => {
-        let va = a[sortCol], vb = b[sortCol];
-        if (typeof va === 'string') va = va.toLowerCase();
-        if (typeof vb === 'string') vb = vb.toLowerCase();
-        if (va < vb) return sortDir === 'asc' ? -1 : 1;
-        if (va > vb) return sortDir === 'asc' ? 1 : -1;
-        return 0;
+// ═══════════════════════════════════════════════════════════
+// BAR CHART — BUILD (one-time setup)
+// ═══════════════════════════════════════════════════════════
+const svgEl = document.getElementById('bar-chart');
+let svgSel, gMain, xScale, yScale, xAxisG, yAxisG, gridG, barsG, yLabelText;
+let chartInitialized = false;
+
+function getChartDims() {
+    const W = svgEl.parentElement.clientWidth;
+    const H = Math.max(340, Math.min(480, window.innerHeight * 0.46));
+    return {
+        W,
+        H,
+        innerW: W - MARGIN.left - MARGIN.right,
+        innerH: H - MARGIN.top - MARGIN.bottom,
+    };
+}
+
+function buildChart() {
+    const { W, H, innerW, innerH } = getChartDims();
+
+    svgSel = d3.select('#bar-chart')
+        .attr('width', W)
+        .attr('height', H);
+
+    svgSel.append('defs').html(`
+        <clipPath id="bars-clip">
+            <rect width="${innerW}" height="${innerH + 4}" y="-4"/>
+        </clipPath>
+        <linearGradient id="bar-grad-accent" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="${ACCENT}" stop-opacity="1"/>
+            <stop offset="100%" stop-color="${ACCENT}" stop-opacity="0.55"/>
+        </linearGradient>
+        <linearGradient id="bar-grad-dim" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="rgba(255,255,255,.12)" stop-opacity="1"/>
+            <stop offset="100%" stop-color="rgba(255,255,255,.04)" stop-opacity="1"/>
+        </linearGradient>
+    `);
+
+    gMain = svgSel.append('g')
+        .attr('class', 'g-main')
+        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+
+    // Grid
+    gridG = gMain.append('g').attr('class', 'grid');
+
+    // Bars group (clipped)
+    barsG = gMain.append('g').attr('class', 'bars-group')
+        .attr('clip-path', 'url(#bars-clip)');
+
+    // Axes
+    xAxisG = gMain.append('g').attr('class', 'axis x-axis').attr('transform', `translate(0,${innerH})`);
+    yAxisG = gMain.append('g').attr('class', 'axis y-axis');
+
+    // X axis label
+    gMain.append('text')
+        .attr('class', 'axis-label')
+        .attr('x', innerW / 2)
+        .attr('y', innerH + 44)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-family', 'Inter, sans-serif')
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('TAHUN');
+
+    // Y axis label (dynamic)
+    yLabelText = gMain.append('text')
+        .attr('class', 'axis-label')
+        .attr('transform', 'rotate(-90)')
+        .attr('x', -innerH / 2)
+        .attr('y', -46)
+        .attr('text-anchor', 'middle')
+        .attr('fill', 'var(--text-muted)')
+        .attr('font-size', 11)
+        .attr('font-family', 'Inter, sans-serif')
+        .attr('font-weight', 600)
+        .attr('letter-spacing', '.08em')
+        .text('JUMLAH FILM');
+
+    // Scales
+    xScale = d3.scaleBand().padding(0.2);
+    yScale = d3.scaleLinear().range([innerH, 0]);
+
+    chartInitialized = true;
+}
+
+// ═══════════════════════════════════════════════════════════
+// BAR CHART — UPDATE (called on every filter/toggle change)
+// ═══════════════════════════════════════════════════════════
+function updateChart() {
+    if (!chartInitialized) return;
+
+    const { W, H, innerW, innerH } = getChartDims();
+
+    // Resize svg if needed
+    svgSel.attr('width', W).attr('height', H);
+    gMain.select('.x-axis').attr('transform', `translate(0,${innerH})`);
+
+    // Build per-year aggregation from filtered data
+    const { yearMin, yearMax, genre } = filterState;
+    const years = d3.range(yearMin, yearMax + 1);
+
+    const byYear = new Map();
+    years.forEach(y => byYear.set(y, { year: y, count: 0, scoreSum: 0, scoreCount: 0, genreCounts: {} }));
+
+    filtered.forEach(d => {
+        const r = byYear.get(d.year);
+        if (!r) return;
+        r.count++;
+        if (d.score > 0) { r.scoreSum += d.score; r.scoreCount++; }
+        r.genreCounts[d.genre] = (r.genreCounts[d.genre] || 0) + 1;
     });
 
-    // Paginate
-    const totalPages = Math.max(1, Math.ceil(sorted.length / PAGE_SIZE));
-    if (currentPage > totalPages) currentPage = totalPages;
-    const start = (currentPage - 1) * PAGE_SIZE;
-    const pageRows = sorted.slice(start, start + PAGE_SIZE);
+    const yearData = years.map(y => {
+        const r = byYear.get(y);
+        return {
+            year: y,
+            count: r.count,
+            avgScore: r.scoreCount > 0 ? r.scoreSum / r.scoreCount : 0,
+            topGenre: Object.keys(r.genreCounts).length
+                ? Object.keys(r.genreCounts).reduce((a, b) => r.genreCounts[a] >= r.genreCounts[b] ? a : b)
+                : (genre || ''),
+        };
+    });
 
-    // Update showing count
-    const end = Math.min(start + PAGE_SIZE, sorted.length);
+    // Showing count
+    const activeYears = yearData.filter(d => d.count > 0).length;
     document.getElementById('showing-count').textContent =
-        sorted.length === 0 ? '0' :
-        `${(start + 1).toLocaleString('id-ID')}–${end.toLocaleString('id-ID')} dari ${sorted.length.toLocaleString('id-ID')}`;
+        `${activeYears} dari ${yearData.length}`;
 
-    // Render rows
-    const tbody = document.getElementById('table-body');
+    // Empty state
+    const isEmpty = filtered.length === 0;
+    document.getElementById('chart-empty').style.display = isEmpty ? 'flex' : 'none';
+    svgEl.style.display = isEmpty ? 'none' : 'block';
+    if (isEmpty) return;
 
-    if (sorted.length === 0) {
-        tbody.innerHTML = `
-            <tr><td colspan="6">
-                <div class="empty-state">
-                    <div class="empty-icon">🎬</div>
-                    <div class="empty-title">Tidak ada film yang cocok</div>
-                    <div class="empty-sub">Coba ubah filter atau perlebar rentang tahun</div>
-                </div>
-            </td></tr>`;
-        renderPagination(0, totalPages);
-        return;
+    // Scales
+    xScale.domain(years.map(String)).range([0, innerW]);
+
+    const getValue = d => chartMode === 'count' ? d.count : d.avgScore;
+    const yMax = d3.max(yearData, getValue) || 1;
+    yScale.domain([0, yMax * 1.08]).nice().range([innerH, 0]);
+
+    // Y axis label
+    yLabelText.text(chartMode === 'count' ? 'JUMLAH FILM' : 'RATA-RATA SKOR IMDB');
+
+    // Color logic
+    const activeGenre = filterState.genre;
+    function barColor(d) {
+        const g = activeGenre || d.topGenre;
+        return GENRE_COLORS[g] || ACCENT;
+    }
+    function barFill(d) {
+        const base = barColor(d);
+        if (activeGenre) return base;
+        return getValue(d) > 0 ? base : 'rgba(255,255,255,.04)';
+    }
+    function barOpacity(d) {
+        return getValue(d) > 0 ? 1 : 0.3;
     }
 
-    tbody.innerHTML = pageRows.map(d => {
-        const scoreC = d.score > 0 ? `<span class="score-badge ${scoreClass(d.score)}">★ ${d.score.toFixed(1)}</span>` : '<span style="color:var(--text-muted);font-size:12px">—</span>';
-        const grossStr = fmtGross(d.gross);
-        const grossCell = grossStr
-            ? `<span class="gross-value">${grossStr}</span>`
-            : `<span class="gross-na">N/A</span>`;
-        const gClass = GENRE_CLASS[d.genre] || 'g-default';
-        const votesFmt = fmtVotes(d.votes);
+    // ── GRID ──
+    const gridY = d3.axisLeft(yScale)
+        .ticks(5)
+        .tickSize(-innerW)
+        .tickFormat('');
 
-        return `<tr>
-            <td class="cell-title"><span class="cell-title-name" title="${escHtml(d.name)}">${escHtml(d.name)}</span></td>
-            <td class="cell-genre"><span class="genre-pill ${gClass}">${escHtml(d.genre)}</span></td>
-            <td class="cell-year">${d.year}</td>
-            <td>${scoreC}</td>
-            <td class="cell-gross">${grossCell}</td>
-            <td class="cell-votes">${votesFmt}</td>
-        </tr>`;
-    }).join('');
+    gridG.transition().duration(350)
+        .call(gridY);
 
-    renderPagination(currentPage, totalPages);
+    // ── X AXIS ──
+    // Show every 2 years or every year if range is small
+    const step = years.length > 16 ? 2 : 1;
+    const xAxis = d3.axisBottom(xScale)
+        .tickValues(years.filter((y, i) => i % step === 0).map(String))
+        .tickFormat(d => d)
+        .tickSize(6);
+
+    xAxisG.transition().duration(350).call(xAxis);
+    xAxisG.selectAll('text')
+        .attr('font-size', years.length > 20 ? 10 : 11)
+        .attr('dy', '1em');
+
+    // ── Y AXIS ──
+    const yAxis = d3.axisLeft(yScale)
+        .ticks(5)
+        .tickFormat(chartMode === 'score' ? d => d.toFixed(1) : d => d);
+
+    yAxisG.transition().duration(350).call(yAxis);
+
+    // ── BARS ── enter / update / exit
+    const bars = barsG.selectAll('.bar-rect')
+        .data(yearData, d => d.year);
+
+    // EXIT
+    bars.exit()
+        .transition().duration(300)
+        .attr('y', innerH)
+        .attr('height', 0)
+        .style('opacity', 0)
+        .remove();
+
+    // ENTER
+    const barsEnter = bars.enter()
+        .append('rect')
+        .attr('class', 'bar-rect')
+        .attr('x', d => xScale(String(d.year)))
+        .attr('width', xScale.bandwidth())
+        .attr('y', innerH)
+        .attr('height', 0)
+        .attr('rx', 3)
+        .style('cursor', 'pointer')
+        .style('transition', 'filter .15s');
+
+    // MERGE + UPDATE
+    const allBars = barsEnter.merge(bars);
+
+    allBars
+        .on('mouseenter', function(event, d) {
+            // Highlight this bar
+            barsG.selectAll('.bar-rect')
+                .style('filter', b => b.year === d.year ? 'brightness(1.3)' : 'brightness(0.6)');
+            showBarTooltip(event, d, barColor(d));
+        })
+        .on('mousemove', function(event, d) {
+            moveTooltip(event);
+        })
+        .on('mouseleave', function() {
+            barsG.selectAll('.bar-rect').style('filter', null);
+            hideBarTooltip();
+        });
+
+    allBars
+        .transition().duration(450)
+        .ease(d3.easeCubicOut)
+        .attr('x', d => xScale(String(d.year)))
+        .attr('width', xScale.bandwidth())
+        .attr('y', d => getValue(d) > 0 ? yScale(getValue(d)) : innerH)
+        .attr('height', d => getValue(d) > 0 ? innerH - yScale(getValue(d)) : 0)
+        .attr('fill', d => barFill(d))
+        .attr('rx', Math.max(2, Math.min(4, xScale.bandwidth() * 0.15)))
+        .style('opacity', d => barOpacity(d));
 }
 
 // ═══════════════════════════════════════════════════════════
-// PAGINATION
+// TOOLTIP
 // ═══════════════════════════════════════════════════════════
-function renderPagination(page, total) {
-    const wrap = document.getElementById('pagination');
-    if (total <= 1) { wrap.innerHTML = ''; return; }
+const tooltip = document.getElementById('bar-tooltip');
 
-    const pages = [];
-    // Always show first, last, current ±1
-    const show = new Set([1, total, page, page - 1, page + 1].filter(p => p >= 1 && p <= total));
-    const sorted = [...show].sort((a, b) => a - b);
+function showBarTooltip(event, d, color) {
+    document.getElementById('btt-year-val').textContent = d.year;
+    document.getElementById('btt-dot').style.background = color;
+    document.getElementById('btt-count').textContent = d.count.toLocaleString('id-ID') + ' film';
+    document.getElementById('btt-score').textContent =
+        d.avgScore > 0 ? '★ ' + d.avgScore.toFixed(2) : '—';
 
-    let html = `<button class="page-btn" id="pg-prev" ${page === 1 ? 'disabled' : ''} title="Sebelumnya">‹</button>`;
+    const genreName = d.topGenre || '—';
+    const genreColor = GENRE_COLORS[genreName] || color;
+    document.getElementById('btt-genre-dot').style.background = genreColor;
+    document.getElementById('btt-genre-name').textContent =
+        genreName ? `Genre dominan: ${genreName}` : 'Genre: —';
 
-    let prev = 0;
-    sorted.forEach(p => {
-        if (p - prev > 1) html += `<span class="page-info">…</span>`;
-        html += `<button class="page-btn ${p === page ? 'active' : ''}" data-pg="${p}">${p}</button>`;
-        prev = p;
-    });
-
-    html += `<button class="page-btn" id="pg-next" ${page === total ? 'disabled' : ''} title="Berikutnya">›</button>`;
-
-    wrap.innerHTML = html;
-
-    wrap.querySelector('#pg-prev')?.addEventListener('click', () => { if (currentPage > 1) { currentPage--; renderTable(); } });
-    wrap.querySelector('#pg-next')?.addEventListener('click', () => { if (currentPage < total) { currentPage++; renderTable(); } });
-    wrap.querySelectorAll('[data-pg]').forEach(btn => {
-        btn.addEventListener('click', () => { currentPage = +btn.dataset.pg; renderTable(); });
-    });
+    moveTooltip(event);
+    tooltip.classList.add('visible');
 }
+
+function moveTooltip(event) {
+    const vw = window.innerWidth, vh = window.innerHeight;
+    const tw = 220, th = 140;
+    let x = event.clientX + 16, y = event.clientY - 20;
+    if (x + tw > vw) x = event.clientX - tw - 16;
+    if (y + th > vh) y = event.clientY - th - 10;
+    tooltip.style.left = x + 'px';
+    tooltip.style.top  = y + 'px';
+}
+
+function hideBarTooltip() {
+    tooltip.classList.remove('visible');
+}
+
+// ═══════════════════════════════════════════════════════════
+// RESPONSIVE RESIZE
+// ═══════════════════════════════════════════════════════════
+window.addEventListener('resize', debounce(() => {
+    if (chartInitialized) updateChart();
+}, 200));
 
 // ═══════════════════════════════════════════════════════════
 // UTILS
@@ -868,14 +1073,6 @@ function renderPagination(page, total) {
 function debounce(fn, ms) {
     let t;
     return (...args) => { clearTimeout(t); t = setTimeout(() => fn(...args), ms); };
-}
-
-function truncate(str, n) {
-    return str.length > n ? str.slice(0, n) + '…' : str;
-}
-
-function escHtml(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 </script>
 </body>
