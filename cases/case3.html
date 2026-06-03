@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -19,15 +20,19 @@
             --warning: #f59e0b;
             --success: #10b981;
             --border: #e2e8f0;
-            --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-            --shadow: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -2px rgba(0,0,0,0.05);
-            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.08), 0 8px 10px -6px rgba(0,0,0,0.04);
+            --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
             --radius: 20px;
             --radius-sm: 12px;
             --transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
         body {
             font-family: 'Plus Jakarta Sans', 'Inter', 'Segoe UI', system-ui, sans-serif;
@@ -52,18 +57,39 @@
         }
 
         @keyframes fadeSlideUp {
-            from { opacity: 0; transform: translateY(40px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4); }
-            50% { box-shadow: 0 0 0 15px rgba(13, 148, 136, 0); }
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(13, 148, 136, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 15px rgba(13, 148, 136, 0);
+            }
         }
 
         @keyframes tooltipIn {
-            from { opacity: 0; transform: translateY(10px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+            from {
+                opacity: 0;
+                transform: translateY(10px) scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         /* ===== HEADER STORY ===== */
@@ -111,7 +137,9 @@
             transition: all 0.35s ease;
         }
 
-        .card:hover { box-shadow: var(--shadow-lg); }
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
 
         .card-header {
             display: flex;
@@ -208,7 +236,11 @@
             color: var(--text-secondary);
         }
 
-        .btn-sort:hover { background: #e2e8f0; border-color: #cbd5e1; transform: translateY(-1px); }
+        .btn-sort:hover {
+            background: #e2e8f0;
+            border-color: #cbd5e1;
+            transform: translateY(-1px);
+        }
 
         .btn-sort.active {
             background: var(--accent);
@@ -232,10 +264,10 @@
             opacity: 0;
             visibility: hidden;
             transition: opacity 0.25s ease, visibility 0.25s ease;
-            box-shadow: 0 24px 48px -12px rgba(0,0,0,0.6);
+            box-shadow: 0 24px 48px -12px rgba(0, 0, 0, 0.6);
             z-index: 99999;
             line-height: 1.7;
-            border: 1px solid rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
             max-width: 340px;
             min-width: 200px;
             word-wrap: break-word;
@@ -279,7 +311,7 @@
             color: #94a3b8;
             margin-top: 8px;
             padding-top: 8px;
-            border-top: 1px solid rgba(255,255,255,0.15);
+            border-top: 1px solid rgba(255, 255, 255, 0.15);
             font-style: italic;
             line-height: 1.5;
         }
@@ -338,7 +370,7 @@
             height: 12px;
             border-radius: 100px;
             background: linear-gradient(to right, #dc2626, #ef4444, #f97316, #f8fafc, #34d399, #10b981, #059669);
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         /* ===== INSIGHT BOX ===== */
@@ -361,7 +393,10 @@
             transition: all 0.3s ease;
         }
 
-        .insight-card:hover { transform: translateY(-2px); box-shadow: var(--shadow); }
+        .insight-card:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
 
         .insight-card.findings {
             background: #fef3c7;
@@ -381,7 +416,11 @@
             color: #065f46;
         }
 
-        .insight-card .icon { font-size: 1.6rem; line-height: 1; flex-shrink: 0; }
+        .insight-card .icon {
+            font-size: 1.6rem;
+            line-height: 1;
+            flex-shrink: 0;
+        }
 
         .highlight-num {
             font-weight: 900;
@@ -429,7 +468,7 @@
         .cell-bg.highlighted {
             stroke: #0f172a !important;
             stroke-width: 4 !important;
-            filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         .cell-bg.dimmed {
@@ -449,631 +488,681 @@
         }
 
         .word-item:hover {
-            filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0,0,0,0.3));
+            filter: brightness(1.2) drop-shadow(0 4px 8px rgba(0, 0, 0, 0.3));
         }
 
         /* ===== SCROLLBAR ===== */
-        .chart-container::-webkit-scrollbar { height: 10px; }
-        .chart-container::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 10px; }
-        .chart-container::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        .chart-container::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .chart-container::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .chart-container::-webkit-scrollbar-track {
+            background: #f1f5f9;
+            border-radius: 10px;
+        }
+
+        .chart-container::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 10px;
+        }
+
+        .chart-container::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
 
         /* ===== RESPONSIF ===== */
         @media (max-width: 768px) {
-            body { padding: 12px; }
-            .card { padding: 16px 14px; }
-            .card-header { flex-direction: column; align-items: flex-start; }
-            .toggle-group { width: 100%; }
-            .toggle-btn { flex: 1; justify-content: center; font-size: 0.75rem; padding: 8px 12px; }
-            .sort-controls { width: 100%; }
-            .btn-sort { flex: 1; text-align: center; font-size: 0.7rem; }
-            .tooltip { max-width: 260px; padding: 14px 18px; font-size: 0.8rem; }
-            .stats-bar { flex-direction: column; }
+            body {
+                padding: 12px;
+            }
+
+            .card {
+                padding: 16px 14px;
+            }
+
+            .card-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .toggle-group {
+                width: 100%;
+            }
+
+            .toggle-btn {
+                flex: 1;
+                justify-content: center;
+                font-size: 0.75rem;
+                padding: 8px 12px;
+            }
+
+            .sort-controls {
+                width: 100%;
+            }
+
+            .btn-sort {
+                flex: 1;
+                text-align: center;
+                font-size: 0.7rem;
+            }
+
+            .tooltip {
+                max-width: 260px;
+                padding: 14px 18px;
+                font-size: 0.8rem;
+            }
+
+            .stats-bar {
+                flex-direction: column;
+            }
         }
     </style>
 </head>
+
 <body>
 
-<div class="dashboard-container">
+    <div class="dashboard-container">
 
-    <!-- ===== HEADER STORY ===== -->
-    <div class="story-header">
-        <div class="eyebrow">📖 Case Study #3</div>
-        <h1>Membedah Formula Kesuksesan: Korelasi Tersembunyi</h1>
-        <p class="subtitle">
-            Dari <strong>10.000 mahasiswa</strong> di <strong>100 kampus</strong>, hanya <strong>16.6% yang berhasil ditempatkan</strong>. 
-            Semua korelasi dihitung <em>real-time</em> dari dataset asli menggunakan D3.js.
-        </p>
-    </div>
+        <!-- ===== HEADER STORY ===== -->
+        <div class="story-header">
+            <div class="eyebrow">📖 Case Study #3</div>
+            <h1>Membedah Formula Kesuksesan: Korelasi Tersembunyi</h1>
+            <p class="subtitle">
+                Dari <strong>10.000 mahasiswa</strong> di <strong>100 kampus</strong>, hanya <strong>16.6% yang berhasil
+                    ditempatkan</strong>.
+                Semua korelasi dihitung <em>real-time</em> dari dataset asli menggunakan D3.js.
+            </p>
+        </div>
 
-    <!-- ===== STATS BAR ===== -->
-    <div class="stats-bar">
-        <div class="stat-item">
-            <div class="stat-value">10,000</div>
-            <div class="stat-label">Mahasiswa</div>
+        <!-- ===== STATS BAR ===== -->
+        <div class="stats-bar">
+            <div class="stat-item">
+                <div class="stat-value">10,000</div>
+                <div class="stat-label">Mahasiswa</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">100</div>
+                <div class="stat-label">Kampus</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">16.6%</div>
+                <div class="stat-label">Tingkat Penempatan</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value">8</div>
+                <div class="stat-label">Variabel Dikorelasikan</div>
+            </div>
         </div>
-        <div class="stat-item">
-            <div class="stat-value">100</div>
-            <div class="stat-label">Kampus</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">16.6%</div>
-            <div class="stat-label">Tingkat Penempatan</div>
-        </div>
-        <div class="stat-item">
-            <div class="stat-value">8</div>
-            <div class="stat-label">Variabel Dikorelasikan</div>
-        </div>
-    </div>
 
-    <!-- ===== KARTU UTAMA ===== -->
-    <div class="card">
-        <div class="card-header">
-            <h2>
-                <span id="view-icon">🌡️</span>
-                <span id="view-title">Matriks Korelasi Lengkap (8×8)</span>
-                <span class="badge">Real-time D3.js</span>
-            </h2>
-            <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
-                <div class="toggle-group" id="toggle-group">
-                    <button id="btn-heatmap" class="toggle-btn active">
-                        <span>🌡️</span> Heatmap
-                    </button>
-                    <button id="btn-wordcloud" class="toggle-btn">
-                        <span>☁️</span> Word Cloud
-                    </button>
+        <!-- ===== KARTU UTAMA ===== -->
+        <div class="card">
+            <div class="card-header">
+                <h2>
+                    <span id="view-icon">🌡️</span>
+                    <span id="view-title">Matriks Korelasi Lengkap (8×8)</span>
+                    <span class="badge">Real-time D3.js</span>
+                </h2>
+                <div style="display:flex; flex-wrap:wrap; gap:12px; align-items:center;">
+                    <div class="toggle-group" id="toggle-group">
+                        <button id="btn-heatmap" class="toggle-btn active">
+                            <span>🌡️</span> Heatmap
+                        </button>
+                        <button id="btn-wordcloud" class="toggle-btn">
+                            <span>☁️</span> Word Cloud
+                        </button>
+                    </div>
+                    <div class="sort-controls" id="sort-controls">
+                        <button id="sort-default" class="btn-sort active">📋 Default</button>
+                        <button id="sort-placement" class="btn-sort">🎯 Terdekat Placement</button>
+                        <button id="sort-strength" class="btn-sort">📊 Kekuatan Umum</button>
+                    </div>
                 </div>
-                <div class="sort-controls" id="sort-controls">
-                    <button id="sort-default" class="btn-sort active">📋 Default</button>
-                    <button id="sort-placement" class="btn-sort">🎯 Terdekat Placement</button>
-                    <button id="sort-strength" class="btn-sort">📊 Kekuatan Umum</button>
+            </div>
+
+          
+
+            <div class="vis-wrapper">
+                <div id="custom-tooltip" class="tooltip"></div>
+                <div class="chart-container" id="chart-container">
+                    <svg id="main-svg"></svg>
+                </div>
+                <div class="legend-container" id="legend-heatmap">
+                    <span style="display:flex; align-items:center; gap:4px;">
+                        <span
+                            style="width:10px;height:10px;background:#dc2626;border-radius:50%;display:inline-block;"></span>
+                        -1.0
+                    </span>
+                    <div class="legend-gradient"></div>
+                    <span style="display:flex; align-items:center; gap:4px;">
+                        <span
+                            style="width:10px;height:10px;background:#059669;border-radius:50%;display:inline-block;"></span>
+                        +1.0
+                    </span>
+                    <span style="font-weight:500;color:#64748b;">(Hover sel untuk detail)</span>
                 </div>
             </div>
         </div>
 
-        <!-- Info: Data dihitung real-time -->
-        <div style="background:#f0fdf4; border:1px solid #a7f3d0; border-radius:10px; padding:10px 16px; margin-bottom:16px; font-size:0.78rem; color:#065f46; display:flex; align-items:center; gap:8px;">
-            <span>🟢</span>
-            <span><strong>Live Computation:</strong> Semua nilai korelasi dihitung langsung dari <code>college_student_placement_dataset.csv</code> (10.000 baris) menggunakan fungsi Pearson Correlation di D3.js. Tidak ada data yang di-hardcode.</span>
-        </div>
-
-        <div class="vis-wrapper">
-            <div id="custom-tooltip" class="tooltip"></div>
-            <div class="chart-container" id="chart-container">
-                <svg id="main-svg"></svg>
+        <!-- ===== INSIGHT GRID ===== -->
+        <div class="insight-grid">
+            <div class="insight-card findings">
+                <span class="icon">🔍</span>
+                <div>
+                    <strong>Temuan Kunci</strong>
+                    <p style="margin-top:4px;font-size:0.82rem;">
+                        <span class="highlight-num">4 variabel</span> berkorelasi moderat dengan Placement:
+                        <strong>Communication Skills</strong> (r≈0.323), <strong>CGPA</strong> (r≈0.322),
+                        <strong>Prev Sem Result</strong> (r≈0.318), dan <strong>IQ</strong> (r≈0.286).
+                        <br><em>Tidak ada faktor tunggal yang dominan — kesuksesan bersifat multi-faktor.</em>
+                    </p>
+                </div>
             </div>
-            <div class="legend-container" id="legend-heatmap">
-                <span style="display:flex; align-items:center; gap:4px;">
-                    <span style="width:10px;height:10px;background:#dc2626;border-radius:50%;display:inline-block;"></span> -1.0
-                </span>
-                <div class="legend-gradient"></div>
-                <span style="display:flex; align-items:center; gap:4px;">
-                    <span style="width:10px;height:10px;background:#059669;border-radius:50%;display:inline-block;"></span> +1.0
-                </span>
-                <span style="font-weight:500;color:#64748b;">(Hover sel untuk detail)</span>
-            </div>
-        </div>
-    </div>
 
-    <!-- ===== INSIGHT GRID ===== -->
-    <div class="insight-grid">
-        <div class="insight-card findings">
-            <span class="icon">🔍</span>
-            <div>
-                <strong>Temuan Kunci</strong>
-                <p style="margin-top:4px;font-size:0.82rem;">
-                    <span class="highlight-num">4 variabel</span> berkorelasi moderat dengan Placement: 
-                    <strong>Communication Skills</strong> (r≈0.323), <strong>CGPA</strong> (r≈0.322), 
-                    <strong>Prev Sem Result</strong> (r≈0.318), dan <strong>IQ</strong> (r≈0.286).
-                    <br><em>Tidak ada faktor tunggal yang dominan — kesuksesan bersifat multi-faktor.</em>
-                </p>
+            <div class="insight-card story">
+                <span class="icon">📖</span>
+                <div>
+                    <strong>Cerita di Balik Data</strong>
+                    <p style="margin-top:4px;font-size:0.82rem;">
+                        <strong>Magang hampir tidak berkorelasi</strong> dengan penempatan (r≈-0.006).
+                        Ini mengejutkan! Artinya, <em>memiliki pengalaman magang saja tidak cukup</em> —
+                        yang lebih penting adalah <strong>kemampuan komunikasi</strong> dan <strong>konsistensi
+                            akademik</strong>.
+                    </p>
+                </div>
             </div>
-        </div>
 
-        <div class="insight-card story">
-            <span class="icon">📖</span>
-            <div>
-                <strong>Cerita di Balik Data</strong>
-                <p style="margin-top:4px;font-size:0.82rem;">
-                    <strong>Magang hampir tidak berkorelasi</strong> dengan penempatan (r≈-0.006). 
-                    Ini mengejutkan! Artinya, <em>memiliki pengalaman magang saja tidak cukup</em> — 
-                    yang lebih penting adalah <strong>kemampuan komunikasi</strong> dan <strong>konsistensi akademik</strong>.
-                </p>
-            </div>
-        </div>
-
-        <div class="insight-card action">
-            <span class="icon">💡</span>
-            <div>
-                <strong>Rekomendasi untuk Mahasiswa</strong>
-                <p style="margin-top:4px;font-size:0.82rem;">
-                    Fokus pada <strong>pengembangan komunikasi</strong>, jaga <strong>IPK di atas 7.5</strong> 
-                    (kuartil atas), dan selesaikan <strong>minimal 3 proyek</strong>. 
-                    Kombinasi ini meningkatkan peluang penempatan secara signifikan.
-                </p>
+            <div class="insight-card action">
+                <span class="icon">💡</span>
+                <div>
+                    <strong>Rekomendasi untuk Mahasiswa</strong>
+                    <p style="margin-top:4px;font-size:0.82rem;">
+                        Fokus pada <strong>pengembangan komunikasi</strong>, jaga <strong>IPK di atas 7.5</strong>
+                        (kuartil atas), dan selesaikan <strong>minimal 3 proyek</strong>.
+                        Kombinasi ini meningkatkan peluang penempatan secara signifikan.
+                    </p>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
-<script>
-// =============================================
-// CASE 3: HEATMAP KORELASI & WORD CLOUD
-// Dataset: college_student_placement_dataset.csv
-// Semua nilai korelasi dihitung REAL-TIME oleh D3.js
-// Fungsi Pearson Correlation memproses 10.000 baris data
-// =============================================
+    <script>
+        // =============================================
+        // CASE 3: HEATMAP KORELASI & WORD CLOUD
+        // Dataset: college_student_placement_dataset.csv
+        // Semua nilai korelasi dihitung REAL-TIME oleh D3.js
+        // Fungsi Pearson Correlation memproses 10.000 baris data
+        // =============================================
 
-const CONFIG = {
-    DATA_PATH: '../data/college_student_placement_dataset.csv',
-    
-    // SEMUA 8 variabel yang akan dikorelasikan
-    ALL_VARIABLES: [
-        'IQ',
-        'CGPA', 
-        'Prev_Sem_Result',
-        'Communication_Skills',
-        'Projects_Completed',
-        'Extra_Curricular_Score',
-        'Placement',
-        'Internship_Experience'
-    ],
-    
-    TARGET_COL: 'Placement',
-    CELL_SIZE: 72,
-    MARGIN_HEATMAP: { top: 30, right: 30, bottom: 100, left: 175 },
-};
+        const CONFIG = {
+            DATA_PATH: '../data/college_student_placement_dataset.csv',
 
-// State global
-let fullData = [];                    // Seluruh data mentah dari CSV
-let correlationMatrix = {};          // Matriks korelasi hasil perhitungan
-let variables = [...CONFIG.ALL_VARIABLES]; // Urutan variabel saat ini
-let currentView = 'heatmap';
-let currentSort = 'default';
+            // SEMUA 8 variabel yang akan dikorelasikan
+            ALL_VARIABLES: [
+                'IQ',
+                'CGPA',
+                'Prev_Sem_Result',
+                'Communication_Skills',
+                'Projects_Completed',
+                'Extra_Curricular_Score',
+                'Placement',
+                'Internship_Experience'
+            ],
 
-// =============================================
-// 1. LOAD DATA DARI CSV
-// =============================================
-async function loadData() {
-    try {
-        console.log('📂 Memuat dataset:', CONFIG.DATA_PATH);
-        const raw = await d3.csv(CONFIG.DATA_PATH);
-        console.log(`✅ ${raw.length} baris berhasil dimuat`);
-        
-        // Konversi semua nilai ke numerik
-        fullData = raw.map(d => ({
-            IQ: +d.IQ || 0,
-            CGPA: +d.CGPA || 0,
-            Prev_Sem_Result: +d.Prev_Sem_Result || 0,
-            Communication_Skills: +d.Communication_Skills || 0,
-            Projects_Completed: +d.Projects_Completed || 0,
-            Extra_Curricular_Score: +d.Extra_Curricular_Score || 0,
-            Academic_Performance: +d.Academic_Performance || 0,
-            Placement: (d.Placement || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
-            Internship_Experience: (d.Internship_Experience || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
-            College_ID: d.College_ID || ''
-        })).filter(d => !isNaN(d.CGPA) && !isNaN(d.IQ));
+            TARGET_COL: 'Placement',
+            CELL_SIZE: 72,
+            MARGIN_HEATMAP: { top: 30, right: 30, bottom: 100, left: 175 },
+        };
 
-        console.log(`✅ ${fullData.length} baris valid setelah filtering`);
-        console.log('📊 Menghitung matriks korelasi Pearson...');
-        
-        // Hitung korelasi untuk semua 8 variabel
-        computeMatrix();
-        
-        console.log('✅ Matriks korelasi selesai dihitung');
-        console.table(correlationMatrix);
-        
-        renderCurrentView();
-    } catch (e) {
-        console.error('❌ Error:', e);
-        document.getElementById('chart-container').innerHTML = `
+        // State global
+        let fullData = [];                    // Seluruh data mentah dari CSV
+        let correlationMatrix = {};          // Matriks korelasi hasil perhitungan
+        let variables = [...CONFIG.ALL_VARIABLES]; // Urutan variabel saat ini
+        let currentView = 'heatmap';
+        let currentSort = 'default';
+
+        // =============================================
+        // 1. LOAD DATA DARI CSV
+        // =============================================
+        async function loadData() {
+            try {
+                console.log('📂 Memuat dataset:', CONFIG.DATA_PATH);
+                const raw = await d3.csv(CONFIG.DATA_PATH);
+                console.log(`✅ ${raw.length} baris berhasil dimuat`);
+
+                // Konversi semua nilai ke numerik
+                fullData = raw.map(d => ({
+                    IQ: +d.IQ || 0,
+                    CGPA: +d.CGPA || 0,
+                    Prev_Sem_Result: +d.Prev_Sem_Result || 0,
+                    Communication_Skills: +d.Communication_Skills || 0,
+                    Projects_Completed: +d.Projects_Completed || 0,
+                    Extra_Curricular_Score: +d.Extra_Curricular_Score || 0,
+                    Academic_Performance: +d.Academic_Performance || 0,
+                    Placement: (d.Placement || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
+                    Internship_Experience: (d.Internship_Experience || '').toString().trim().toLowerCase() === 'yes' ? 1 : 0,
+                    College_ID: d.College_ID || ''
+                })).filter(d => !isNaN(d.CGPA) && !isNaN(d.IQ));
+
+                console.log(`✅ ${fullData.length} baris valid setelah filtering`);
+                console.log('📊 Menghitung matriks korelasi Pearson...');
+
+                // Hitung korelasi untuk semua 8 variabel
+                computeMatrix();
+
+                console.log('✅ Matriks korelasi selesai dihitung');
+                console.table(correlationMatrix);
+
+                renderCurrentView();
+            } catch (e) {
+                console.error('❌ Error:', e);
+                document.getElementById('chart-container').innerHTML = `
             <div style="text-align:center;padding:50px;color:#b91c1c;">
                 <p style="font-size:2rem;">⚠️</p>
                 <p style="font-weight:700;">Gagal Memuat Data</p>
                 <p style="font-size:0.85rem;">Pastikan file <code>data/college_student_placement_dataset.csv</code> tersedia.</p>
                 <p style="font-size:0.75rem;color:#94a3b8;">Error: ${e.message}</p>
             </div>`;
-    }
-}
-
-// =============================================
-// 2. FUNGSI KORELASI PEARSON (REAL-TIME)
-//    Memproses 10.000 data point per pasangan variabel
-// =============================================
-function pearson(x, y) {
-    const n = x.length;
-    if (n === 0) return 0;
-    
-    // Hitung mean
-    const mx = x.reduce((a, b) => a + b, 0) / n;
-    const my = y.reduce((a, b) => a + b, 0) / n;
-    
-    // Hitung covariance dan variance
-    let num = 0, dx2 = 0, dy2 = 0;
-    for (let i = 0; i < n; i++) {
-        const dx = x[i] - mx;
-        const dy = y[i] - my;
-        num += dx * dy;
-        dx2 += dx * dx;
-        dy2 += dy * dy;
-    }
-    
-    const den = Math.sqrt(dx2 * dy2);
-    const result = den === 0 ? 0 : num / den;
-    
-    // Bulatkan ke 3 desimal
-    return Math.round(result * 1000) / 1000;
-}
-
-function computeMatrix() {
-    console.log('🔄 Menghitung korelasi untuk', CONFIG.ALL_VARIABLES.length, 'variabel...');
-    correlationMatrix = {};
-    
-    // Inisialisasi matriks
-    CONFIG.ALL_VARIABLES.forEach(a => {
-        correlationMatrix[a] = {};
-    });
-    
-    // Hitung setiap pasangan (matriks simetris)
-    const totalPairs = (CONFIG.ALL_VARIABLES.length * (CONFIG.ALL_VARIABLES.length + 1)) / 2;
-    let pairCount = 0;
-    
-    for (let i = 0; i < CONFIG.ALL_VARIABLES.length; i++) {
-        for (let j = i; j < CONFIG.ALL_VARIABLES.length; j++) {
-            const colA = CONFIG.ALL_VARIABLES[i];
-            const colB = CONFIG.ALL_VARIABLES[j];
-            pairCount++;
-            
-            if (i === j) {
-                correlationMatrix[colA][colB] = 1.0;
-            } else {
-                const valuesA = fullData.map(d => d[colA]);
-                const valuesB = fullData.map(d => d[colB]);
-                const corr = pearson(valuesA, valuesB);
-                correlationMatrix[colA][colB] = corr;
-                correlationMatrix[colB][colA] = corr; // Simetris
             }
         }
-    }
-    
-    console.log(`✅ ${pairCount} pasangan korelasi dihitung`);
-}
 
-// =============================================
-// 3. INTERPRETASI KORELASI
-// =============================================
-function interpretCorrelation(value) {
-    const abs = Math.abs(value);
-    const direction = value > 0 ? 'positif' : 'negatif';
-    if (abs >= 0.8) return `Korelasi ${direction} sangat kuat. Hubungan hampir pasti antar variabel.`;
-    if (abs >= 0.6) return `Korelasi ${direction} kuat. Hubungan signifikan dan konsisten.`;
-    if (abs >= 0.3) return `Korelasi ${direction} moderat. Ada hubungan yang berarti namun tidak dominan.`;
-    if (abs >= 0.15) return `Korelasi ${direction} lemah. Hubungan mulai terlihat namun kecil.`;
-    return `Korelasi sangat lemah (mendekati nol). Tidak ada hubungan linear yang berarti.`;
-}
+        // =============================================
+        // 2. FUNGSI KORELASI PEARSON (REAL-TIME)
+        //    Memproses 10.000 data point per pasangan variabel
+        // =============================================
+        function pearson(x, y) {
+            const n = x.length;
+            if (n === 0) return 0;
 
-function getCorrelationLabel(value) {
-    const abs = Math.abs(value);
-    if (abs >= 0.8) return 'Sangat Kuat';
-    if (abs >= 0.6) return 'Kuat';
-    if (abs >= 0.3) return 'Moderat';
-    if (abs >= 0.15) return 'Lemah';
-    return 'Sangat Lemah';
-}
+            // Hitung mean
+            const mx = x.reduce((a, b) => a + b, 0) / n;
+            const my = y.reduce((a, b) => a + b, 0) / n;
 
-function getStrengthColor(value) {
-    const abs = Math.abs(value);
-    if (abs >= 0.8) return { bg: '#7c3aed', text: '#ffffff' };
-    if (abs >= 0.6) return { bg: '#3b82f6', text: '#ffffff' };
-    if (abs >= 0.3) return { bg: '#f59e0b', text: '#1e293b' };
-    if (abs >= 0.15) return { bg: '#94a3b8', text: '#ffffff' };
-    return { bg: '#cbd5e1', text: '#475569' };
-}
-
-// =============================================
-// 4. FORMAT NAMA
-// =============================================
-function formatName(name) {
-    const map = {
-        'IQ': 'IQ Score',
-        'CGPA': 'IPK (CGPA)',
-        'Prev_Sem_Result': 'Nilai Semester Lalu',
-        'Communication_Skills': 'Kemampuan Komunikasi',
-        'Projects_Completed': 'Proyek Diselesaikan',
-        'Extra_Curricular_Score': 'Skor Ekstrakurikuler',
-        'Placement': 'Status Penempatan',
-        'Internship_Experience': 'Pengalaman Magang'
-    };
-    return map[name] || name.replace(/_/g, ' ');
-}
-
-// =============================================
-// 5. SKEMA WARNA HEATMAP
-// =============================================
-const colorScale = d3.scaleLinear()
-    .domain([-1, -0.5, -0.2, 0, 0.2, 0.5, 1])
-    .range(['#dc2626', '#ef4444', '#f97316', '#f8fafc', '#34d399', '#10b981', '#059669'])
-    .clamp(true);
-
-function getTextColor(value) {
-    return Math.abs(value) > 0.45 ? '#ffffff' : '#1e293b';
-}
-
-// =============================================
-// 6. RENDER HEATMAP (8×8 - SEMUA VARIABEL)
-// =============================================
-function renderHeatmap() {
-    const svg = d3.select('#main-svg');
-    svg.selectAll('*').remove();
-    
-    const cols = variables;
-    const cell = CONFIG.CELL_SIZE;
-    const m = CONFIG.MARGIN_HEATMAP;
-    const w = cols.length * cell + m.left + m.right;
-    const h = cols.length * cell + m.top + m.bottom;
-    
-    svg.attr('width', w).attr('height', h).style('overflow', 'visible');
-    
-    const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
-    const tooltip = d3.select('#custom-tooltip');
-
-    const xScale = d3.scaleBand().domain(cols).range([0, cols.length * cell]).padding(0.06);
-    const yScale = d3.scaleBand().domain(cols).range([0, cols.length * cell]).padding(0.06);
-
-    // Buat grid data untuk semua sel
-    const cellsData = cols.flatMap(r => cols.map(c => ({
-        row: r, 
-        col: c, 
-        value: correlationMatrix[r]?.[c] ?? 0
-    })));
-
-    // Debug: tampilkan jumlah sel
-    console.log(`🔲 Merender ${cellsData.length} sel heatmap (${cols.length}×${cols.length})`);
-
-    const cellGroups = g.selectAll('.cell-group')
-        .data(cellsData)
-        .enter().append('g')
-        .attr('class', 'cell-group')
-        .attr('transform', d => `translate(${xScale(d.col)},${yScale(d.row)})`);
-
-    // Background sel dengan warna korelasi
-    cellGroups.append('rect')
-        .attr('class', 'cell-bg')
-        .attr('width', xScale.bandwidth())
-        .attr('height', yScale.bandwidth())
-        .attr('rx', 10).attr('ry', 10)
-        .attr('fill', d => colorScale(d.value))
-        .attr('stroke', '#ffffff')
-        .attr('stroke-width', 2.5)
-        .style('cursor', 'pointer');
-
-    // Bubble di dalam sel (ukuran = kekuatan korelasi)
-    cellGroups.append('circle')
-        .attr('class', 'bubble')
-        .attr('cx', xScale.bandwidth() / 2)
-        .attr('cy', yScale.bandwidth() / 2)
-        .attr('r', d => Math.max(3, Math.abs(d.value) * (xScale.bandwidth() / 2.8)))
-        .attr('fill', 'rgba(255, 255, 255, 0.4)')
-        .attr('stroke', 'rgba(255, 255, 255, 0.7)')
-        .attr('stroke-width', 1.5)
-        .style('pointer-events', 'none');
-
-    // Teks nilai korelasi
-    cellGroups.append('text')
-        .attr('x', xScale.bandwidth() / 2)
-        .attr('y', yScale.bandwidth() / 2 + 1)
-        .attr('text-anchor', 'middle')
-        .attr('dominant-baseline', 'middle')
-        .style('font-size', '0.82rem')
-        .style('font-weight', '800')
-        .style('fill', d => getTextColor(d.value))
-        .style('pointer-events', 'none')
-        .text(d => d.value.toFixed(2));
-
-    // Label sumbu X (di atas)
-    g.selectAll('.x-label')
-        .data(cols)
-        .enter().append('text')
-        .attr('class', 'x-label')
-        .attr('x', d => xScale(d) + xScale.bandwidth() / 2)
-        .attr('y', -12)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '10px')
-        .style('font-weight', '700')
-        .style('fill', '#334155')
-        .text(d => formatName(d))
-        .each(function(d) {
-            if (d.length > 15) {
-                d3.select(this)
-                    .attr('transform', `rotate(-30, ${xScale(d) + xScale.bandwidth()/2}, -12)`)
-                    .attr('text-anchor', 'end');
+            // Hitung covariance dan variance
+            let num = 0, dx2 = 0, dy2 = 0;
+            for (let i = 0; i < n; i++) {
+                const dx = x[i] - mx;
+                const dy = y[i] - my;
+                num += dx * dy;
+                dx2 += dx * dx;
+                dy2 += dy * dy;
             }
-        });
 
-    // Label sumbu Y (di kiri)
-    g.selectAll('.y-label')
-        .data(cols)
-        .enter().append('text')
-        .attr('class', 'y-label')
-        .attr('x', -10)
-        .attr('y', d => yScale(d) + yScale.bandwidth() / 2)
-        .attr('text-anchor', 'end')
-        .attr('dominant-baseline', 'middle')
-        .style('font-size', '10px')
-        .style('font-weight', '700')
-        .style('fill', '#334155')
-        .text(d => formatName(d));
+            const den = Math.sqrt(dx2 * dy2);
+            const result = den === 0 ? 0 : num / den;
 
-    // =============================================
-    // INTERAKSI HOVER (DIPERBAIKI - PASTI MUNCUL)
-    // =============================================
-    cellGroups
-        .on('mouseenter', function(event, d) {
-            // Reset semua sel ke opacity normal dulu
-            g.selectAll('.cell-bg')
-                .classed('dimmed', true)
-                .classed('row-col-highlight', false)
-                .classed('highlighted', false);
-            
-            // Highlight baris dan kolom yang sesuai
-            g.selectAll('.cell-bg')
-                .filter(cell => cell.row === d.row || cell.col === d.col)
-                .classed('dimmed', false)
-                .classed('row-col-highlight', true);
-            
-            // Highlight sel yang dihover
-            d3.select(this).select('.cell-bg')
-                .classed('highlighted', true)
-                .classed('row-col-highlight', false);
+            // Bulatkan ke 3 desimal
+            return Math.round(result * 1000) / 1000;
+        }
 
-            // Siapkan tooltip
-            const strength = getCorrelationLabel(d.value);
-            const strengthColors = getStrengthColor(d.value);
-            const interpretation = interpretCorrelation(d.value);
-            
-            // Update konten tooltip
-            tooltip
-                .html(`
+        function computeMatrix() {
+            console.log('🔄 Menghitung korelasi untuk', CONFIG.ALL_VARIABLES.length, 'variabel...');
+            correlationMatrix = {};
+
+            // Inisialisasi matriks
+            CONFIG.ALL_VARIABLES.forEach(a => {
+                correlationMatrix[a] = {};
+            });
+
+            // Hitung setiap pasangan (matriks simetris)
+            const totalPairs = (CONFIG.ALL_VARIABLES.length * (CONFIG.ALL_VARIABLES.length + 1)) / 2;
+            let pairCount = 0;
+
+            for (let i = 0; i < CONFIG.ALL_VARIABLES.length; i++) {
+                for (let j = i; j < CONFIG.ALL_VARIABLES.length; j++) {
+                    const colA = CONFIG.ALL_VARIABLES[i];
+                    const colB = CONFIG.ALL_VARIABLES[j];
+                    pairCount++;
+
+                    if (i === j) {
+                        correlationMatrix[colA][colB] = 1.0;
+                    } else {
+                        const valuesA = fullData.map(d => d[colA]);
+                        const valuesB = fullData.map(d => d[colB]);
+                        const corr = pearson(valuesA, valuesB);
+                        correlationMatrix[colA][colB] = corr;
+                        correlationMatrix[colB][colA] = corr; // Simetris
+                    }
+                }
+            }
+
+            console.log(`✅ ${pairCount} pasangan korelasi dihitung`);
+        }
+
+        // =============================================
+        // 3. INTERPRETASI KORELASI
+        // =============================================
+        function interpretCorrelation(value) {
+            const abs = Math.abs(value);
+            const direction = value > 0 ? 'positif' : 'negatif';
+            if (abs >= 0.8) return `Korelasi ${direction} sangat kuat. Hubungan hampir pasti antar variabel.`;
+            if (abs >= 0.6) return `Korelasi ${direction} kuat. Hubungan signifikan dan konsisten.`;
+            if (abs >= 0.3) return `Korelasi ${direction} moderat. Ada hubungan yang berarti namun tidak dominan.`;
+            if (abs >= 0.15) return `Korelasi ${direction} lemah. Hubungan mulai terlihat namun kecil.`;
+            return `Korelasi sangat lemah (mendekati nol). Tidak ada hubungan linear yang berarti.`;
+        }
+
+        function getCorrelationLabel(value) {
+            const abs = Math.abs(value);
+            if (abs >= 0.8) return 'Sangat Kuat';
+            if (abs >= 0.6) return 'Kuat';
+            if (abs >= 0.3) return 'Moderat';
+            if (abs >= 0.15) return 'Lemah';
+            return 'Sangat Lemah';
+        }
+
+        function getStrengthColor(value) {
+            const abs = Math.abs(value);
+            if (abs >= 0.8) return { bg: '#7c3aed', text: '#ffffff' };
+            if (abs >= 0.6) return { bg: '#3b82f6', text: '#ffffff' };
+            if (abs >= 0.3) return { bg: '#f59e0b', text: '#1e293b' };
+            if (abs >= 0.15) return { bg: '#94a3b8', text: '#ffffff' };
+            return { bg: '#cbd5e1', text: '#475569' };
+        }
+
+        // =============================================
+        // 4. FORMAT NAMA
+        // =============================================
+        function formatName(name) {
+            const map = {
+                'IQ': 'IQ Score',
+                'CGPA': 'IPK (CGPA)',
+                'Prev_Sem_Result': 'Nilai Semester Lalu',
+                'Communication_Skills': 'Kemampuan Komunikasi',
+                'Projects_Completed': 'Proyek Diselesaikan',
+                'Extra_Curricular_Score': 'Skor Ekstrakurikuler',
+                'Placement': 'Status Penempatan',
+                'Internship_Experience': 'Pengalaman Magang'
+            };
+            return map[name] || name.replace(/_/g, ' ');
+        }
+
+        // =============================================
+        // 5. SKEMA WARNA HEATMAP
+        // =============================================
+        const colorScale = d3.scaleLinear()
+            .domain([-1, -0.5, -0.2, 0, 0.2, 0.5, 1])
+            .range(['#dc2626', '#ef4444', '#f97316', '#f8fafc', '#34d399', '#10b981', '#059669'])
+            .clamp(true);
+
+        function getTextColor(value) {
+            return Math.abs(value) > 0.45 ? '#ffffff' : '#1e293b';
+        }
+
+        // =============================================
+        // 6. RENDER HEATMAP (8×8 - SEMUA VARIABEL)
+        // =============================================
+        function renderHeatmap() {
+            const svg = d3.select('#main-svg');
+            svg.selectAll('*').remove();
+
+            const cols = variables;
+            const cell = CONFIG.CELL_SIZE;
+            const m = CONFIG.MARGIN_HEATMAP;
+            const w = cols.length * cell + m.left + m.right;
+            const h = cols.length * cell + m.top + m.bottom;
+
+            svg.attr('width', w).attr('height', h).style('overflow', 'visible');
+
+            const g = svg.append('g').attr('transform', `translate(${m.left},${m.top})`);
+            const tooltip = d3.select('#custom-tooltip');
+
+            const xScale = d3.scaleBand().domain(cols).range([0, cols.length * cell]).padding(0.06);
+            const yScale = d3.scaleBand().domain(cols).range([0, cols.length * cell]).padding(0.06);
+
+            // Buat grid data untuk semua sel
+            const cellsData = cols.flatMap(r => cols.map(c => ({
+                row: r,
+                col: c,
+                value: correlationMatrix[r]?.[c] ?? 0
+            })));
+
+            // Debug: tampilkan jumlah sel
+            console.log(`🔲 Merender ${cellsData.length} sel heatmap (${cols.length}×${cols.length})`);
+
+            const cellGroups = g.selectAll('.cell-group')
+                .data(cellsData)
+                .enter().append('g')
+                .attr('class', 'cell-group')
+                .attr('transform', d => `translate(${xScale(d.col)},${yScale(d.row)})`);
+
+            // Background sel dengan warna korelasi
+            cellGroups.append('rect')
+                .attr('class', 'cell-bg')
+                .attr('width', xScale.bandwidth())
+                .attr('height', yScale.bandwidth())
+                .attr('rx', 10).attr('ry', 10)
+                .attr('fill', d => colorScale(d.value))
+                .attr('stroke', '#ffffff')
+                .attr('stroke-width', 2.5)
+                .style('cursor', 'pointer');
+
+            // Bubble di dalam sel (ukuran = kekuatan korelasi)
+            cellGroups.append('circle')
+                .attr('class', 'bubble')
+                .attr('cx', xScale.bandwidth() / 2)
+                .attr('cy', yScale.bandwidth() / 2)
+                .attr('r', d => Math.max(3, Math.abs(d.value) * (xScale.bandwidth() / 2.8)))
+                .attr('fill', 'rgba(255, 255, 255, 0.4)')
+                .attr('stroke', 'rgba(255, 255, 255, 0.7)')
+                .attr('stroke-width', 1.5)
+                .style('pointer-events', 'none');
+
+            // Teks nilai korelasi
+            cellGroups.append('text')
+                .attr('x', xScale.bandwidth() / 2)
+                .attr('y', yScale.bandwidth() / 2 + 1)
+                .attr('text-anchor', 'middle')
+                .attr('dominant-baseline', 'middle')
+                .style('font-size', '0.82rem')
+                .style('font-weight', '800')
+                .style('fill', d => getTextColor(d.value))
+                .style('pointer-events', 'none')
+                .text(d => d.value.toFixed(2));
+
+            // Label sumbu X (di atas)
+            g.selectAll('.x-label')
+                .data(cols)
+                .enter().append('text')
+                .attr('class', 'x-label')
+                .attr('x', d => xScale(d) + xScale.bandwidth() / 2)
+                .attr('y', -12)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '10px')
+                .style('font-weight', '700')
+                .style('fill', '#334155')
+                .text(d => formatName(d))
+                .each(function (d) {
+                    if (d.length > 15) {
+                        d3.select(this)
+                            .attr('transform', `rotate(-30, ${xScale(d) + xScale.bandwidth() / 2}, -12)`)
+                            .attr('text-anchor', 'end');
+                    }
+                });
+
+            // Label sumbu Y (di kiri)
+            g.selectAll('.y-label')
+                .data(cols)
+                .enter().append('text')
+                .attr('class', 'y-label')
+                .attr('x', -10)
+                .attr('y', d => yScale(d) + yScale.bandwidth() / 2)
+                .attr('text-anchor', 'end')
+                .attr('dominant-baseline', 'middle')
+                .style('font-size', '10px')
+                .style('font-weight', '700')
+                .style('fill', '#334155')
+                .text(d => formatName(d));
+
+            // =============================================
+            // INTERAKSI HOVER (DIPERBAIKI - PASTI MUNCUL)
+            // =============================================
+            cellGroups
+                .on('mouseenter', function (event, d) {
+                    // Reset semua sel ke opacity normal dulu
+                    g.selectAll('.cell-bg')
+                        .classed('dimmed', true)
+                        .classed('row-col-highlight', false)
+                        .classed('highlighted', false);
+
+                    // Highlight baris dan kolom yang sesuai
+                    g.selectAll('.cell-bg')
+                        .filter(cell => cell.row === d.row || cell.col === d.col)
+                        .classed('dimmed', false)
+                        .classed('row-col-highlight', true);
+
+                    // Highlight sel yang dihover
+                    d3.select(this).select('.cell-bg')
+                        .classed('highlighted', true)
+                        .classed('row-col-highlight', false);
+
+                    // Siapkan tooltip
+                    const strength = getCorrelationLabel(d.value);
+                    const strengthColors = getStrengthColor(d.value);
+                    const interpretation = interpretCorrelation(d.value);
+
+                    // Update konten tooltip
+                    tooltip
+                        .html(`
                     <span class="corr-value">r = ${d.value.toFixed(3)}</span>
                     <span class="strength-badge" style="background:${strengthColors.bg};color:${strengthColors.text};">${strength}</span>
                     <span class="var-names">${formatName(d.row)} ↔ ${formatName(d.col)}</span>
                     <span class="interpretation">📘 ${interpretation}</span>
                     <span class="data-source">🟢 Dihitung dari 10.000 data point (Pearson)</span>
                 `)
-                .style('opacity', 1)
-                .classed('visible', true);
-        })
-        .on('mousemove', function(event) {
-            // Dapatkan ukuran tooltip
-            const tooltipNode = tooltip.node();
-            const tw = tooltipNode ? tooltipNode.offsetWidth : 300;
-            const th = tooltipNode ? tooltipNode.offsetHeight : 150;
-            
-            // Hitung posisi dengan boundary checking
-            let left = event.clientX + 25;
-            let top = event.clientY - th - 20;
-            
-            // Cek batas kanan
-            if (left + tw > window.innerWidth - 15) {
-                left = event.clientX - tw - 25;
+                        .style('opacity', 1)
+                        .classed('visible', true);
+                })
+                .on('mousemove', function (event) {
+                    // Dapatkan ukuran tooltip
+                    const tooltipNode = tooltip.node();
+                    const tw = tooltipNode ? tooltipNode.offsetWidth : 300;
+                    const th = tooltipNode ? tooltipNode.offsetHeight : 150;
+
+                    // Hitung posisi dengan boundary checking
+                    let left = event.clientX + 25;
+                    let top = event.clientY - th - 20;
+
+                    // Cek batas kanan
+                    if (left + tw > window.innerWidth - 15) {
+                        left = event.clientX - tw - 25;
+                    }
+                    // Cek batas atas
+                    if (top < 15) {
+                        top = event.clientY + 30;
+                    }
+                    // Cek batas kiri
+                    if (left < 15) {
+                        left = 15;
+                    }
+                    // Cek batas bawah
+                    if (top + th > window.innerHeight - 15) {
+                        top = window.innerHeight - th - 15;
+                    }
+
+                    tooltip
+                        .style('left', left + 'px')
+                        .style('top', top + 'px');
+                })
+                .on('mouseleave', function () {
+                    // Sembunyikan tooltip
+                    tooltip
+                        .style('opacity', 0)
+                        .classed('visible', false);
+
+                    // Kembalikan semua sel ke normal
+                    g.selectAll('.cell-bg')
+                        .classed('dimmed', false)
+                        .classed('row-col-highlight', false)
+                        .classed('highlighted', false);
+                })
+                .on('click', function (event, d) {
+                    // Klik untuk mengurutkan berdasarkan variabel baris
+                    sortByVariable(d.row);
+                });
+
+            console.log('✅ Heatmap 8×8 selesai dirender');
+        }
+
+        // =============================================
+        // 7. RENDER WORD CLOUD
+        // =============================================
+        function renderWordCloud() {
+            const svg = d3.select('#main-svg');
+            svg.selectAll('*').remove();
+
+            const w = 750, h = 500;
+            svg.attr('width', w).attr('height', h).style('overflow', 'visible');
+
+            const tooltip = d3.select('#custom-tooltip');
+            const target = CONFIG.TARGET_COL;
+
+            // Siapkan data: korelasi setiap variabel dengan Placement
+            const wordData = CONFIG.ALL_VARIABLES
+                .filter(v => v !== target)
+                .map(v => ({
+                    text: formatName(v),
+                    value: Math.abs(correlationMatrix[target]?.[v] || 0),
+                    correlation: correlationMatrix[target]?.[v] || 0,
+                    size: 0
+                }))
+                .sort((a, b) => b.value - a.value);
+
+            if (wordData.length === 0) {
+                svg.append('text').attr('x', w / 2).attr('y', h / 2)
+                    .attr('text-anchor', 'middle').text('Data tidak tersedia')
+                    .style('fill', '#94a3b8').style('font-size', '1rem');
+                return;
             }
-            // Cek batas atas
-            if (top < 15) {
-                top = event.clientY + 30;
-            }
-            // Cek batas kiri
-            if (left < 15) {
-                left = 15;
-            }
-            // Cek batas bawah
-            if (top + th > window.innerHeight - 15) {
-                top = window.innerHeight - th - 15;
-            }
-            
-            tooltip
-                .style('left', left + 'px')
-                .style('top', top + 'px');
-        })
-        .on('mouseleave', function() {
-            // Sembunyikan tooltip
-            tooltip
-                .style('opacity', 0)
-                .classed('visible', false);
-            
-            // Kembalikan semua sel ke normal
-            g.selectAll('.cell-bg')
-                .classed('dimmed', false)
-                .classed('row-col-highlight', false)
-                .classed('highlighted', false);
-        })
-        .on('click', function(event, d) {
-            // Klik untuk mengurutkan berdasarkan variabel baris
-            sortByVariable(d.row);
-        });
 
-    console.log('✅ Heatmap 8×8 selesai dirender');
-}
+            const maxVal = d3.max(wordData, d => d.value) || 0.35;
+            const fontSizeScale = d3.scaleLinear()
+                .domain([0, maxVal * 0.4, maxVal])
+                .range([20, 40, 68])
+                .clamp(true);
 
-// =============================================
-// 7. RENDER WORD CLOUD
-// =============================================
-function renderWordCloud() {
-    const svg = d3.select('#main-svg');
-    svg.selectAll('*').remove();
-    
-    const w = 750, h = 500;
-    svg.attr('width', w).attr('height', h).style('overflow', 'visible');
-    
-    const tooltip = d3.select('#custom-tooltip');
-    const target = CONFIG.TARGET_COL;
+            const layout = d3.layout.cloud()
+                .size([w, h])
+                .words(wordData.map(d => ({ ...d, size: fontSizeScale(d.value) })))
+                .padding(10)
+                .rotate(() => 0)
+                .fontSize(d => d.size)
+                .on('end', drawWords);
 
-    // Siapkan data: korelasi setiap variabel dengan Placement
-    const wordData = CONFIG.ALL_VARIABLES
-        .filter(v => v !== target)
-        .map(v => ({
-            text: formatName(v),
-            value: Math.abs(correlationMatrix[target]?.[v] || 0),
-            correlation: correlationMatrix[target]?.[v] || 0,
-            size: 0
-        }))
-        .sort((a, b) => b.value - a.value);
+            layout.start();
 
-    if (wordData.length === 0) {
-        svg.append('text').attr('x', w/2).attr('y', h/2)
-            .attr('text-anchor', 'middle').text('Data tidak tersedia')
-            .style('fill', '#94a3b8').style('font-size', '1rem');
-        return;
-    }
+            function drawWords(words) {
+                const g = svg.append('g')
+                    .attr('transform', `translate(${w / 2}, ${h / 2})`);
 
-    const maxVal = d3.max(wordData, d => d.value) || 0.35;
-    const fontSizeScale = d3.scaleLinear()
-        .domain([0, maxVal * 0.4, maxVal])
-        .range([20, 40, 68])
-        .clamp(true);
+                g.selectAll('text')
+                    .data(words)
+                    .enter().append('text')
+                    .attr('class', 'word-item')
+                    .style('font-size', d => d.size + 'px')
+                    .style('font-weight', d => d.value > 0.2 ? '900' : d.value > 0.1 ? '700' : '500')
+                    .style('fill', d => {
+                        if (d.correlation > 0.3) return '#059669';
+                        if (d.correlation > 0.15) return '#10b981';
+                        if (d.correlation > 0) return '#34d399';
+                        if (d.correlation > -0.1) return '#94a3b8';
+                        return '#ef4444';
+                    })
+                    .style('opacity', d => 0.55 + d.value * 1.4)
+                    .style('cursor', 'pointer')
+                    .attr('text-anchor', 'middle')
+                    .attr('transform', d => `translate(${d.x}, ${d.y})`)
+                    .text(d => d.text)
+                    .on('mouseenter', function (event, d) {
+                        d3.select(this)
+                            .transition().duration(200)
+                            .style('filter', 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))')
+                            .attr('transform', `translate(${d.x}, ${d.y}) scale(1.12)`);
 
-    const layout = d3.layout.cloud()
-        .size([w, h])
-        .words(wordData.map(d => ({ ...d, size: fontSizeScale(d.value) })))
-        .padding(10)
-        .rotate(() => 0)
-        .fontSize(d => d.size)
-        .on('end', drawWords);
-
-    layout.start();
-
-    function drawWords(words) {
-        const g = svg.append('g')
-            .attr('transform', `translate(${w/2}, ${h/2})`);
-
-        g.selectAll('text')
-            .data(words)
-            .enter().append('text')
-            .attr('class', 'word-item')
-            .style('font-size', d => d.size + 'px')
-            .style('font-weight', d => d.value > 0.2 ? '900' : d.value > 0.1 ? '700' : '500')
-            .style('fill', d => {
-                if (d.correlation > 0.3) return '#059669';
-                if (d.correlation > 0.15) return '#10b981';
-                if (d.correlation > 0) return '#34d399';
-                if (d.correlation > -0.1) return '#94a3b8';
-                return '#ef4444';
-            })
-            .style('opacity', d => 0.55 + d.value * 1.4)
-            .style('cursor', 'pointer')
-            .attr('text-anchor', 'middle')
-            .attr('transform', d => `translate(${d.x}, ${d.y})`)
-            .text(d => d.text)
-            .on('mouseenter', function(event, d) {
-                d3.select(this)
-                    .transition().duration(200)
-                    .style('filter', 'drop-shadow(0 4px 10px rgba(0,0,0,0.4))')
-                    .attr('transform', `translate(${d.x}, ${d.y}) scale(1.12)`);
-
-                const interpretation = interpretCorrelation(d.correlation);
-                tooltip
-                    .style('opacity', 1)
-                    .classed('visible', true)
-                    .html(`
+                        const interpretation = interpretCorrelation(d.correlation);
+                        tooltip
+                            .style('opacity', 1)
+                            .classed('visible', true)
+                            .html(`
                         <span class="corr-value">r = ${d.correlation.toFixed(3)}</span>
                         <span class="var-names">${d.text} → Status Penempatan</span>
                         <span style="display:block;margin-top:4px;font-size:0.72rem;color:#94a3b8;">
@@ -1082,152 +1171,153 @@ function renderWordCloud() {
                         <span class="interpretation">📘 ${interpretation}</span>
                         <span class="data-source">🟢 Dihitung dari 10.000 data point</span>
                     `);
-            })
-            .on('mousemove', function(event) {
-                const tooltipNode = tooltip.node();
-                const tw = tooltipNode ? tooltipNode.offsetWidth : 280;
-                const th = tooltipNode ? tooltipNode.offsetHeight : 140;
-                let left = event.clientX + 22;
-                let top = event.clientY - th - 20;
-                if (left + tw > window.innerWidth - 10) left = event.clientX - tw - 22;
-                if (top < 10) top = event.clientY + 25;
-                if (left < 10) left = 10;
-                tooltip.style('left', left + 'px').style('top', top + 'px');
-            })
-            .on('mouseleave', function(event, d) {
-                d3.select(this)
-                    .transition().duration(200)
-                    .style('filter', 'none')
-                    .attr('transform', `translate(${d.x}, ${d.y}) scale(1)`);
-                tooltip.style('opacity', 0).classed('visible', false);
+                    })
+                    .on('mousemove', function (event) {
+                        const tooltipNode = tooltip.node();
+                        const tw = tooltipNode ? tooltipNode.offsetWidth : 280;
+                        const th = tooltipNode ? tooltipNode.offsetHeight : 140;
+                        let left = event.clientX + 22;
+                        let top = event.clientY - th - 20;
+                        if (left + tw > window.innerWidth - 10) left = event.clientX - tw - 22;
+                        if (top < 10) top = event.clientY + 25;
+                        if (left < 10) left = 10;
+                        tooltip.style('left', left + 'px').style('top', top + 'px');
+                    })
+                    .on('mouseleave', function (event, d) {
+                        d3.select(this)
+                            .transition().duration(200)
+                            .style('filter', 'none')
+                            .attr('transform', `translate(${d.x}, ${d.y}) scale(1)`);
+                        tooltip.style('opacity', 0).classed('visible', false);
+                    });
+            }
+
+            svg.append('text')
+                .attr('x', w / 2).attr('y', 25)
+                .attr('text-anchor', 'middle')
+                .style('font-size', '0.85rem').style('font-weight', '700')
+                .style('fill', '#475569')
+                .text('☁️ Kekuatan Korelasi dengan Status Penempatan Kerja');
+
+            console.log('✅ Word Cloud selesai dirender');
+        }
+
+        // =============================================
+        // 8. SORTING LOGIC
+        // =============================================
+        function sortByVariable(target) {
+            const corrs = variables.map(v => ({
+                v,
+                val: Math.abs(correlationMatrix[target]?.[v] || 0)
+            }));
+            corrs.sort((a, b) => {
+                if (a.v === target) return -1;
+                if (b.v === target) return 1;
+                return b.val - a.val;
             });
-    }
+            variables = corrs.map(c => c.v);
+            updateSortButtons('custom');
+            renderHeatmap();
+        }
 
-    svg.append('text')
-        .attr('x', w/2).attr('y', 25)
-        .attr('text-anchor', 'middle')
-        .style('font-size', '0.85rem').style('font-weight', '700')
-        .style('fill', '#475569')
-        .text('☁️ Kekuatan Korelasi dengan Status Penempatan Kerja');
-    
-    console.log('✅ Word Cloud selesai dirender');
-}
+        function sortPlacement() {
+            const t = CONFIG.TARGET_COL;
+            variables.sort((a, b) =>
+                Math.abs(correlationMatrix[t]?.[b] || 0) - Math.abs(correlationMatrix[t]?.[a] || 0)
+            );
+            updateSortButtons('placement');
+            renderHeatmap();
+        }
 
-// =============================================
-// 8. SORTING LOGIC
-// =============================================
-function sortByVariable(target) {
-    const corrs = variables.map(v => ({ 
-        v, 
-        val: Math.abs(correlationMatrix[target]?.[v] || 0) 
-    }));
-    corrs.sort((a, b) => { 
-        if (a.v === target) return -1; 
-        if (b.v === target) return 1; 
-        return b.val - a.val; 
-    });
-    variables = corrs.map(c => c.v);
-    updateSortButtons('custom');
-    renderHeatmap();
-}
+        function sortStrength() {
+            variables.sort((a, b) => {
+                const others = variables.filter(o => o !== a && o !== b);
+                const avgA = others.length > 0
+                    ? others.reduce((sum, o) => sum + Math.abs(correlationMatrix[a]?.[o] || 0), 0) / others.length
+                    : 0;
+                const avgB = others.length > 0
+                    ? others.reduce((sum, o) => sum + Math.abs(correlationMatrix[b]?.[o] || 0), 0) / others.length
+                    : 0;
+                return avgB - avgA;
+            });
+            updateSortButtons('strength');
+            renderHeatmap();
+        }
 
-function sortPlacement() {
-    const t = CONFIG.TARGET_COL;
-    variables.sort((a, b) => 
-        Math.abs(correlationMatrix[t]?.[b] || 0) - Math.abs(correlationMatrix[t]?.[a] || 0)
-    );
-    updateSortButtons('placement');
-    renderHeatmap();
-}
+        function resetDefault() {
+            variables = [...CONFIG.ALL_VARIABLES];
+            updateSortButtons('default');
+            renderHeatmap();
+        }
 
-function sortStrength() {
-    variables.sort((a, b) => {
-        const others = variables.filter(o => o !== a && o !== b);
-        const avgA = others.length > 0 
-            ? others.reduce((sum, o) => sum + Math.abs(correlationMatrix[a]?.[o] || 0), 0) / others.length 
-            : 0;
-        const avgB = others.length > 0 
-            ? others.reduce((sum, o) => sum + Math.abs(correlationMatrix[b]?.[o] || 0), 0) / others.length 
-            : 0;
-        return avgB - avgA;
-    });
-    updateSortButtons('strength');
-    renderHeatmap();
-}
+        function updateSortButtons(mode) {
+            currentSort = mode;
+            document.querySelectorAll('.btn-sort').forEach(b => b.classList.remove('active'));
+            const map = {
+                default: 'sort-default',
+                placement: 'sort-placement',
+                strength: 'sort-strength'
+            };
+            if (map[mode]) document.getElementById(map[mode]).classList.add('active');
+        }
 
-function resetDefault() {
-    variables = [...CONFIG.ALL_VARIABLES];
-    updateSortButtons('default');
-    renderHeatmap();
-}
+        // =============================================
+        // 9. TOGGLE VIEW (HEATMAP / WORD CLOUD)
+        // =============================================
+        function setView(view) {
+            currentView = view;
 
-function updateSortButtons(mode) {
-    currentSort = mode;
-    document.querySelectorAll('.btn-sort').forEach(b => b.classList.remove('active'));
-    const map = { 
-        default: 'sort-default', 
-        placement: 'sort-placement', 
-        strength: 'sort-strength' 
-    };
-    if (map[mode]) document.getElementById(map[mode]).classList.add('active');
-}
+            document.getElementById('btn-heatmap').classList.toggle('active', view === 'heatmap');
+            document.getElementById('btn-wordcloud').classList.toggle('active', view === 'wordcloud');
 
-// =============================================
-// 9. TOGGLE VIEW (HEATMAP / WORD CLOUD)
-// =============================================
-function setView(view) {
-    currentView = view;
-    
-    document.getElementById('btn-heatmap').classList.toggle('active', view === 'heatmap');
-    document.getElementById('btn-wordcloud').classList.toggle('active', view === 'wordcloud');
-    
-    // Sort controls hanya untuk heatmap
-    document.getElementById('sort-controls').style.display = view === 'heatmap' ? 'flex' : 'none';
-    document.getElementById('legend-heatmap').style.display = view === 'heatmap' ? 'flex' : 'none';
-    
-    document.getElementById('view-icon').textContent = view === 'heatmap' ? '🌡️' : '☁️';
-    document.getElementById('view-title').textContent = view === 'heatmap' 
-        ? 'Matriks Korelasi Lengkap (8×8)' 
-        : 'Word Cloud: Kekuatan Korelasi → Penempatan';
-    
-    renderCurrentView();
-}
+            // Sort controls hanya untuk heatmap
+            document.getElementById('sort-controls').style.display = view === 'heatmap' ? 'flex' : 'none';
+            document.getElementById('legend-heatmap').style.display = view === 'heatmap' ? 'flex' : 'none';
 
-function renderCurrentView() {
-    if (currentView === 'heatmap') renderHeatmap();
-    else renderWordCloud();
-}
+            document.getElementById('view-icon').textContent = view === 'heatmap' ? '🌡️' : '☁️';
+            document.getElementById('view-title').textContent = view === 'heatmap'
+                ? 'Matriks Korelasi Lengkap (8×8)'
+                : 'Word Cloud: Kekuatan Korelasi → Penempatan';
 
-// =============================================
-// 10. INISIALISASI
-// =============================================
-document.addEventListener('DOMContentLoaded', () => {
-    console.log('🚀 Case 3: Inisialisasi...');
-    
-    document.getElementById('btn-heatmap').addEventListener('click', () => setView('heatmap'));
-    document.getElementById('btn-wordcloud').addEventListener('click', () => setView('wordcloud'));
-    document.getElementById('sort-default').addEventListener('click', resetDefault);
-    document.getElementById('sort-placement').addEventListener('click', sortPlacement);
-    document.getElementById('sort-strength').addEventListener('click', sortStrength);
-    
-    loadData();
-});
+            renderCurrentView();
+        }
 
-// Handle resize
-let resizeTimer;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => {
-        if (fullData.length > 0) renderCurrentView();
-    }, 350);
-});
+        function renderCurrentView() {
+            if (currentView === 'heatmap') renderHeatmap();
+            else renderWordCloud();
+        }
 
-// Log info ke console
-console.log('📊 Case 3 Ready');
-console.log('   - Heatmap: 8×8 matriks korelasi');
-console.log('   - Word Cloud: visualisasi kekuatan korelasi');
-console.log('   - Semua nilai dihitung real-time dari CSV');
-console.log('   - Hover tooltip dengan boundary detection');
-</script>
+        // =============================================
+        // 10. INISIALISASI
+        // =============================================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('🚀 Case 3: Inisialisasi...');
+
+            document.getElementById('btn-heatmap').addEventListener('click', () => setView('heatmap'));
+            document.getElementById('btn-wordcloud').addEventListener('click', () => setView('wordcloud'));
+            document.getElementById('sort-default').addEventListener('click', resetDefault);
+            document.getElementById('sort-placement').addEventListener('click', sortPlacement);
+            document.getElementById('sort-strength').addEventListener('click', sortStrength);
+
+            loadData();
+        });
+
+        // Handle resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                if (fullData.length > 0) renderCurrentView();
+            }, 350);
+        });
+
+        // Log info ke console
+        console.log('📊 Case 3 Ready');
+        console.log('   - Heatmap: 8×8 matriks korelasi');
+        console.log('   - Word Cloud: visualisasi kekuatan korelasi');
+        console.log('   - Semua nilai dihitung real-time dari CSV');
+        console.log('   - Hover tooltip dengan boundary detection');
+    </script>
 </body>
+
 </html>
