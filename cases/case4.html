@@ -1,590 +1,858 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Case 4 — Score vs Gross | Visualisasi Data Film</title>
-    <meta name="description" content="Scatter plot korelasi antara skor IMDb (rating) dan pendapatan kotor (gross) film dari 1986 hingga 2016.">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="../css/style.css">
+    <meta
+      name="description"
+      content="Scatter plot korelasi antara skor IMDb (rating) dan pendapatan kotor (gross) film dari 1986 hingga 2016."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="../css/style.css" />
     <style>
-        body { background: var(--bg-base); }
+      body {
+        background: var(--bg-base);
+      }
 
-        .topbar {
-            position: sticky; top: 0; z-index: 100;
-            background: rgba(13,13,18,.88);
-            backdrop-filter: blur(20px) saturate(180%);
-            border-bottom: 1px solid var(--border);
-        }
-        .topbar-inner {
-            max-width: 1320px; margin: 0 auto; padding: 0 28px;
-            height: 56px; display: flex; align-items: center; justify-content: space-between;
-        }
-        .topbar-brand {
-            display: flex; align-items: center; gap: 8px; text-decoration: none;
-        }
-        .brand-dot {
-            width: 10px; height: 10px; border-radius: 50%;
-            background: var(--accent); box-shadow: 0 0 10px var(--accent-glow);
-        }
-        .brand-text { font-size: 14px; font-weight: 800; letter-spacing: .12em; color: var(--text-primary); }
-        .brand-sub {
-            font-size: 11px; font-weight: 600; letter-spacing: .08em; color: var(--accent);
-            background: var(--accent-dim); border: 1px solid var(--accent-glow);
-            padding: 2px 7px; border-radius: 4px;
-        }
-        .topbar-case {
-            font-size: 12px; font-weight: 500; color: var(--text-muted);
-            letter-spacing: .04em; display: flex; align-items: center; gap: 6px;
-        }
-        .topbar-case span { color: var(--text-secondary); }
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: rgba(13, 13, 18, 0.88);
+        backdrop-filter: blur(20px) saturate(180%);
+        border-bottom: 1px solid var(--border);
+      }
+      .topbar-inner {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 0 28px;
+        height: 56px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .topbar-brand {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+      .brand-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: var(--accent);
+        box-shadow: 0 0 10px var(--accent-glow);
+      }
+      .brand-text {
+        font-size: 14px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        color: var(--text-primary);
+      }
+      .brand-sub {
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.08em;
+        color: var(--accent);
+        background: var(--accent-dim);
+        border: 1px solid var(--accent-glow);
+        padding: 2px 7px;
+        border-radius: 4px;
+      }
+      .topbar-case {
+        font-size: 12px;
+        font-weight: 500;
+        color: var(--text-muted);
+        letter-spacing: 0.04em;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+      .topbar-case span {
+        color: var(--text-secondary);
+      }
 
-        .page-wrap { max-width: 1320px; margin: 0 auto; padding: 36px 28px 80px; }
+      .page-wrap {
+        max-width: 1320px;
+        margin: 0 auto;
+        padding: 36px 28px 80px;
+      }
 
-        .back-btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            font-size: 12px; font-weight: 600; letter-spacing: .04em; text-transform: uppercase;
-            color: var(--text-muted); text-decoration: none;
-            padding: 7px 14px; border-radius: 6px; border: 1px solid var(--border);
-            background: var(--bg-elevated); transition: color .2s, border-color .2s;
-            margin-bottom: 28px;
-        }
-        .back-btn:hover { color: var(--text-primary); border-color: var(--border-hover); }
-        .back-btn svg { width: 14px; height: 14px; }
+      .back-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        text-decoration: none;
+        padding: 7px 14px;
+        border-radius: 6px;
+        border: 1px solid var(--border);
+        background: var(--bg-elevated);
+        transition:
+          color 0.2s,
+          border-color 0.2s;
+        margin-bottom: 28px;
+      }
+      .back-btn:hover {
+        color: var(--text-primary);
+        border-color: var(--border-hover);
+      }
+      .back-btn svg {
+        width: 14px;
+        height: 14px;
+      }
 
-        .case-badge {
-            display: inline-flex; align-items: center; gap: 6px;
-            font-size: 10px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase;
-            color: #f59e0b; background: rgba(245,158,11,.12);
-            border: 1px solid rgba(245,158,11,.2); padding: 4px 10px; border-radius: 100px;
-            margin-bottom: 14px;
-        }
-        .case-badge-dot { width: 5px; height: 5px; border-radius: 50%; background: #f59e0b; }
+      .case-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: #f59e0b;
+        background: rgba(245, 158, 11, 0.12);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        padding: 4px 10px;
+        border-radius: 100px;
+        margin-bottom: 14px;
+      }
+      .case-badge-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: #f59e0b;
+      }
 
-        h1.case-title {
-            font-size: clamp(1.8rem, 4vw, 2.8rem); font-weight: 900;
-            letter-spacing: -.03em; line-height: 1.1; color: var(--text-primary);
-            margin-bottom: 12px;
-        }
-        h1.case-title em {
-            font-style: normal;
-            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-        }
-        .case-desc {
-            font-size: .975rem; color: var(--text-secondary);
-            max-width: 700px; line-height: 1.65; margin-bottom: 32px;
-        }
+      h1.case-title {
+        font-size: clamp(1.8rem, 4vw, 2.8rem);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 1.1;
+        color: var(--text-primary);
+        margin-bottom: 12px;
+      }
+      h1.case-title em {
+        font-style: normal;
+        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+      .case-desc {
+        font-size: 0.975rem;
+        color: var(--text-secondary);
+        max-width: 700px;
+        line-height: 1.65;
+        margin-bottom: 32px;
+      }
 
-        /* Stats Grid */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-            gap: 12px; margin-bottom: 24px;
-        }
-        .stat-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius-md); padding: 16px 18px;
-            position: relative; overflow: hidden;
-        }
-        .stat-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-        }
-        .stat-card.sc-total::before  { background: var(--accent); }
-        .stat-card.sc-avg::before    { background: #f59e0b; }
-        .stat-card.sc-topscore::before { background: #f97316; }
-        .stat-card.sc-topgross::before { background: #2dd4bf; }
-        .stat-card.sc-corr::before   { background: #a78bfa; }
-        .stat-lbl {
-            font-size: 10px; font-weight: 700; letter-spacing: .1em;
-            text-transform: uppercase; color: var(--text-muted); margin-bottom: 6px;
-        }
-        .stat-val {
-            font-size: 1.4rem; font-weight: 800; letter-spacing: -.02em;
-            color: var(--text-primary); line-height: 1; margin-bottom: 3px;
-        }
-        .stat-sub { font-size: 10px; color: var(--text-muted); }
+      /* Stats Grid */
+      .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+        gap: 12px;
+        margin-bottom: 24px;
+      }
+      .stat-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 16px 18px;
+        position: relative;
+        overflow: hidden;
+      }
+      .stat-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+      }
+      .stat-card.sc-total::before {
+        background: var(--accent);
+      }
+      .stat-card.sc-avg::before {
+        background: #f59e0b;
+      }
+      .stat-card.sc-topscore::before {
+        background: #f97316;
+      }
+      .stat-card.sc-topgross::before {
+        background: #2dd4bf;
+      }
+      .stat-card.sc-corr::before {
+        background: #a78bfa;
+      }
+      .stat-lbl {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .stat-val {
+        font-size: 1.4rem;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        color: var(--text-primary);
+        line-height: 1;
+        margin-bottom: 3px;
+      }
+      .stat-sub {
+        font-size: 10px;
+        color: var(--text-muted);
+      }
 
-        /* Controls Row */
+      /* Controls Row */
+      .controls-row {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-bottom: 20px;
+        background: var(--bg-card);
+        padding: 16px 24px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+      }
+      .filter-group {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .filter-group label {
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-muted);
+      }
+      .filter-group select,
+      .filter-group input {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: 6px;
+        padding: 6px 12px;
+        color: var(--text-primary);
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        outline: none;
+        cursor: pointer;
+      }
+      .filter-group select:focus,
+      .filter-group input:focus {
+        border-color: #f59e0b;
+      }
+      .range-slider-wrap {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+      .range-slider-wrap input[type="range"] {
+        width: 120px;
+        accent-color: #f59e0b;
+      }
+      .btn-reset {
+        background: transparent;
+        border: 1px solid var(--border);
+        color: var(--text-muted);
+        padding: 6px 16px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-left: auto;
+      }
+      .btn-reset:hover {
+        color: var(--text-primary);
+        border-color: #f59e0b;
+      }
+
+      /* Chart Card */
+      .chart-card {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        position: relative;
+        overflow-x: auto;
+        margin-bottom: 24px;
+      }
+      .chart-card::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          #f59e0b 0%,
+          #f97316 60%,
+          transparent 100%
+        );
+        opacity: 0.5;
+      }
+
+      .axis text {
+        fill: #ffffff; /* ← warna putih */
+        font-family: "Inter", sans-serif;
+        font-size: 11px;
+        font-weight: 500;
+      }
+      .axis line,
+      .axis path {
+        stroke: rgba(255, 255, 255, 0.07);
+      }
+      .axis .domain {
+        display: none;
+      }
+      .grid line {
+        stroke: rgba(255, 255, 255, 0.04);
+        stroke-dasharray: 3, 4;
+      }
+
+      /* Insight Panel (seperti Case 6) */
+      .insight-panel {
+        background: var(--bg-card);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        padding: 24px;
+        margin-bottom: 24px;
+      }
+      .insight-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 20px;
+      }
+      .insight-icon {
+        width: 40px;
+        height: 40px;
+        border-radius: var(--radius-sm);
+        background: rgba(245, 158, 11, 0.15);
+        border: 1px solid rgba(245, 158, 11, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #f59e0b;
+      }
+      .insight-title {
+        font-size: 13px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-primary);
+      }
+      .insight-subtitle {
+        font-size: 11px;
+        color: var(--text-muted);
+      }
+      .insights-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 14px;
+      }
+      .insight-card {
+        background: var(--bg-elevated);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        padding: 14px;
+        border-left: 3px solid #f59e0b;
+      }
+      .ic-num {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+      }
+      .ic-label {
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        margin-bottom: 6px;
+      }
+      .ic-desc {
+        font-size: 11px;
+        color: var(--text-secondary);
+        line-height: 1.5;
+      }
+
+      .legend-wrap {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        margin-top: 20px;
+        justify-content: center;
+      }
+      .legend-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 11px;
+        font-weight: 500;
+        color: var(--text-secondary);
+      }
+      .legend-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      .tooltip-scatter {
+        position: fixed;
+        background: rgba(10, 10, 16, 0.97);
+        border: 1px solid var(--border-hover);
+        border-radius: 12px;
+        padding: 12px 16px;
+        pointer-events: none;
+        z-index: 200;
+        font-family: "Inter", sans-serif;
+        font-size: 12px;
+        min-width: 260px;
+        opacity: 0;
+        transition: opacity 0.15s ease;
+        box-shadow: 0 12px 48px rgba(0, 0, 0, 0.7);
+      }
+      .tooltip-scatter.visible {
+        opacity: 1;
+      }
+      .tt-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 6px;
+        gap: 20px;
+      }
+
+      @media (max-width: 768px) {
+        .page-wrap {
+          padding: 20px 16px 60px;
+        }
         .controls-row {
-            display: flex;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-bottom: 20px;
-            background: var(--bg-card);
-            padding: 16px 24px;
-            border-radius: var(--radius-md);
-            border: 1px solid var(--border);
-        }
-        .filter-group {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .filter-group label {
-            font-size: 11px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            color: var(--text-muted);
-        }
-        .filter-group select, .filter-group input {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            padding: 6px 12px;
-            color: var(--text-primary);
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            outline: none;
-            cursor: pointer;
-        }
-        .filter-group select:focus, .filter-group input:focus {
-            border-color: #f59e0b;
-        }
-        .range-slider-wrap {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .range-slider-wrap input[type="range"] {
-            width: 120px;
-            accent-color: #f59e0b;
+          flex-direction: column;
+          align-items: stretch;
         }
         .btn-reset {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-muted);
-            padding: 6px 16px;
-            border-radius: 6px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all .2s;
-            margin-left: auto;
+          margin-left: 0;
+          width: 100%;
         }
-        .btn-reset:hover {
-            color: var(--text-primary);
-            border-color: #f59e0b;
+        .range-slider-wrap {
+          flex-wrap: wrap;
         }
+      }
 
-        /* Chart Card */
-        .chart-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            position: relative;
-            overflow-x: auto;
-            margin-bottom: 24px;
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
         }
-        .chart-card::before {
-            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-            background: linear-gradient(90deg, #f59e0b 0%, #f97316 60%, transparent 100%);
-            opacity: .5;
-        }
-
-        .axis text { fill: var(--text-muted); font-family: 'Inter', sans-serif; font-size: 10px; font-weight: 500; }
-        .axis line, .axis path { stroke: rgba(255,255,255,.07); }
-        .axis .domain { display: none; }
-        .grid line { stroke: rgba(255,255,255,.04); stroke-dasharray: 3,4; }
-
-        /* Insight Panel (seperti Case 6) */
-        .insight-panel {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-lg);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        .insight-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .insight-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: var(--radius-sm);
-            background: rgba(245,158,11,.15);
-            border: 1px solid rgba(245,158,11,.2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #f59e0b;
-        }
-        .insight-title {
-            font-size: 13px;
-            font-weight: 700;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: var(--text-primary);
-        }
-        .insight-subtitle {
-            font-size: 11px;
-            color: var(--text-muted);
-        }
-        .insights-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 14px;
-        }
-        .insight-card {
-            background: var(--bg-elevated);
-            border: 1px solid var(--border);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            border-left: 3px solid #f59e0b;
-        }
-        .ic-num {
-            font-size: 1.2rem;
-            font-weight: 800;
-            color: var(--text-primary);
-            margin-bottom: 6px;
-        }
-        .ic-label {
-            font-size: 10px;
-            font-weight: 700;
-            letter-spacing: .08em;
-            text-transform: uppercase;
-            color: var(--text-muted);
-            margin-bottom: 6px;
-        }
-        .ic-desc {
-            font-size: 11px;
-            color: var(--text-secondary);
-            line-height: 1.5;
-        }
-
-        .legend-wrap {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 16px;
-            margin-top: 20px;
-            justify-content: center;
-        }
-        .legend-item {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            font-weight: 500;
-            color: var(--text-secondary);
-        }
-        .legend-dot { width: 10px; height: 10px; border-radius: 50%; }
-
-        .tooltip-scatter {
-            position: fixed;
-            background: rgba(10,10,16,.97);
-            border: 1px solid var(--border-hover);
-            border-radius: 12px;
-            padding: 12px 16px;
-            pointer-events: none;
-            z-index: 200;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            min-width: 260px;
-            opacity: 0;
-            transition: opacity .15s ease;
-            box-shadow: 0 12px 48px rgba(0,0,0,.7);
-        }
-        .tooltip-scatter.visible { opacity: 1; }
-        .tt-row { display: flex; justify-content: space-between; margin-bottom: 6px; gap: 20px; }
-
-        @media (max-width: 768px) {
-            .page-wrap { padding: 20px 16px 60px; }
-            .controls-row { flex-direction: column; align-items: stretch; }
-            .btn-reset { margin-left: 0; width: 100%; }
-            .range-slider-wrap { flex-wrap: wrap; }
-        }
-
-        @keyframes spin { to { transform: rotate(360deg); } }
+      }
     </style>
-</head>
-<body>
-
-<div class="topbar">
-    <div class="topbar-inner">
+  </head>
+  <body>
+    <div class="topbar">
+      <div class="topbar-inner">
         <a href="../index.html" class="topbar-brand">
-            <span class="brand-dot"></span>
-            <span class="brand-text">VISDAT</span>
-            <span class="brand-sub">KLP 10</span>
+          <span class="brand-dot"></span>
+          <span class="brand-text">VISDAT</span>
+          <span class="brand-sub">KLP 10</span>
         </a>
         <div class="topbar-case">Case <span>04</span> · Score vs Gross</div>
+      </div>
     </div>
-</div>
 
-<div class="page-wrap">
-
-    <a href="../index.html" class="back-btn">
+    <div class="page-wrap">
+      <a href="../index.html" class="back-btn">
         <svg viewBox="0 0 20 20" fill="currentColor" width="14" height="14">
-            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"/>
+          <path
+            fill-rule="evenodd"
+            d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z"
+          />
         </svg>
         Kembali ke Dashboard
-    </a>
+      </a>
 
-    <div class="case-badge">
+      <div class="case-badge">
         <span class="case-badge-dot"></span>
         Case 04 · Scatter Plot
-    </div>
-    <h1 class="case-title">Kualitas <em>vs</em> Komersial</h1>
-    <p class="case-desc">
-        Apakah film dengan rating IMDb tinggi selalu sukses secara finansial? 
-        Visualisasi ini menunjukkan hubungan antara <strong style="color:#f59e0b">skor IMDb</strong> (sumbu X) dan 
-        <strong style="color:#2dd4bf">pendapatan kotor (gross)</strong> (sumbu Y). 
-        Ukuran titik merepresentasikan jumlah votes. Hover untuk melihat detail film.
-    </p>
+      </div>
+      <h1 class="case-title">Kualitas <em>vs</em> Komersial</h1>
+      <p class="case-desc">
+        Apakah film dengan rating IMDb tinggi selalu sukses secara finansial?
+        Visualisasi ini menunjukkan hubungan antara
+        <strong style="color: #f59e0b">skor IMDb</strong> (sumbu X) dan
+        <strong style="color: #2dd4bf">pendapatan kotor (gross)</strong> (sumbu
+        Y). Ukuran titik merepresentasikan jumlah votes. Hover untuk melihat
+        detail film.
+      </p>
 
-    <!-- Stats Grid -->
-    <div class="stats-grid">
+      <!-- Stats Grid -->
+      <div class="stats-grid">
         <div class="stat-card sc-total">
-            <div class="stat-lbl">Total Film</div>
-            <div class="stat-val" id="stat-total">—</div>
-            <div class="stat-sub">dalam filter aktif</div>
+          <div class="stat-lbl">Total Film</div>
+          <div class="stat-val" id="stat-total">—</div>
+          <div class="stat-sub">dalam filter aktif</div>
         </div>
         <div class="stat-card sc-avg">
-            <div class="stat-lbl">Rata-rata Score</div>
-            <div class="stat-val" id="stat-avg-score">—</div>
-            <div class="stat-sub">IMDb Rating</div>
+          <div class="stat-lbl">Rata-rata Score</div>
+          <div class="stat-val" id="stat-avg-score">—</div>
+          <div class="stat-sub">IMDb Rating</div>
         </div>
         <div class="stat-card sc-topscore">
-            <div class="stat-lbl">Score Tertinggi</div>
-            <div class="stat-val" id="stat-top-score">—</div>
-            <div class="stat-sub" id="stat-top-score-name">—</div>
+          <div class="stat-lbl">Score Tertinggi</div>
+          <div class="stat-val" id="stat-top-score">—</div>
+          <div class="stat-sub" id="stat-top-score-name">—</div>
         </div>
         <div class="stat-card sc-topgross">
-            <div class="stat-lbl">Gross Tertinggi</div>
-            <div class="stat-val" id="stat-top-gross">—</div>
-            <div class="stat-sub" id="stat-top-gross-name">—</div>
+          <div class="stat-lbl">Gross Tertinggi</div>
+          <div class="stat-val" id="stat-top-gross">—</div>
+          <div class="stat-sub" id="stat-top-gross-name">—</div>
         </div>
         <div class="stat-card sc-corr">
-            <div class="stat-lbl">Korelasi (r)</div>
-            <div class="stat-val" id="stat-correlation">—</div>
-            <div class="stat-sub">Score vs Gross</div>
+          <div class="stat-lbl">Korelasi (r)</div>
+          <div class="stat-val" id="stat-correlation">—</div>
+          <div class="stat-sub">Score vs Gross</div>
         </div>
-    </div>
+      </div>
 
-    <!-- Controls Row (seperti Case 6) -->
-    <div class="controls-row">
+      <!-- Controls Row (seperti Case 6) -->
+      <div class="controls-row">
         <div class="filter-group">
-            <label>🎭 Genre</label>
-            <select id="genre-select">
-                <option value="">Semua Genre</option>
-            </select>
+          <label>🎭 Genre</label>
+          <select id="genre-select">
+            <option value="">Semua Genre</option>
+          </select>
         </div>
         <div class="filter-group">
-            <label>📅 Tahun</label>
-            <div class="range-slider-wrap">
-                <input type="range" id="year-min" min="1986" max="2016" value="1986">
-                <span style="color:var(--text-muted);font-weight:700;">-</span>
-                <input type="range" id="year-max" min="1986" max="2016" value="2016">
-                <span id="year-range-label" style="font-size:11px;color:#f59e0b;font-weight:700;">1986 - 2016</span>
-            </div>
+          <label>📅 Tahun</label>
+          <div class="range-slider-wrap">
+            <input
+              type="range"
+              id="year-min"
+              min="1986"
+              max="2016"
+              value="1986"
+            />
+            <span style="color: var(--text-muted); font-weight: 700">-</span>
+            <input
+              type="range"
+              id="year-max"
+              min="1986"
+              max="2016"
+              value="2016"
+            />
+            <span
+              id="year-range-label"
+              style="font-size: 11px; color: #f59e0b; font-weight: 700"
+              >1986 - 2016</span
+            >
+          </div>
         </div>
         <div class="filter-group">
-            <label>⭐ Min Score</label>
-            <input type="number" id="min-score" min="0" max="10" step="0.5" value="0" style="width:70px">
+          <label>⭐ Min Score</label>
+          <input
+            type="number"
+            id="min-score"
+            min="0"
+            max="10"
+            step="0.5"
+            value="0"
+            style="width: 70px"
+          />
         </div>
         <button class="btn-reset" id="btn-reset">↺ Reset Filter</button>
-    </div>
+      </div>
 
-    <!-- Chart Card -->
-    <div class="chart-card">
-        <div id="loading" style="display: flex; align-items: center; justify-content: center; height: 500px; flex-direction: column; gap: 16px;">
-            <div style="width: 36px; height: 36px; border: 3px solid var(--border); border-top-color: #f59e0b; border-radius: 50%; animation: spin .7s linear infinite;"></div>
-            <span style="color: var(--text-muted);">Memuat data film...</span>
+      <!-- Chart Card -->
+      <div class="chart-card">
+        <div
+          id="loading"
+          style="
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 500px;
+            flex-direction: column;
+            gap: 16px;
+          "
+        >
+          <div
+            style="
+              width: 36px;
+              height: 36px;
+              border: 3px solid var(--border);
+              border-top-color: #f59e0b;
+              border-radius: 50%;
+              animation: spin 0.7s linear infinite;
+            "
+          ></div>
+          <span style="color: var(--text-muted)">Memuat data film...</span>
         </div>
-        <svg id="scatter-chart" width="100%" height="540" style="display: none;"></svg>
+        <svg
+          id="scatter-chart"
+          width="100%"
+          height="540"
+          style="display: none"
+        ></svg>
         <div class="legend-wrap" id="legend"></div>
-    </div>
+      </div>
 
-    <!-- Insight Panel (seperti Case 6) -->
-    <div class="insight-panel">
+      <!-- Insight Panel (seperti Case 6) -->
+      <div class="insight-panel">
         <div class="insight-header">
-            <div class="insight-icon">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="16" x2="12" y2="12"/>
-                    <line x1="12" y1="8" x2="12.01" y2="8"/>
-                </svg>
-            </div>
-            <div>
-                <div class="insight-title">Analisis Korelasi Score vs Gross</div>
-                <div class="insight-subtitle">Berdasarkan data 1986–2016</div>
-            </div>
+          <div class="insight-icon">
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" y1="16" x2="12" y2="12" />
+              <line x1="12" y1="8" x2="12.01" y2="8" />
+            </svg>
+          </div>
+          <div>
+            <div class="insight-title">Analisis Korelasi Score vs Gross</div>
+            <div class="insight-subtitle">Berdasarkan data 1986–2016</div>
+          </div>
         </div>
         <div class="insights-grid" id="insights-grid"></div>
+      </div>
     </div>
 
-</div>
+    <div id="tooltip" class="tooltip-scatter"></div>
 
-<div id="tooltip" class="tooltip-scatter"></div>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+      // ═══════════════════════════════════════════════════════════════
+      // CONFIGURATION
+      // ═══════════════════════════════════════════════════════════════
+      const GENRE_COLORS = {
+        Comedy: "#e05c3a",
+        Action: "#2dd4bf",
+        Drama: "#a78bfa",
+        Crime: "#f59e0b",
+        Biography: "#60a5fa",
+        Adventure: "#34d399",
+        Animation: "#f97316",
+        Horror: "#fb7185",
+        Thriller: "#8b5cf6",
+        Romance: "#ec4899",
+        "Sci-Fi": "#06b6d4",
+        Fantasy: "#d946ef",
+      };
 
-<script src="https://d3js.org/d3.v7.min.js"></script>
-<script>
-// ═══════════════════════════════════════════════════════════════
-// CONFIGURATION
-// ═══════════════════════════════════════════════════════════════
-const GENRE_COLORS = {
-    'Comedy': '#e05c3a', 'Action': '#2dd4bf', 'Drama': '#a78bfa',
-    'Crime': '#f59e0b', 'Biography': '#60a5fa', 'Adventure': '#34d399',
-    'Animation': '#f97316', 'Horror': '#fb7185', 'Thriller': '#8b5cf6',
-    'Romance': '#ec4899', 'Sci-Fi': '#06b6d4', 'Fantasy': '#d946ef'
-};
+      let allData = [];
+      let currentData = [];
 
-let allData = [];
-let currentData = [];
+      const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
 
-const MARGIN = { top: 20, right: 28, bottom: 60, left: 70 };
+      function fmtMoney(v) {
+        if (!v || isNaN(v) || v <= 0) return "N/A";
+        if (v >= 1e9) return "$" + (v / 1e9).toFixed(2) + "B";
+        if (v >= 1e6) return "$" + (v / 1e6).toFixed(1) + "M";
+        return "$" + Math.round(v);
+      }
 
-function fmtMoney(v) {
-    if (!v || isNaN(v) || v <= 0) return 'N/A';
-    if (v >= 1e9) return '$' + (v / 1e9).toFixed(2) + 'B';
-    if (v >= 1e6) return '$' + (v / 1e6).toFixed(1) + 'M';
-    return '$' + Math.round(v);
-}
+      function calculateCorrelation(xArr, yArr) {
+        const n = xArr.length;
+        if (n < 3) return 0;
+        const sumX = d3.sum(xArr),
+          sumY = d3.sum(yArr);
+        const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
+        const sumX2 = d3.sum(xArr.map((x) => x * x));
+        const sumY2 = d3.sum(yArr.map((y) => y * y));
+        const numerator = n * sumXY - sumX * sumY;
+        const denominator = Math.sqrt(
+          (n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY),
+        );
+        return denominator === 0 ? 0 : numerator / denominator;
+      }
 
-function calculateCorrelation(xArr, yArr) {
-    const n = xArr.length;
-    if (n < 3) return 0;
-    const sumX = d3.sum(xArr), sumY = d3.sum(yArr);
-    const sumXY = d3.sum(xArr.map((x, i) => x * yArr[i]));
-    const sumX2 = d3.sum(xArr.map(x => x * x));
-    const sumY2 = d3.sum(yArr.map(y => y * y));
-    const numerator = n * sumXY - sumX * sumY;
-    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
-    return denominator === 0 ? 0 : numerator / denominator;
-}
+      function truncate(str, n) {
+        return str.length > n ? str.slice(0, n) + "…" : str;
+      }
 
-function truncate(str, n) {
-    return str.length > n ? str.slice(0, n) + '…' : str;
-}
+      // ═══════════════════════════════════════════════════════════════
+      // LOAD DATA
+      // ═══════════════════════════════════════════════════════════════
+      d3.csv("../data/movies.csv")
+        .then((raw) => {
+          allData = raw
+            .map((d) => ({
+              name: d.name || "",
+              genre: d.genre || "Other",
+              year: +d.year || 0,
+              score: parseFloat(d.score) || 0,
+              gross: parseFloat(d.gross) || 0,
+              budget: parseFloat(d.budget) || 0,
+              votes: parseFloat(d.votes) || 0,
+            }))
+            .filter(
+              (d) =>
+                d.year >= 1980 &&
+                d.name &&
+                d.score > 0 &&
+                d.gross > 0 &&
+                d.genre,
+            );
 
-// ═══════════════════════════════════════════════════════════════
-// LOAD DATA
-// ═══════════════════════════════════════════════════════════════
-d3.csv('../data/movies.csv').then(raw => {
-    allData = raw.map(d => ({
-        name: d.name || '',
-        genre: d.genre || 'Other',
-        year: +d.year || 0,
-        score: parseFloat(d.score) || 0,
-        gross: parseFloat(d.gross) || 0,
-        budget: parseFloat(d.budget) || 0,
-        votes: parseFloat(d.votes) || 0,
-    })).filter(d => d.year >= 1980 && d.name && d.score > 0 && d.gross > 0 && d.genre);
+          // Populate genre dropdown
+          const genres = [...new Set(allData.map((d) => d.genre))]
+            .filter(Boolean)
+            .sort();
+          const sel = document.getElementById("genre-select");
+          genres.forEach((g) => {
+            const opt = document.createElement("option");
+            opt.value = g;
+            opt.textContent = g;
+            sel.appendChild(opt);
+          });
 
-    // Populate genre dropdown
-    const genres = [...new Set(allData.map(d => d.genre))].filter(Boolean).sort();
-    const sel = document.getElementById('genre-select');
-    genres.forEach(g => {
-        const opt = document.createElement('option');
-        opt.value = g;
-        opt.textContent = g;
-        sel.appendChild(opt);
-    });
+          // Setup range slider labels
+          const yearMin = document.getElementById("year-min");
+          const yearMax = document.getElementById("year-max");
+          const rangeLabel = document.getElementById("year-range-label");
 
-    // Setup range slider labels
-    const yearMin = document.getElementById('year-min');
-    const yearMax = document.getElementById('year-max');
-    const rangeLabel = document.getElementById('year-range-label');
-    
-    yearMin.addEventListener('input', () => {
-        if (parseInt(yearMin.value) > parseInt(yearMax.value)) yearMax.value = yearMin.value;
-        rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
-        applyFilters();
-    });
-    yearMax.addEventListener('input', () => {
-        if (parseInt(yearMax.value) < parseInt(yearMin.value)) yearMin.value = yearMax.value;
-        rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
-        applyFilters();
-    });
+          yearMin.addEventListener("input", () => {
+            if (parseInt(yearMin.value) > parseInt(yearMax.value))
+              yearMax.value = yearMin.value;
+            rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
+            applyFilters();
+          });
+          yearMax.addEventListener("input", () => {
+            if (parseInt(yearMax.value) < parseInt(yearMin.value))
+              yearMin.value = yearMax.value;
+            rangeLabel.textContent = `${yearMin.value} - ${yearMax.value}`;
+            applyFilters();
+          });
 
-    document.getElementById('loading').style.display = 'none';
-    document.getElementById('scatter-chart').style.display = 'block';
-    applyFilters();
-}).catch(err => {
-    document.getElementById('loading').innerHTML = `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small><br>Pastikan file data/movies.csv ada</div>`;
-});
+          document.getElementById("loading").style.display = "none";
+          document.getElementById("scatter-chart").style.display = "block";
+          applyFilters();
+        })
+        .catch((err) => {
+          document.getElementById("loading").innerHTML =
+            `<div style="text-align:center;color:var(--accent)"><strong>Gagal memuat data</strong><br><small style="color:var(--text-muted)">${err.message}</small><br>Pastikan file data/movies.csv ada</div>`;
+        });
 
-// ═══════════════════════════════════════════════════════════════
-// FILTERS
-// ═══════════════════════════════════════════════════════════════
-function applyFilters() {
-    const genre = document.getElementById('genre-select').value;
-    const yearMin = parseInt(document.getElementById('year-min').value) || 1986;
-    const yearMax = parseInt(document.getElementById('year-max').value) || 2016;
-    const minScore = parseFloat(document.getElementById('min-score').value) || 0;
+      // ═══════════════════════════════════════════════════════════════
+      // FILTERS
+      // ═══════════════════════════════════════════════════════════════
+      function applyFilters() {
+        const genre = document.getElementById("genre-select").value;
+        const yearMin =
+          parseInt(document.getElementById("year-min").value) || 1986;
+        const yearMax =
+          parseInt(document.getElementById("year-max").value) || 2016;
+        const minScore =
+          parseFloat(document.getElementById("min-score").value) || 0;
 
-    currentData = allData.filter(d => {
-        if (genre && d.genre !== genre) return false;
-        if (d.year < yearMin || d.year > yearMax) return false;
-        if (d.score < minScore) return false;
-        return true;
-    });
+        currentData = allData.filter((d) => {
+          if (genre && d.genre !== genre) return false;
+          if (d.year < yearMin || d.year > yearMax) return false;
+          if (d.score < minScore) return false;
+          return true;
+        });
 
-    updateStats();
-    updateInsights();
-    renderChart();
-}
+        updateStats();
+        updateInsights();
+        renderChart();
+      }
 
-function updateStats() {
-    const total = currentData.length;
-    document.getElementById('stat-total').textContent = total.toLocaleString('id-ID');
-    
-    if (total === 0) {
-        document.getElementById('stat-avg-score').textContent = '—';
-        document.getElementById('stat-top-score').textContent = '—';
-        document.getElementById('stat-top-gross').textContent = '—';
-        document.getElementById('stat-correlation').textContent = '—';
-        return;
-    }
+      function updateStats() {
+        const total = currentData.length;
+        document.getElementById("stat-total").textContent =
+          total.toLocaleString("id-ID");
 
-    const avgScore = d3.mean(currentData, d => d.score);
-    document.getElementById('stat-avg-score').textContent = avgScore.toFixed(2);
-    
-    const topScore = d3.greatest(currentData, d => d.score);
-    const topGross = d3.greatest(currentData, d => d.gross);
-    document.getElementById('stat-top-score').textContent = topScore ? topScore.score.toFixed(1) : '—';
-    document.getElementById('stat-top-score-name').textContent = topScore ? truncate(topScore.name, 20) : '—';
-    document.getElementById('stat-top-gross').textContent = topGross ? fmtMoney(topGross.gross) : '—';
-    document.getElementById('stat-top-gross-name').textContent = topGross ? truncate(topGross.name, 20) : '—';
+        if (total === 0) {
+          document.getElementById("stat-avg-score").textContent = "—";
+          document.getElementById("stat-top-score").textContent = "—";
+          document.getElementById("stat-top-gross").textContent = "—";
+          document.getElementById("stat-correlation").textContent = "—";
+          return;
+        }
 
-    const corr = calculateCorrelation(currentData.map(d => d.score), currentData.map(d => Math.log(d.gross)));
-    document.getElementById('stat-correlation').textContent = corr.toFixed(3);
-}
+        const avgScore = d3.mean(currentData, (d) => d.score);
+        document.getElementById("stat-avg-score").textContent =
+          avgScore.toFixed(2);
 
-function updateInsights() {
-    const total = currentData.length;
-    if (total === 0) return;
+        const topScore = d3.greatest(currentData, (d) => d.score);
+        const topGross = d3.greatest(currentData, (d) => d.gross);
+        document.getElementById("stat-top-score").textContent = topScore
+          ? topScore.score.toFixed(1)
+          : "—";
+        document.getElementById("stat-top-score-name").textContent = topScore
+          ? truncate(topScore.name, 20)
+          : "—";
+        document.getElementById("stat-top-gross").textContent = topGross
+          ? fmtMoney(topGross.gross)
+          : "—";
+        document.getElementById("stat-top-gross-name").textContent = topGross
+          ? truncate(topGross.name, 20)
+          : "—";
 
-    const avgScore = d3.mean(currentData, d => d.score);
-    const corr = calculateCorrelation(currentData.map(d => d.score), currentData.map(d => Math.log(d.gross)));
-    const strength = Math.abs(corr);
-    let interpretation = '';
-    if (strength > 0.5) interpretation = 'KUAT';
-    else if (strength > 0.3) interpretation = 'SEDANG';
-    else if (strength > 0.1) interpretation = 'LEMAH';
-    else interpretation = 'SANGAT LEMAH';
+        const corr = calculateCorrelation(
+          currentData.map((d) => d.score),
+          currentData.map((d) => Math.log(d.gross)),
+        );
+        document.getElementById("stat-correlation").textContent =
+          corr.toFixed(3);
+      }
 
-    const highScoreLowGross = currentData.filter(d => d.score >= 7.5 && d.gross < 50000000).length;
-    const lowScoreHighGross = currentData.filter(d => d.score < 6.0 && d.gross > 200000000).length;
+      function updateInsights() {
+        const total = currentData.length;
+        if (total === 0) return;
 
-    const grid = document.getElementById('insights-grid');
-    grid.innerHTML = `
+        const avgScore = d3.mean(currentData, (d) => d.score);
+        const corr = calculateCorrelation(
+          currentData.map((d) => d.score),
+          currentData.map((d) => Math.log(d.gross)),
+        );
+        const strength = Math.abs(corr);
+        let interpretation = "";
+        if (strength > 0.5) interpretation = "KUAT";
+        else if (strength > 0.3) interpretation = "SEDANG";
+        else if (strength > 0.1) interpretation = "LEMAH";
+        else interpretation = "SANGAT LEMAH";
+
+        const highScoreLowGross = currentData.filter(
+          (d) => d.score >= 7.5 && d.gross < 50000000,
+        ).length;
+        const lowScoreHighGross = currentData.filter(
+          (d) => d.score < 6.0 && d.gross > 200000000,
+        ).length;
+
+        const grid = document.getElementById("insights-grid");
+        grid.innerHTML = `
         <div class="insight-card">
             <div class="ic-num">${corr.toFixed(3)}</div>
             <div class="ic-label">Koefisien Korelasi (r)</div>
-            <div class="ic-desc">Hubungan ${interpretation} dan ${corr > 0 ? 'positif' : 'negatif'} antara skor IMDb dan pendapatan gross.</div>
+            <div class="ic-desc">Hubungan ${interpretation} dan ${corr > 0 ? "positif" : "negatif"} antara skor IMDb dan pendapatan gross.</div>
         </div>
         <div class="insight-card">
             <div class="ic-num">${avgScore.toFixed(2)}</div>
             <div class="ic-label">Rata-rata Skor</div>
-            <div class="ic-desc">Rata-rata rating IMDb dari ${total.toLocaleString('id-ID')} film dalam filter aktif.</div>
+            <div class="ic-desc">Rata-rata rating IMDb dari ${total.toLocaleString("id-ID")} film dalam filter aktif.</div>
         </div>
         <div class="insight-card">
             <div class="ic-num">${highScoreLowGross}</div>
@@ -597,120 +865,168 @@ function updateInsights() {
             <div class="ic-desc">Film dengan skor < 6.0 namun gross > $200M — "popcorn movies" yang sukses.</div>
         </div>
     `;
-}
+      }
 
-// ═══════════════════════════════════════════════════════════════
-// RENDER CHART
-// ═══════════════════════════════════════════════════════════════
-function renderChart() {
-    const container = document.getElementById('scatter-chart');
-    const width = Math.max(700, container.parentElement.clientWidth - 40);
-    const height = 540;
-    container.setAttribute('width', width);
-    container.setAttribute('height', height);
-    container.innerHTML = '';
+      // ═══════════════════════════════════════════════════════════════
+      // RENDER CHART
+      // ═══════════════════════════════════════════════════════════════
+      function renderChart() {
+        const container = document.getElementById("scatter-chart");
+        const width = Math.max(700, container.parentElement.clientWidth - 40);
+        const height = 540;
+        container.setAttribute("width", width);
+        container.setAttribute("height", height);
+        container.innerHTML = "";
 
-    if (currentData.length === 0) {
-        container.innerHTML = `<text x="${width/2}" y="${height/2}" text-anchor="middle" fill="var(--text-muted)" font-size="14">Tidak ada data dengan filter yang dipilih</text>`;
-        return;
-    }
+        if (currentData.length === 0) {
+          container.innerHTML = `<text x="${width / 2}" y="${height / 2}" text-anchor="middle" fill="var(--text-muted)" font-size="14">Tidak ada data dengan filter yang dipilih</text>`;
+          return;
+        }
 
-    const innerW = width - MARGIN.left - MARGIN.right;
-    const innerH = height - MARGIN.top - MARGIN.bottom;
-    const svg = d3.select('#scatter-chart')
-        .append('g')
-        .attr('transform', `translate(${MARGIN.left},${MARGIN.top})`);
+        const innerW = width - MARGIN.left - MARGIN.right;
+        const innerH = height - MARGIN.top - MARGIN.bottom;
+        const svg = d3
+          .select("#scatter-chart")
+          .append("g")
+          .attr("transform", `translate(${MARGIN.left},${MARGIN.top})`);
 
-    // Scales
-    const xScale = d3.scaleLinear()
-        .domain([0, 10])
-        .range([0, innerW]);
-    const yScale = d3.scaleLog()
-        .domain([d3.min(currentData, d => d.gross), d3.max(currentData, d => d.gross)])
-        .range([innerH, 0])
-        .nice();
-    const rScale = d3.scaleSqrt()
-        .domain([1000, d3.max(currentData, d => d.votes)])
-        .range([3, 12]);
+        // Scales
+        const xScale = d3.scaleLinear().domain([0, 10]).range([0, innerW]);
+        const yScale = d3
+          .scaleLog()
+          .domain([
+            d3.min(currentData, (d) => d.gross),
+            d3.max(currentData, (d) => d.gross),
+          ])
+          .range([innerH, 0])
+          .nice();
+        const rScale = d3
+          .scaleSqrt()
+          .domain([1000, d3.max(currentData, (d) => d.votes)])
+          .range([3, 12]);
 
-    // Grid
-    svg.append('g')
-        .attr('class', 'grid')
-        .call(d3.axisLeft(yScale).ticks(6).tickSize(-innerW).tickFormat(''))
-        .selectAll('.domain, .tick line')
-        .attr('stroke', 'rgba(255,255,255,.05)');
-    svg.append('g')
-        .attr('class', 'grid')
-        .attr('transform', `translate(0,${innerH})`)
-        .call(d3.axisBottom(xScale).ticks(10).tickSize(-innerH).tickFormat(''))
-        .selectAll('.domain, .tick line')
-        .attr('stroke', 'rgba(255,255,255,.05)');
+        // Grid
+        svg
+          .append("g")
+          .attr("class", "grid")
+          .call(d3.axisLeft(yScale).ticks(6).tickSize(-innerW).tickFormat(""))
+          .selectAll(".domain, .tick line")
+          .attr("stroke", "rgba(255,255,255,.05)");
+        svg
+          .append("g")
+          .attr("class", "grid")
+          .attr("transform", `translate(0,${innerH})`)
+          .call(d3.axisBottom(xScale).ticks(8).tickSize(-innerH).tickFormat(""))
+          .selectAll(".domain, .tick line")
+          .attr("stroke", "rgba(255,255,255,.05)");
 
-    // Axes
-    svg.append('g')
-        .attr('class', 'axis')
-        .attr('transform', `translate(0,${innerH})`)
-        .call(d3.axisBottom(xScale).ticks(10));
-    svg.append('g')
-        .attr('class', 'axis')
-        .call(d3.axisLeft(yScale).tickFormat(d3.format('~s')));
+        // ============================================================
+        // SUMBU X — dengan label putih dan jarak longgar
+        // ============================================================
+        svg
+          .append("g")
+          .attr("class", "axis")
+          .attr("transform", `translate(0,${innerH})`)
+          .call(
+            d3.axisBottom(xScale).ticks(8), // ← maksimal 8 label agar tidak padat
+          )
+          .selectAll("text")
+          .attr("fill", "#ffffff")
+          .attr("font-size", "11px")
+          .attr("font-weight", "500");
 
-    // Reference lines
-    svg.append('line')
-        .attr('x1', xScale(7.5))
-        .attr('x2', xScale(7.5))
-        .attr('y1', 0)
-        .attr('y2', innerH)
-        .attr('stroke', 'rgba(255,255,255,.1)')
-        .attr('stroke-dasharray', '4,4');
-    svg.append('text')
-        .attr('x', xScale(7.5) + 5)
-        .attr('y', 14)
-        .attr('fill', 'rgba(255,255,255,.3)')
-        .attr('font-size', 9)
-        .text('High Quality Zone (≥ 7.5)');
+        // ============================================================
+        // SUMBU Y — dengan label putih dan jarak longgar
+        // ============================================================
+        svg
+          .append("g")
+          .attr("class", "axis")
+          .call(
+            d3
+              .axisLeft(yScale)
+              .ticks(6) // ← maksimal 6 label agar tidak padat
+              .tickFormat(d3.format("~s")),
+          )
+          .selectAll("text")
+          .attr("fill", "#ffffff")
+          .attr("font-size", "11px")
+          .attr("font-weight", "500");
 
-    svg.append('line')
-        .attr('x1', xScale(5.0))
-        .attr('x2', xScale(5.0))
-        .attr('y1', 0)
-        .attr('y2', innerH)
-        .attr('stroke', 'rgba(255,255,255,.05)')
-        .attr('stroke-dasharray', '2,4');
+        // ============================================================
+        // LABEL SUMBU X — putih, lebih besar, lebih jelas
+        // ============================================================
+        svg
+          .append("text")
+          .attr("class", "x-axis-label")
+          .attr("x", innerW / 2)
+          .attr("y", innerH + 48)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#ffffff")
+          .attr("font-size", 13)
+          .attr("font-weight", 700)
+          .attr("letter-spacing", "0.03em")
+          .text("IMDb SCORE →");
 
-    // Labels
-    svg.append('text')
-        .attr('x', innerW / 2)
-        .attr('y', innerH + 42)
-        .attr('text-anchor', 'middle')
-        .attr('fill', 'var(--text-muted)')
-        .attr('font-size', 11)
-        .attr('font-weight', 600)
-        .text('IMDb SCORE →');
-    svg.append('text')
-        .attr('transform', 'rotate(-90)')
-        .attr('x', -innerH / 2)
-        .attr('y', -52)
-        .attr('text-anchor', 'middle')
-        .attr('fill', 'var(--text-muted)')
-        .attr('font-size', 11)
-        .attr('font-weight', 600)
-        .text('GROSS REVENUE (USD) → (log scale)');
+        // ============================================================
+        // LABEL SUMBU Y — putih, lebih besar, lebih jelas
+        // ============================================================
+        svg
+          .append("text")
+          .attr("class", "y-axis-label")
+          .attr("transform", "rotate(-90)")
+          .attr("x", -innerH / 2)
+          .attr("y", -55)
+          .attr("text-anchor", "middle")
+          .attr("fill", "#ffffff")
+          .attr("font-size", 13)
+          .attr("font-weight", 700)
+          .attr("letter-spacing", "0.03em")
+          .text("GROSS REVENUE (USD) → (log scale)");
 
-    // Points
-    const tooltip = d3.select('#tooltip');
-    svg.selectAll('.dot')
-        .data(currentData)
-        .enter()
-        .append('circle')
-        .attr('cx', d => xScale(d.score))
-        .attr('cy', d => yScale(d.gross))
-        .attr('r', d => rScale(d.votes))
-        .attr('fill', d => GENRE_COLORS[d.genre] || '#888')
-        .attr('fill-opacity', 0.55)
-        .attr('stroke', 'none')
-        .on('mouseenter', function(event, d) {
-            d3.select(this).attr('stroke', '#fff').attr('stroke-width', 2).attr('fill-opacity', 0.9);
+        // Reference lines
+        svg
+          .append("line")
+          .attr("x1", xScale(7.5))
+          .attr("x2", xScale(7.5))
+          .attr("y1", 0)
+          .attr("y2", innerH)
+          .attr("stroke", "rgba(255,255,255,.1)")
+          .attr("stroke-dasharray", "4,4");
+        svg
+          .append("text")
+          .attr("x", xScale(7.5) + 5)
+          .attr("y", 14)
+          .attr("fill", "rgba(255,255,255,.3)")
+          .attr("font-size", 9)
+          .text("High Quality Zone (≥ 7.5)");
+
+        svg
+          .append("line")
+          .attr("x1", xScale(5.0))
+          .attr("x2", xScale(5.0))
+          .attr("y1", 0)
+          .attr("y2", innerH)
+          .attr("stroke", "rgba(255,255,255,.05)")
+          .attr("stroke-dasharray", "2,4");
+
+        // Points
+        const tooltip = d3.select("#tooltip");
+        svg
+          .selectAll(".dot")
+          .data(currentData)
+          .enter()
+          .append("circle")
+          .attr("cx", (d) => xScale(d.score))
+          .attr("cy", (d) => yScale(d.gross))
+          .attr("r", (d) => rScale(d.votes))
+          .attr("fill", (d) => GENRE_COLORS[d.genre] || "#888")
+          .attr("fill-opacity", 0.55)
+          .attr("stroke", "none")
+          .on("mouseenter", function (event, d) {
+            d3.select(this)
+              .attr("stroke", "#fff")
+              .attr("stroke-width", 2)
+              .attr("fill-opacity", 0.9);
             tooltip.html(`
                 <div style="display: flex; justify-content: space-between; margin-bottom: 6px;">
                     <span style="font-weight: 700;">${d.name}</span>
@@ -719,54 +1035,72 @@ function renderChart() {
                 <div class="tt-row"><span style="color: var(--text-muted);">📅 Tahun / 🎭 Genre</span><span>${d.year} · ${d.genre}</span></div>
                 <div class="tt-row"><span style="color: var(--text-muted);">💰 Budget</span><span>${fmtMoney(d.budget)}</span></div>
                 <div class="tt-row"><span style="color: var(--text-muted);">📈 Gross</span><span style="color: #2dd4bf;">${fmtMoney(d.gross)}</span></div>
-                <div class="tt-row"><span style="color: var(--text-muted);">🗳️ Votes</span><span>${d.votes.toLocaleString('id-ID')}</span></div>
+                <div class="tt-row"><span style="color: var(--text-muted);">🗳️ Votes</span><span>${d.votes.toLocaleString("id-ID")}</span></div>
             `);
-            tooltip.classed('visible', true);
+            tooltip.classed("visible", true);
             const left = event.clientX + 14;
             const top = event.clientY - 10;
-            tooltip.style('left', Math.min(left, window.innerWidth - 280) + 'px')
-                   .style('top', Math.max(8, top) + 'px');
-        })
-        .on('mouseleave', function() {
-            d3.select(this).attr('stroke', 'none').attr('fill-opacity', 0.55);
-            tooltip.classed('visible', false);
-        });
+            tooltip
+              .style("left", Math.min(left, window.innerWidth - 280) + "px")
+              .style("top", Math.max(8, top) + "px");
+          })
+          .on("mouseleave", function () {
+            d3.select(this).attr("stroke", "none").attr("fill-opacity", 0.55);
+            tooltip.classed("visible", false);
+          });
 
-    // Legend
-    const genresInView = [...new Set(currentData.map(d => d.genre))].slice(0, 8);
-    const legendWrap = document.getElementById('legend');
-    legendWrap.innerHTML = genresInView.map(g => `
+        // Legend
+        const genresInView = [
+          ...new Set(currentData.map((d) => d.genre)),
+        ].slice(0, 8);
+        const legendWrap = document.getElementById("legend");
+        legendWrap.innerHTML =
+          genresInView
+            .map(
+              (g) => `
         <div class="legend-item">
-            <span class="legend-dot" style="background: ${GENRE_COLORS[g] || '#888'}"></span>
+            <span class="legend-dot" style="background: ${GENRE_COLORS[g] || "#888"}"></span>
             <span>${g}</span>
         </div>
-    `).join('') + `<div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3);"></span><span>Ukuran titik = Jumlah Votes</span></div>`;
-}
+    `,
+            )
+            .join("") +
+          `<div class="legend-item"><span style="width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,0.3);"></span><span>Ukuran titik = Jumlah Votes</span></div>`;
+      }
 
-// ═══════════════════════════════════════════════════════════════
-// EVENT LISTENERS
-// ═══════════════════════════════════════════════════════════════
-function debounce(fn, ms) {
-    let timer;
-    return (...args) => { clearTimeout(timer); timer = setTimeout(() => fn(...args), ms); };
-}
+      // ═══════════════════════════════════════════════════════════════
+      // EVENT LISTENERS
+      // ═══════════════════════════════════════════════════════════════
+      function debounce(fn, ms) {
+        let timer;
+        return (...args) => {
+          clearTimeout(timer);
+          timer = setTimeout(() => fn(...args), ms);
+        };
+      }
 
-document.getElementById('genre-select').addEventListener('change', applyFilters);
-document.getElementById('min-score').addEventListener('input', debounce(applyFilters, 300));
-document.getElementById('btn-reset').addEventListener('click', () => {
-    document.getElementById('genre-select').value = '';
-    document.getElementById('year-min').value = '1986';
-    document.getElementById('year-max').value = '2016';
-    document.getElementById('min-score').value = '0';
-    document.getElementById('year-range-label').textContent = '1986 - 2016';
-    applyFilters();
-});
+      document
+        .getElementById("genre-select")
+        .addEventListener("change", applyFilters);
+      document
+        .getElementById("min-score")
+        .addEventListener("input", debounce(applyFilters, 300));
+      document.getElementById("btn-reset").addEventListener("click", () => {
+        document.getElementById("genre-select").value = "";
+        document.getElementById("year-min").value = "1986";
+        document.getElementById("year-max").value = "2016";
+        document.getElementById("min-score").value = "0";
+        document.getElementById("year-range-label").textContent = "1986 - 2016";
+        applyFilters();
+      });
 
-let resizeTimer;
-window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(() => { if (currentData.length) renderChart(); }, 200);
-});
-</script>
-</body>
+      let resizeTimer;
+      window.addEventListener("resize", () => {
+        clearTimeout(resizeTimer);
+        resizeTimer = setTimeout(() => {
+          if (currentData.length) renderChart();
+        }, 200);
+      });
+    </script>
+  </body>
 </html>
